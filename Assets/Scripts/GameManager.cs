@@ -238,6 +238,8 @@ public class GameManager : MonoBehaviour
 
         PostRaceScoring();
 
+        raceResultsPanel.SetActive(false);
+
      }
 
 
@@ -270,12 +272,16 @@ public class GameManager : MonoBehaviour
 
             {
                 P2WinsCar();
+                MainManager.player1Cash -= MainManager.carPrizes[MainManager.currentCarIndex];
+                cashP1.text = MainManager.player1Cash.ToString();
             }
 
             else if (MainManager.activePlayer == 1)
 
             {
                 P1WinsCar();
+                MainManager.player2Cash -= MainManager.carPrizes[MainManager.currentCarIndex];
+                cashP2.text = MainManager.player2Cash.ToString();
             }
         }
 
