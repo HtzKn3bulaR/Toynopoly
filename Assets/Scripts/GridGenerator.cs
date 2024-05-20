@@ -53,6 +53,8 @@ public class GridGenerator : MonoBehaviour
 
     [SerializeField] GameObject enterPlayerNamesPanel;
 
+    private GameManager gameManagerScript;
+
         
 
     List<string> trackList = new List<string>
@@ -263,12 +265,15 @@ public class GridGenerator : MonoBehaviour
     public void PopulatePlayerPanel()
 
     {
+        gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         MainManager.playerNames[0] = p1NameInputField.text;
         MainManager.playerNames[1] = p2NameInputField.text;
         player1NameField.text = MainManager.playerNames[0];
         player2NameField.text = MainManager.playerNames[1];
         enterPlayerNamesPanel.SetActive(false);
+
+        gameManagerScript.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
     }
 
 

@@ -14,13 +14,42 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] GameObject nextRaceComingUpPanel;
     [SerializeField] GameObject raceInProgressPanel;
+    [SerializeField] GameObject raceResultsPanel;
     [SerializeField] TextMeshProUGUI activePlayerMessage;
     [SerializeField] TextMeshProUGUI nextTrackDisplay;
     [SerializeField] TextMeshProUGUI nextCarDisplay;
+    [SerializeField] TextMeshProUGUI resultPanelActivePlayer;
 
+    [SerializeField] TextMeshProUGUI priceCarA;
+    [SerializeField] TextMeshProUGUI priceCarB;
+    [SerializeField] TextMeshProUGUI priceCarC;
+    [SerializeField] TextMeshProUGUI priceCarD;
+    [SerializeField] TextMeshProUGUI priceCarE;
+    [SerializeField] TextMeshProUGUI priceCarF;
+
+    [SerializeField] TextMeshProUGUI cashP1;
+    [SerializeField] TextMeshProUGUI cashP2;
+
+    [SerializeField] Button invAP1;
+    [SerializeField] Button invAP2;
+    [SerializeField] Button invBP1;
+    [SerializeField] Button invBP2;
+    [SerializeField] Button invCP1;
+    [SerializeField] Button invCP2;
+    [SerializeField] Button invDP1;
+    [SerializeField] Button invDP2;
+    [SerializeField] Button invEP1;
+    [SerializeField] Button invEP2;
+    [SerializeField] Button invFP1;
+    [SerializeField] Button invFP2;
+
+    public TMP_Dropdown winnerDropdown;
+    public TMP_Dropdown defeatDropdown;
+   
+ 
     [SerializeField] GameObject turnIndicatorP1;
     [SerializeField] GameObject turnIndicatorP2;
-    [SerializeField] TextMeshProUGUI statusInfoTextBar;
+    public TextMeshProUGUI statusInfoTextBar;
 
     [SerializeField] TextMeshProUGUI currentRaceInfoTrack;
     [SerializeField] TextMeshProUGUI currentRaceInfoCar;
@@ -53,24 +82,36 @@ public class GameManager : MonoBehaviour
 
         if (fieldNumber <= 9)
 
-        { selectedCar = MainManager.cars[0]; }
+        { selectedCar = MainManager.cars[0];
+            MainManager.currentCarIndex = 0;
+        }
 
         else if (fieldNumber <= 19)
 
-        { selectedCar = MainManager.cars[1]; }
+        { selectedCar = MainManager.cars[1];
+            MainManager.currentCarIndex = 1;
+        }
 
         else if (fieldNumber <= 29)
-        { selectedCar = MainManager.cars[2]; }
+        { selectedCar = MainManager.cars[2];
+                MainManager.currentCarIndex = 2;
+        }
 
         else if (fieldNumber <= 39)
-        { selectedCar = MainManager.cars[3]; }
+        { selectedCar = MainManager.cars[3];
+            MainManager.currentCarIndex = 3;
+        }
 
         else if (fieldNumber <= 49)
-        { selectedCar = MainManager.cars[4]; }
+        { selectedCar = MainManager.cars[4];
+            MainManager.currentCarIndex = 4;
+        }
 
         else
 
-        { selectedCar = MainManager.cars[5]; }
+        { selectedCar = MainManager.cars[5];
+            MainManager.currentCarIndex = 5;
+        }
 
         if (fieldNumber == 0 || fieldNumber == 10 || fieldNumber == 20 || fieldNumber == 30 || fieldNumber == 40 || fieldNumber == 50)
 
@@ -164,5 +205,164 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public void ShowResultsPanel()
 
-}
+    {
+
+        raceInProgressPanel.SetActive(false);
+        raceResultsPanel.SetActive(true);
+        resultPanelActivePlayer.text = MainManager.playerNames[MainManager.activePlayer];
+
+    }
+
+
+    public void RegisterResults()
+
+    {
+        Debug.Log(winnerDropdown.value);
+        if ((winnerDropdown.value)  == 2)
+
+        { MainManager.raceWinner = (winnerDropdown.value);
+            MainManager.activePlayerWins = false;
+        }
+
+        else
+
+        {
+            MainManager.raceWinner = MainManager.activePlayer;
+            MainManager.activePlayerWins = true;
+         }
+
+
+        fields[MainManager.pendingField].gameObject.SetActive(false);
+
+        PostRaceScoring();
+
+     }
+
+
+    public void PostRaceScoring()
+
+    {
+        if (MainManager.activePlayerWins == true)
+
+        {
+            if (MainManager.activePlayer == 0)
+
+            {
+                P1WinsCar();
+
+            }
+
+            else if (MainManager.activePlayer == 1)
+
+            {
+
+                P2WinsCar();
+            }
+
+        }
+
+        if(MainManager.activePlayerWins == false)
+
+        {
+            if (MainManager.activePlayer == 0)
+
+            {
+                P2WinsCar();
+            }
+
+            else if (MainManager.activePlayer == 1)
+
+            {
+                P1WinsCar();
+            }
+        }
+
+    }
+
+    void P1WinsCar()
+
+    {
+        MainManager.p1Inventory[MainManager.currentCarIndex]++;
+
+        switch (MainManager.currentCarIndex)
+
+        {
+            case 0:
+                invAP1.gameObject.SetActive(true);
+                invAP1.GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[MainManager.currentCarIndex].ToString();
+                break;
+
+            case 1:
+                invBP1.gameObject.SetActive(true);
+                invBP1.GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[MainManager.currentCarIndex].ToString();
+                break;
+
+            case 2:
+                invCP1.gameObject.SetActive(true);
+                invCP1.GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[MainManager.currentCarIndex].ToString();
+                break;
+
+            case 3:
+                invDP1.gameObject.SetActive(true);
+                invDP1.GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[MainManager.currentCarIndex].ToString();
+                break;
+
+            case 4:
+                invEP1.gameObject.SetActive(true);
+                invEP1.GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[MainManager.currentCarIndex].ToString();
+                break;
+
+            case 5:
+                invFP1.gameObject.SetActive(true);
+                invFP1.GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[MainManager.currentCarIndex].ToString();
+                break;
+
+        }
+    }
+
+        void P2WinsCar()
+
+        {
+            MainManager.p2Inventory[MainManager.currentCarIndex]++;
+
+            switch (MainManager.currentCarIndex)
+
+            {
+                case 0:
+                    invAP2.gameObject.SetActive(true);
+                    invAP2.GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[MainManager.currentCarIndex].ToString();
+                    break;
+
+                case 1:
+                    invBP2.gameObject.SetActive(true);
+                    invBP2.GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[MainManager.currentCarIndex].ToString();
+                    break;
+
+                case 2:
+                    invCP2.gameObject.SetActive(true);
+                    invCP2.GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[MainManager.currentCarIndex].ToString();
+                    break;
+
+                case 3:
+                    invDP2.gameObject.SetActive(true);
+                    invDP2.GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[MainManager.currentCarIndex].ToString();
+                    break;
+
+                case 4:
+                    invEP2.gameObject.SetActive(true);
+                    invEP2.GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[MainManager.currentCarIndex].ToString();
+                    break;
+
+                case 5:
+                    invFP2.gameObject.SetActive(true);
+                    invFP2.GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[MainManager.currentCarIndex].ToString();
+                    break;
+
+            }
+
+        }
+    }
+
+

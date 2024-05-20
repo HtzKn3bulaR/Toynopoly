@@ -20,10 +20,15 @@ public class MainManager : MonoBehaviour
     public static string[] playerNames = { "Player1", "Player2" };
 
     public static int pendingField = 0;
+    public static int currentCarIndex = 0;
+    
     
     public static int activePlayer = 0;
     public static int roundCounter = 1;
     public static int levelCounter = 1;
+
+    public static int raceWinner = 0;
+    public static bool activePlayerWins = false;
 
     //game Scores
 
@@ -32,6 +37,10 @@ public class MainManager : MonoBehaviour
 
     public static int[] p1Inventory = { 0, 0, 0, 0, 0, 0 };
     public static int[] p2Inventory = { 0, 0, 0, 0, 0, 0 };
+
+    //game Market Data
+
+    public static int[] carPrizes = { 20, 20, 20, 20, 20, 20 };
 
 
     // Start is called before the first frame update
