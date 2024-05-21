@@ -26,8 +26,9 @@ public class MainManager : MonoBehaviour
     public static int activePlayer = 0;
     public static int roundCounter = 1;
     public static int levelCounter = 1;
-
+    
     public static int raceWinner = 0;
+    
     public static bool activePlayerWins = false;
 
     //game Scores
