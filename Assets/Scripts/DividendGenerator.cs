@@ -93,7 +93,7 @@ public class DividendGenerator : MonoBehaviour
         amountToPay = MainManager.carPrizes[actualDividendList[MainManager.roundCounter - 1]];
 
         MainManager.player1Cash += (MainManager.p1Inventory[MainManager.currentCarIndex]) * amountToPay;
-        MainManager.player2Cash += (MainManager.p1Inventory[MainManager.currentCarIndex]) * amountToPay;
+        MainManager.player2Cash += (MainManager.p2Inventory[MainManager.currentCarIndex]) * amountToPay;
         }
 
     public void DividendAccepted()

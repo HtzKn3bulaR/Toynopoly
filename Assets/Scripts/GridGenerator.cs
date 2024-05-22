@@ -267,8 +267,8 @@ public class GridGenerator : MonoBehaviour
     {
         gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-        MainManager.playerNames[0] = p1NameInputField.text;
-        MainManager.playerNames[1] = p2NameInputField.text;
+        MainManager.playerNames[0] = p1NameInputField.text.ToUpper();
+        MainManager.playerNames[1] = p2NameInputField.text.ToUpper();
         player1NameField.text = MainManager.playerNames[0];
         player2NameField.text = MainManager.playerNames[1];
         enterPlayerNamesPanel.SetActive(false);

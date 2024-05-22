@@ -21,7 +21,8 @@ public class MainManager : MonoBehaviour
 
     public static int pendingField = 0;
     public static int currentCarIndex = 0;
-    
+
+    public static int TimeBattleCarIndex = 0;
     
     public static int activePlayer = 0;
     public static int roundCounter = 1;
@@ -42,6 +43,8 @@ public class MainManager : MonoBehaviour
     //game Market Data
 
     public static int[] carPrizes = { 20, 20, 20, 20, 20, 20 };
+
+    public static int timeBattleSeconds = 0;
 
 
     // Start is called before the first frame update
