@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject level2StartPanel;
     [SerializeField] GameObject timeBattlePanel;
     [SerializeField] GameObject buffNerfPanel;
+    [SerializeField] GameObject preSellingInfoPanel;
+    [SerializeField] GameObject sellingDialoguePanel;
 
     [SerializeField] GameObject sliderDefeat;
     [SerializeField] GameObject sliderWin;
@@ -99,8 +101,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] Button startRace;
     [SerializeField] Button buyCarButton;
 
+    [SerializeField] Button SellDoneButton;
+    [SerializeField] Button p1SellButton;
+    [SerializeField] Button p2SellButton;
+
+
     private int[] carValueChangeOptions = { -10, -7, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 7, 10 };
 
+    private List<int> roundsWithCarSellingOption = new List<int> { 2, 4, 6, 8, 10, 12 };
+   
     private TimeBattleButtons timeBattlePanelScript;
     private DividendGenerator dividendScript;
 
@@ -606,7 +615,7 @@ public class GameManager : MonoBehaviour
             {
                 priceUpArrow.SetActive(true);
                 priceDownArrow.SetActive(false);
-                valueChangeMessage.text = "The price of this car has gone up.";
+                valueChangeMessage.text = "The price of this car has gone up";
 
                 SetNewCarPrizes();
             }
@@ -616,7 +625,7 @@ public class GameManager : MonoBehaviour
             {
                 priceUpArrow.SetActive(false);
                 priceDownArrow.SetActive(true);
-                valueChangeMessage.text = "The price of this car has gone down.";
+                valueChangeMessage.text = "The price of this car has gone down";
 
                 SetNewCarPrizes();
             }
@@ -626,7 +635,7 @@ public class GameManager : MonoBehaviour
             {
                 priceUpArrow.SetActive(false);
                 priceDownArrow.SetActive(false);
-                valueChangeMessage.text = "The price of this car remains unchanged.";
+                valueChangeMessage.text = "The price of this car remains unchanged";
 
                 SetNewCarPrizes();
 
@@ -748,7 +757,7 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void UpdateInventoryDisplay()
+    public void UpdateInventoryDisplay()
 
     {
         for (int i = 0; i < p1InventoryDisplay.Length; i++)
@@ -854,7 +863,17 @@ public class GameManager : MonoBehaviour
         UpdateCarPrizesDisplay();
         timeBattlePanel.SetActive(false);
         buffNerfPanel.SetActive(false);
-        RoundChangeover();
+
+        if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
+
+        {
+            preSellingInfoPanel.SetActive(true);
+        }
+
+        else
+
+            RoundChangeover();
+
     }
 
     public void NerfCarAndContinue()
@@ -863,12 +882,40 @@ public class GameManager : MonoBehaviour
         UpdateCarPrizesDisplay();
         timeBattlePanel.SetActive(false);
         buffNerfPanel.SetActive(false);
-        RoundChangeover();
+        
+        if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
+
+        {
+            preSellingInfoPanel.SetActive(true);
+        }
+
+        else
+
+            RoundChangeover();
     }
+
+
+    public void StartSellingRound()
+
+    {
+        preSellingInfoPanel.SetActive(false);
+        p1SellButton.gameObject.SetActive(true);
+        p2SellButton.gameObject.SetActive(true);
+        SellDoneButton.gameObject.SetActive(true);
+
+    }
+
+    
+
+
 
     public void RoundChangeover()
 
     {
+        p1SellButton.gameObject.SetActive(false);
+        p2SellButton.gameObject.SetActive(false);
+        SellDoneButton.gameObject.SetActive(false);
+
 
         postRaceMarketPanel.SetActive(false);
 
@@ -900,6 +947,8 @@ public class GameManager : MonoBehaviour
         { dividendScript.DividendCheck(); }
 
         LevelCheck();
+
+
     
 
 }

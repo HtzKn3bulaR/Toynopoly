@@ -29,6 +29,7 @@ public class MainManager : MonoBehaviour
     public static int levelCounter = 1;
     
     public static int raceWinner = 0;
+    public static int seller = 0;
     
     public static bool activePlayerWins = false;
 
