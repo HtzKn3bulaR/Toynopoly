@@ -16,6 +16,9 @@ public class GridGenerator : MonoBehaviour
     public Button carPicE;
     public Button carPicF;
 
+    public AudioClip carPopulateSound;
+    public AudioSource gameSounds;
+
     [SerializeField] TextMeshProUGUI track1;
     [SerializeField] TextMeshProUGUI track2;
     [SerializeField] TextMeshProUGUI track3;
@@ -55,7 +58,7 @@ public class GridGenerator : MonoBehaviour
 
     private GameManager gameManagerScript;
 
-        
+    private int carCardsPopulated = 0;
 
     List<string> trackList = new List<string>
 
@@ -85,6 +88,7 @@ public class GridGenerator : MonoBehaviour
 
 
     List<string> activeList;
+    List<Sprite> activeSpriteList;
 
     List<string> rookieNamesList = new List<string>
 
@@ -97,6 +101,76 @@ public class GridGenerator : MonoBehaviour
     public List<Sprite> rookieSpriteList = new List<Sprite>
 
     { };
+
+    List<string> amateurNamesList = new List<string>
+
+    {
+        "AMCO TC","Bad Bison","Badd RC","Baja Dash","Breadfast","Bumblebee","Candy Pebbles","Dr. Grudge","Eatium","Emilia","Evil Weasel","Exceed","Flatter 4V","Frograph","Groovster","Harmor","Honeybee",
+        "Hotknife","Ignit-9","Koin Karp","Kyarus","LA 54","LMW","Locker","Madness","Manfred","Moby Trick","Mongoose","Mouse","Muller GT","Nevermore","Nitro Crusher","NY 54","Off Gear","Phantum","Power Cap",
+        "Queen Bee","RC Bandit","Reddlum","Red Kermit","Reliance","Road King","Rotor","RV Loco","Silvarooky","Smokie","Sprinter XL","Star Carbs","Strax","Tempest","Toy-Volt Towing","Triton","Ultima","Ultra Gamma",
+        "Vixen","Wild Ride"
+
+    };
+
+    public List<Sprite> amateurSpriteList = new List<Sprite>
+
+    { };
+
+    List<string> advancedNamesList = new List<string>
+
+    {
+        "75C","Aerozad","Akagi Attacker","Alice","APC L-13","Aquamarina","Aquasonic","Bajaette","Bendor","Bertha Ballistics","BossVolt","Breaker","Camelia","Cerveth","Donnie TC","Drawall","DRJ-61","Duck Sky",
+        "Ember","Emperor","Flower Power","Frostbite","Frosted Delight","Fulon X","Grimlock","Hammerhead","Hyper XL","Junker","Le Pastel","Lithmus","Llag Sat","Marauder","Matra XL","Micro Tache","Panga TC","Panther",
+        "Pest Control","Phenom","Pole Poz","Prizmer","R6 Turbo","Raudy","RC 1999","RC San","Recon MK1","Rice Ball","Road Rage","Romeo","Sarge","Shocker","Spearhead","Springtrap","ST 1","Sturm","Sunnyboy","Swizz Cheezer",
+        "Thunder","Twyster","Unicorn","Urban Jungle","Vibe Box","Wave Dancer","Weaver","Whiplash","YNZ"
+    };
+
+    public List<Sprite> advancedSpriteList = new List<Sprite>
+
+    { };
+
+    List<string> semiProNamesList = new List<string>
+
+    {
+        "5TP","Acclaim GT","Adeon","Aeromaster","AMW","Ancile","Arnoux","Artifact","BHV 1","Big Load","Big Match Jim","Blazar","Blaze V8","Bushido RS","CHC 305","Chubba","Cobra Max","Cossie","Danger","Dragoon",
+        "Dual Signal","Ducktail","Fat Agnus","Gravel Basher","Heritage","Hydrox","Iron-Z","Jackal","Jet Astro","JG-7","Jungle Beast","Karlington","KC-3","Locust","LV 54","Mambra","Maxam RS","Max Attack","Middle5",
+        "Nitromare","Norwood","Ontogen","Oval Ace","Pemto","Predator","Quazar","RC-Erra","RC Vector","RG1","Riptor","Rothams Racing","Runner 2000","Rustique","Sasquatch","Serrate","Sizzler","Sokudo","Speed Balancer","Styn",
+        "Swede","Touga", "Tri-Enter","Tribute","Trundle Buster","Victoria","Voltz XL","Winger","Yuurei V8","Zipper"
+     };
+
+    public List<Sprite> semiProSpriteList = new List<Sprite>
+
+    { };
+
+    List<string> proNamesList = new List<string>
+
+    {
+        "After Image","Artair","Ayrton SP","BajaVolt","BanKing","Black Widow","Cerberus","Cherencov","Chimera TC","Cintach","Cougar","Drome Champ","Duflame","Eaglet","Electric Sheep","EXE TC","G3X","Gust","Humma"
+        ,"Hydro Flame","Indy B","Jet Spike","Karen","Keyakizaka","Maverick","Mean Streak","Mid-Musc","N-Sharp","Outlaw","Panga","Patriot","Power Loader","Prime Target","Probe-24","Proto Combo","Puma","Purp XL",
+        "Quinx","RC Bulldog","RC Winglet","Redhead","Ridgeback","RVRC 20","RVXXL 5","Ryu","S13 Alltune","Sandstorm","Shark Bite","Shinobi","Sin","Sir Gleam","SNW 35","Spectrum","SR-8000","Star Oil","Steezy",
+        "Sucker Punch","Sunrise","The Knight","Tier 15","Toro GT84","Toyeca","TT Raider","Ultra Drive","Velter Ultron","Visconti R","Vitesse","Warrion","Wattage","Wildstar"
+
+    };
+
+    public List<Sprite> proSpriteList = new List<Sprite>
+
+    { };
+
+    List<string> superProNamesList = new List<string>
+
+    {
+        "Anaconda GT","Armand","AU-8","Calcure","Cambold R","Commandine","Daemmon","Dragheat","Elyta","Endo","Exclaim GT Mk.2","FD-400","FLIR","Golden Eye","Gungnir","Hanabira","Hemera","Hetgarde GT1","Horizenna",
+        "Identity X","King Kaiju","King Moloko","Komet","La Rossa","Madax GT","Maxxas XLR8","Megalodon XL","Mudman","Nakajima","Napalm","Nyx","Orbitron","Orion","P4 Super","Prototype FX77","Quicksilver","Raven",
+        "Reiser","Revel","Rinne","RVRC","Saeger","Selsia Turbo","Sentaro XL","Sideswipe","Skarlet","Skull Crusher","Slingshot","Spectron","Starmac","Sterling F77","Stinger","Sylea","Tesseract","Ultra-RV","U.V.G.S.",
+        "Voltrex","Wind Slicer","Wyvern","XM250","Yinisa"
+    };
+
+    public List<Sprite> superProSpriteList = new List<Sprite>
+
+    { };
+
+
+
 
     List<T> GetUniqueRandomElements<T>(List<T> inputList, int count)
 
@@ -112,6 +186,8 @@ public class GridGenerator : MonoBehaviour
         CarSelect();
 
         TrackSelect();
+
+        gameSounds = GetComponent<AudioSource>();
     }
 
    
@@ -138,26 +214,32 @@ public class GridGenerator : MonoBehaviour
             {
                 case 0:
                     activeList = rookieNamesList;
+                    activeSpriteList = rookieSpriteList;
                     break;
 
                 case 1:
-                    //activeList = amateurList;
+                    activeList = amateurNamesList;
+                    activeSpriteList = amateurSpriteList;
                     break;
 
                 case 2:
-                    //activeList = advancedList;
+                    activeList = advancedNamesList;
+                    activeSpriteList = advancedSpriteList;
                     break;
 
                 case 3:
-                    //activeList = semiProList;
+                    activeList = semiProNamesList;
+                activeSpriteList = semiProSpriteList;
                     break;
 
                 case 4:
-                    //activeList = proList;
+                    activeList = proNamesList;
+                activeSpriteList = proSpriteList;
                     break;
 
                 case 5:
-                    //activeList = superProList;
+                    activeList = superProNamesList;
+                activeSpriteList = superProSpriteList;
                     break;
 
             }
@@ -176,9 +258,11 @@ public class GridGenerator : MonoBehaviour
 
         Debug.Log("First Car" + MainManager.cars[0]);
         
-        PopulateCarCards();
+        PopulateCarCardA();
             
     }
+
+    //populate without delay:
 
     void PopulateCarCards()
 
@@ -195,30 +279,147 @@ public class GridGenerator : MonoBehaviour
         {
             if (activeList[i] == MainManager.cars[0])
 
-            { carPicA.image.sprite = rookieSpriteList[i]; }
+            { carPicA.image.sprite = activeSpriteList[i]; }
 
             else if (activeList[i] == MainManager.cars[1])
 
-            { carPicB.image.sprite = rookieSpriteList[i]; }
+            { carPicB.image.sprite = activeSpriteList[i]; }
 
             else if (activeList[i] == MainManager.cars[2])
 
-            { carPicC.image.sprite = rookieSpriteList[i]; }
+            { carPicC.image.sprite = activeSpriteList[i]; }
 
             else if (activeList[i] == MainManager.cars[3])
 
-            { carPicD.image.sprite = rookieSpriteList[i]; }
+            { carPicD.image.sprite = activeSpriteList[i]; }
 
             else if (activeList[i] == MainManager.cars[4])
 
-            { carPicE.image.sprite = rookieSpriteList[i]; }
+            { carPicE.image.sprite = activeSpriteList[i]; }
 
             else if (activeList[i] == MainManager.cars[5])
 
-            { carPicF.image.sprite = rookieSpriteList[i]; }
+            { carPicF.image.sprite = activeSpriteList[i]; }
 
         }
     }
+
+    void PopulateCarCardA()
+    {
+        carAText.text = MainManager.cars[0];
+        gameSounds.PlayOneShot(carPopulateSound);
+
+        for (int i = 0; i < activeList.Count; i++)
+
+        {
+            if (activeList[i] == MainManager.cars[0])
+
+            { carPicA.image.sprite = activeSpriteList[i]; }
+
+        }
+
+        carCardsPopulated++;
+        StartCoroutine(TablePopulateDelayRoutine());
+    }
+
+    void PopulateCarCardB()
+
+    {
+        carBText.text = MainManager.cars[1];
+        gameSounds.PlayOneShot(carPopulateSound);
+
+        for (int i = 0; i < activeList.Count; i++)
+
+        {
+            if (activeList[i] == MainManager.cars[1])
+
+            { carPicB.image.sprite = activeSpriteList[i]; }
+
+        }
+
+        carCardsPopulated++;
+        StartCoroutine(TablePopulateDelayRoutine());
+    }
+
+    void PopulateCarCardC()
+    {
+        carCText.text = MainManager.cars[2];
+        gameSounds.PlayOneShot(carPopulateSound);
+
+        for (int i = 0; i < activeList.Count; i++)
+
+        {
+            if (activeList[i] == MainManager.cars[2])
+
+            { carPicC.image.sprite = activeSpriteList[i]; }
+
+        }
+
+        carCardsPopulated++;
+        StartCoroutine(TablePopulateDelayRoutine());
+    }
+
+    void PopulateCarCardD()
+    {
+        carDText.text = MainManager.cars[3];
+        gameSounds.PlayOneShot(carPopulateSound);
+
+        for (int i = 0; i < activeList.Count; i++)
+
+        {
+            if (activeList[i] == MainManager.cars[3])
+
+            { carPicD.image.sprite = activeSpriteList[i]; }
+
+        }
+
+        carCardsPopulated++;
+        StartCoroutine(TablePopulateDelayRoutine());
+
+    }
+
+    void PopulateCarCardE()
+
+    {
+        carEText.text = MainManager.cars[4];
+        gameSounds.PlayOneShot(carPopulateSound);
+
+        for (int i = 0; i < activeList.Count; i++)
+
+        {
+            if (activeList[i] == MainManager.cars[4])
+
+            { carPicE.image.sprite = activeSpriteList[i]; }
+
+        }
+
+        carCardsPopulated++;
+        StartCoroutine(TablePopulateDelayRoutine());
+
+    }
+
+    void PopulateCarCardF()
+
+    {
+        carFText.text = MainManager.cars[5];
+        gameSounds.PlayOneShot(carPopulateSound);
+
+        for (int i = 0; i < activeList.Count; i++)
+
+        {
+            if (activeList[i] == MainManager.cars[5])
+
+            { carPicF.image.sprite = activeSpriteList[i]; }
+
+        }
+
+        enterPlayerNamesPanel.SetActive(true);
+
+    }
+
+
+
+
 
     void TrackSelect()
 
@@ -257,9 +458,7 @@ public class GridGenerator : MonoBehaviour
 
         bonusTrack.text = MainManager.bonusTrack;
 
-        enterPlayerNamesPanel.SetActive(true);
-
-
+        
     }
 
     public void PopulatePlayerPanel()
@@ -285,4 +484,31 @@ public class GridGenerator : MonoBehaviour
     {
         
     }
+
+    IEnumerator TablePopulateDelayRoutine()
+
+    {
+        yield return new WaitForSeconds(1.5f);
+
+        switch (carCardsPopulated)
+
+        {
+            case 1:
+                PopulateCarCardB();
+                break;
+            case 2:
+                PopulateCarCardC();
+                break;
+            case 3:
+                PopulateCarCardD();
+                break;
+            case 4:
+                PopulateCarCardE();
+                break;
+            default:
+                PopulateCarCardF();
+                break;
+        }
+    }
+
 }

@@ -47,6 +47,8 @@ public class MainManager : MonoBehaviour
 
     public static int timeBattleSeconds = 0;
 
+    public static bool gameOver = false;
+
 
     // Start is called before the first frame update
     private void Awake()

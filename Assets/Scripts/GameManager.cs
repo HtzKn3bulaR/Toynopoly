@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     private string selectedCar;
 
     private bool l2SelectionIsOkay = true;
+    private bool l3SelectionIsOkay = true;
     private bool buyingPossible = true;
     private bool playerHasBoughtCarThisRound = false;
 
@@ -286,9 +287,67 @@ public class GameManager : MonoBehaviour
 
         { activePlayerMessage.text = ($"{ MainManager.playerNames[MainManager.activePlayer]} has made their selection:"); }
 
+
+        if (MainManager.levelCounter == 3)
+
+        {
+            startRaceButton.SetActive(true);
+            buyCarButton.gameObject.SetActive(false);
+
+            PerformLevel3Check();
+
+            if (l3SelectionIsOkay == false)
+
+            {
+                activePlayerMessage.text = ("You don't own this car.");
+                startRaceButton.SetActive(false);
+            }
+
+            else
+
+            {
+                activePlayerMessage.text = ($"{ MainManager.playerNames[MainManager.activePlayer]} has made their selection:");
+            }
+
+
+
+        }
+
         nextTrackDisplay.text = selectedTrack;
         nextCarDisplay.text = selectedCar;
-            }
+            
+
+
+        }
+
+    void PerformLevel3Check()
+    {
+
+        switch (MainManager.activePlayer)
+        {
+            case 0:
+                if (MainManager.p1Inventory[MainManager.currentCarIndex] == 0)
+                {
+                    l3SelectionIsOkay = false;
+                }
+
+                else l3SelectionIsOkay = true;
+
+                break;
+
+            case 1:
+                if (MainManager.p2Inventory[MainManager.currentCarIndex] == 0)
+                {
+                    l3SelectionIsOkay = false;
+                }
+
+                else l3SelectionIsOkay = true;
+
+                 break;
+
+        }
+
+    }
 
     void PerformLevel2Check()
 
@@ -409,6 +468,15 @@ public class GameManager : MonoBehaviour
 
         }
 
+        else
+
+        {
+            sliderDefeat.SetActive(false);
+            sliderWin.SetActive(false);
+        }
+
+        
+
     }
 
 
@@ -459,6 +527,13 @@ public class GameManager : MonoBehaviour
 
         {
             Level2Scoring();
+
+        }
+
+        else
+
+        {
+            Level3Scoring();
 
         }
 
@@ -860,6 +935,11 @@ public class GameManager : MonoBehaviour
 
     {
         MainManager.carPrizes[MainManager.TimeBattleCarIndex] += MainManager.timeBattleSeconds;
+        if (MainManager.carPrizes[MainManager.TimeBattleCarIndex] < 0)
+
+        {
+            MainManager.carPrizes[MainManager.TimeBattleCarIndex] = 0;
+        }
         UpdateCarPrizesDisplay();
         timeBattlePanel.SetActive(false);
         buffNerfPanel.SetActive(false);
@@ -879,6 +959,11 @@ public class GameManager : MonoBehaviour
     public void NerfCarAndContinue()
     {
         MainManager.carPrizes[MainManager.TimeBattleCarIndex] -= MainManager.timeBattleSeconds;
+        if (MainManager.carPrizes[MainManager.TimeBattleCarIndex] < 0)
+
+        {
+            MainManager.carPrizes[MainManager.TimeBattleCarIndex] = 0;
+        }
         UpdateCarPrizesDisplay();
         timeBattlePanel.SetActive(false);
         buffNerfPanel.SetActive(false);
@@ -921,6 +1006,7 @@ public class GameManager : MonoBehaviour
 
         MainManager.roundCounter++;
         l2SelectionIsOkay = true;
+        l3SelectionIsOkay = true;
         buyingPossible = true;
         playerHasBoughtCarThisRound = false;
 
@@ -941,15 +1027,27 @@ public class GameManager : MonoBehaviour
 
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
-
         if (MainManager.levelCounter == 2)
+        {
+            if (MainManager.roundCounter < 13)
 
-        { dividendScript.DividendCheck(); }
+            {
+                dividendScript.DividendCheck();
+            }
+        }
+
+        if (MainManager.levelCounter == 3)
+
+        {
+            InventoryCheck();
+        }
 
         LevelCheck();
 
+        BankruptCheck();
 
-    
+       
+                 
 
 }
 
@@ -973,6 +1071,19 @@ public class GameManager : MonoBehaviour
 
                 
             }
+
+            else if (MainManager.levelCounter == 2)
+
+            {
+                if (MainManager.roundCounter == 13)
+
+                {
+                    MainManager.levelCounter = 3;
+                    MainManager.roundCounter = 1;
+                    StartLevel3();
+                }
+
+            }
         }
 
     }
@@ -992,6 +1103,147 @@ public class GameManager : MonoBehaviour
         cashP2.text = MainManager.player2Cash.ToString();
     }
 
-}
+
+    public void StartLevel3()
+
+    {
+        statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+
+        for (int i = 0; i < MainManager.cars.Length; i++)
+
+        {
+            if (MainManager.p1Inventory[i] > 0 && MainManager.p2Inventory[i] > 0)
+
+            {
+                MainManager.p1Inventory[i] = 0;
+                MainManager.p2Inventory[i] = 0;
+                UpdateInventoryDisplay();
+            }
+
+        }
+
+    }
+
+
+    void Level3Scoring()
+
+    {
+        if (MainManager.activePlayerWins == true)
+
+        {
+            if (MainManager.activePlayer == 0)
+
+            {
+                MainManager.player1Cash += MainManager.carPrizes[MainManager.currentCarIndex];
+                MainManager.player2Cash -= MainManager.carPrizes[MainManager.currentCarIndex];
+
+                cashP1.text = MainManager.player1Cash.ToString();
+                cashP2.text = MainManager.player2Cash.ToString();
+
+                RoundChangeover();
+
+            }
+
+            else if (MainManager.activePlayer == 1)
+
+            {
+                MainManager.player2Cash += MainManager.carPrizes[MainManager.currentCarIndex];
+                MainManager.player1Cash -= MainManager.carPrizes[MainManager.currentCarIndex];
+
+                cashP1.text = MainManager.player1Cash.ToString();
+                cashP2.text = MainManager.player2Cash.ToString();
+
+                RoundChangeover();
+            }
+
+        }
+
+
+        if (MainManager.activePlayerWins == false)
+
+        {
+            if (MainManager.activePlayer == 0)
+
+            {
+                {
+                   MainManager.p1Inventory[MainManager.currentCarIndex]--;
+                   UpdateInventoryDisplay();
+
+                    RoundChangeover();
+                }
+            }
+
+            else if (MainManager.activePlayer == 1)
+
+            {
+                
+                {
+                    MainManager.p2Inventory[MainManager.currentCarIndex]--;
+                    UpdateInventoryDisplay();
+
+                    RoundChangeover();
+                }
+            }
+        }
+
+    }
+
+    void BankruptCheck()
+
+    {
+        if (MainManager.player1Cash < 1 || MainManager.player2Cash < 1)
+
+        {
+            MainManager.gameOver = true;
+            EndGame();
+
+        }
+
+
+    }
+
+    void InventoryCheck()
+
+    {
+        int sumInventoryp1 = 0;
+        int sumInventoryp2 = 0;
+
+        for (int i = 0; i < MainManager.cars.Length; i++)
+            {
+                sumInventoryp1 += MainManager.p1Inventory[i];
+                sumInventoryp2 += MainManager.p2Inventory[i];
+            }
+
+        if (sumInventoryp1 + sumInventoryp2 == 0)
+            {
+                EndGame();
+            }
+        
+        else if (sumInventoryp1 == 0 && MainManager.activePlayer == 0)
+            {
+            RoundChangeover();
+
+        }
+
+        else if (sumInventoryp2 == 0 && MainManager.activePlayer == 1)
+        {
+            RoundChangeover();
+        }
+        
+
+
+    }
+
+    void EndGame()
+
+    {
+        MainManager.gameOver = true;
+        Debug.Log("Game Over");
+
+    }
+       
+
+
+    }
 
 

@@ -25,6 +25,10 @@ public class SellingHandler : MonoBehaviour
     [SerializeField] GameObject p2SellButton;
     [SerializeField] GameObject sellerDisplay;
 
+
+    private int P1carsSoldFinalRound = 0;
+    private int P2carsSoldFinalRound = 0;
+
     private GameManager gameManagerScript;
 
     // Start is called before the first frame update
@@ -109,7 +113,24 @@ public class SellingHandler : MonoBehaviour
                 gameManagerScript.UpdateInventoryDisplay();
                 cashP1.text = MainManager.player1Cash.ToString();
                 sellCarDialoguePanel.SetActive(false);
-                p1SellButton.SetActive(false);
+
+                if (MainManager.roundCounter == 12)
+
+                {
+                    P1carsSoldFinalRound++;
+
+                    if (P1carsSoldFinalRound >= 3)
+
+                    {
+                        p1SellButton.SetActive(false);
+                    }
+
+                }
+
+                else
+
+                { p1SellButton.SetActive(false); }
+
                 break;
 
             case 1:
@@ -118,7 +139,23 @@ public class SellingHandler : MonoBehaviour
                 gameManagerScript.UpdateInventoryDisplay();
                 cashP2.text = MainManager.player2Cash.ToString();
                 sellCarDialoguePanel.SetActive(false);
-                p2SellButton.SetActive(false);
+               
+                if (MainManager.roundCounter == 12)
+
+                {
+                    P2carsSoldFinalRound++;
+
+                    if (P2carsSoldFinalRound >= 3)
+
+                    {
+                        p2SellButton.SetActive(false);
+                    }
+
+                }
+
+                else
+
+                { p2SellButton.SetActive(false); }
                 break;
 
         }
