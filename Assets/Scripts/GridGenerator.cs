@@ -17,7 +17,9 @@ public class GridGenerator : MonoBehaviour
     public Button carPicF;
 
     public AudioClip carPopulateSound;
+    public AudioClip stageReady;
     public AudioSource gameSounds;
+
 
     [SerializeField] TextMeshProUGUI track1;
     [SerializeField] TextMeshProUGUI track2;
@@ -57,6 +59,8 @@ public class GridGenerator : MonoBehaviour
     [SerializeField] GameObject enterPlayerNamesPanel;
 
     private GameManager gameManagerScript;
+
+    
 
     private int carCardsPopulated = 0;
 
@@ -414,6 +418,7 @@ public class GridGenerator : MonoBehaviour
         }
 
         enterPlayerNamesPanel.SetActive(true);
+        gameSounds.PlayOneShot(stageReady);
 
     }
 

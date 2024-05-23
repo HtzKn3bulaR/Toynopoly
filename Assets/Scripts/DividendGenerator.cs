@@ -19,6 +19,10 @@ public class DividendGenerator : MonoBehaviour
     [SerializeField] TextMeshProUGUI dividendCarNamePanel;
     [SerializeField] TextMeshProUGUI dividendCarPrizePanel;
 
+    public AudioSource divGenAudio;
+    public AudioClip dividend;
+
+
 
     List<T> GetUniqueRandomElements<T>(List<T> inputList, int count)
 
@@ -85,6 +89,7 @@ public class DividendGenerator : MonoBehaviour
         int amountToPay;
 
         dividendPayPanel.gameObject.SetActive(true);
+        divGenAudio.PlayOneShot(dividend);
 
         dividendCarNamePanel.text = MainManager.cars[actualDividendList[MainManager.roundCounter - 1]];
         dividendCarPrizePanel.text = MainManager.carPrizes[actualDividendList[MainManager.roundCounter - 1]].ToString();
