@@ -60,45 +60,12 @@ public class SellingHandler : MonoBehaviour
             SellPanelNameDisplay[i].text = MainManager.cars[i];
             SellPanelPrizeDisplay[i].text = MainManager.carPrizes[i].ToString();
            
-        }
+           SellPanelInventoryDisplay[i].text = MainManager.playerInventory[MainManager.seller,i].ToString();
 
-        switch (MainManager.seller)
-
-        {
-            case 0:
-                for (int i = 0; i < MainManager.p1Inventory.Length; i++)
-
-                {
-                    SellPanelInventoryDisplay[i].text = MainManager.p1Inventory[i].ToString();
-
-                    //if (MainManager.p1Inventory[i] < 1)
-                    //{
-                    //    nameButtons[i].gameObject.SetActive(false);
-                    //    prizeButtons[i].gameObject.SetActive(false);
-                    //    inventoryButtons[i].gameObject.SetActive(false);
-                    //}
-                }
-
-                 
-
-
-                break;
-
-            case 1:
-                for (int i = 0; i < MainManager.p2Inventory.Length; i++)
-                {
-                    SellPanelInventoryDisplay[i].text = MainManager.p2Inventory[i].ToString();
-
-                    //if (MainManager.p2Inventory[i] < 1)
-                    //{
-                    //    nameButtons[i].gameObject.SetActive(false);
-                    //    prizeButtons[i].gameObject.SetActive(false);
-                    //    inventoryButtons[i].gameObject.SetActive(false);
-                    //}
-                }
-                break;
-         }
-        
+                   
+          }
+                     
+                          
     }
 
 
@@ -108,10 +75,10 @@ public class SellingHandler : MonoBehaviour
         switch (MainManager.seller)
         {
             case 0:
-                MainManager.p1Inventory[car]--;
-                MainManager.player1Cash += MainManager.carPrizes[car];
+                MainManager.playerInventory[0,car]--;
+                MainManager.playerCash[0] += MainManager.carPrizes[car];
                 gameManagerScript.UpdateInventoryDisplay();
-                cashP1.text = MainManager.player1Cash.ToString();
+                gameManagerScript.cashDisplay[0].text = MainManager.playerCash[0].ToString();
                 sellCarDialoguePanel.SetActive(false);
 
                 if (MainManager.roundCounter == 12)
@@ -134,10 +101,10 @@ public class SellingHandler : MonoBehaviour
                 break;
 
             case 1:
-                MainManager.p2Inventory[car]--;
-                MainManager.player2Cash += MainManager.carPrizes[car];
+                MainManager.playerInventory[1,car]--;
+                MainManager.playerCash[1] += MainManager.carPrizes[car];
                 gameManagerScript.UpdateInventoryDisplay();
-                cashP2.text = MainManager.player2Cash.ToString();
+                gameManagerScript.cashDisplay[1].text = MainManager.playerCash[1].ToString();
                 sellCarDialoguePanel.SetActive(false);
                
                 if (MainManager.roundCounter == 12)

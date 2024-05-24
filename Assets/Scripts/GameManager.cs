@@ -15,8 +15,8 @@ public class GameManager : MonoBehaviour
     public AudioClip transition;
     public AudioSource audioSource;
 
+    public GameObject[] rows;
 
-    
     public Button[] fields;
 
     public Button[] p1InventoryDisplay;
@@ -46,6 +46,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject level3StartPanel;
     [SerializeField] GameObject gameOverPanel;
     [SerializeField] GameObject carInDefaultPanel;
+    [SerializeField] GameObject buyOptionPanel;
 
     [SerializeField] GameObject sliderDefeat;
     [SerializeField] GameObject sliderWin;
@@ -58,11 +59,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI nextCarDisplay;
     [SerializeField] TextMeshProUGUI resultPanelActivePlayer;
     [SerializeField] TextMeshProUGUI valueChangeMessage;
+    [SerializeField] TextMeshProUGUI defaultPanelTextMessage;
 
     [SerializeField] TextMeshProUGUI timeBattleWinnerDisplay;
     [SerializeField] TextMeshProUGUI timeBattleSecondsDisplay;
 
-    
+
 
     [SerializeField] TextMeshProUGUI priceCarA;
     [SerializeField] TextMeshProUGUI priceCarB;
@@ -78,22 +80,18 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI cashP1;
     [SerializeField] TextMeshProUGUI cashP2;
+    public TextMeshProUGUI[] cashDisplay;
 
     [SerializeField] TextMeshProUGUI gapDefeatSecondsDisplay;
     [SerializeField] TextMeshProUGUI gapWinSecondsDisplay;
 
-    [SerializeField] Button invAP1;
-    [SerializeField] Button invAP2;
-    [SerializeField] Button invBP1;
-    [SerializeField] Button invBP2;
-    [SerializeField] Button invCP1;
-    [SerializeField] Button invCP2;
-    [SerializeField] Button invDP1;
-    [SerializeField] Button invDP2;
-    [SerializeField] Button invEP1;
-    [SerializeField] Button invEP2;
-    [SerializeField] Button invFP1;
-    [SerializeField] Button invFP2;
+        
+    //New
+    [SerializeField] Button[] invDisplayP1;
+    [SerializeField] Button[] invDisplayP2;
+    [SerializeField] Button[] invDisplayP3;
+
+    //
 
     [SerializeField] GameObject startRaceButton;
 
@@ -110,8 +108,7 @@ public class GameManager : MonoBehaviour
     public TMP_Dropdown defeatDropdown;
 
 
-    [SerializeField] GameObject turnIndicatorP1;
-    [SerializeField] GameObject turnIndicatorP2;
+    [SerializeField] GameObject[] turnIndicator;
     public TextMeshProUGUI statusInfoTextBar;
 
     [SerializeField] TextMeshProUGUI currentRaceInfoTrack;
@@ -140,15 +137,17 @@ public class GameManager : MonoBehaviour
     public int lastChangebeforeDefault = 0;
 
     private List<int> roundsWithCarSellingOption = new List<int> { 2, 4, 6, 8, 10, 12 };
-   
+
     private TimeBattleButtons timeBattlePanelScript;
     private DividendGenerator dividendScript;
+    private ToynopolyCalculator toynopolyCalculatorScript;
 
     // Start is called before the first frame update
     void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         dividendScript = GameObject.Find("DividendGenerator").GetComponent<DividendGenerator>();
+        toynopolyCalculatorScript = GameObject.Find("ToynopolyCalculator").GetComponent<ToynopolyCalculator>();
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
     }
 
@@ -253,7 +252,7 @@ public class GameManager : MonoBehaviour
     void ShowNextRacePanel()
 
     {
-        
+
 
         if (MainManager.levelCounter == 2)
 
@@ -307,8 +306,8 @@ public class GameManager : MonoBehaviour
                 activePlayerMessage.text = ($"{ MainManager.playerNames[MainManager.activePlayer]} has made their selection:");
                 buyCarButton.gameObject.SetActive(false);
             }
-            
-            
+
+
             else
 
             {
@@ -322,7 +321,7 @@ public class GameManager : MonoBehaviour
 
         nextRaceComingUpPanel.SetActive(true);
         audioSource.PlayOneShot(panelOpen);
-        
+
 
         if (MainManager.levelCounter == 1)
 
@@ -356,37 +355,27 @@ public class GameManager : MonoBehaviour
 
         nextTrackDisplay.text = selectedTrack;
         nextCarDisplay.text = selectedCar;
-            
 
 
-        }
+
+    }
 
     void PerformLevel3Check()
     {
 
-        switch (MainManager.activePlayer)
+        if (MainManager.playerInventory[MainManager.activePlayer, MainManager.currentCarIndex] < 1)
+
         {
-            case 0:
-                if (MainManager.p1Inventory[MainManager.currentCarIndex] == 0)
-                {
-                    l3SelectionIsOkay = false;
-                }
-
-                else l3SelectionIsOkay = true;
-
-                break;
-
-            case 1:
-                if (MainManager.p2Inventory[MainManager.currentCarIndex] == 0)
-                {
-                    l3SelectionIsOkay = false;
-                }
-
-                else l3SelectionIsOkay = true;
-
-                 break;
-
+            l3SelectionIsOkay = false;
         }
+
+        else
+
+        {
+            l3SelectionIsOkay = true;
+        }
+
+
 
     }
 
@@ -396,40 +385,40 @@ public class GameManager : MonoBehaviour
         switch (MainManager.activePlayer)
         {
             case 0:
-                if (MainManager.p1Inventory[MainManager.currentCarIndex] == 0)
+                if (MainManager.playerInventory[0, MainManager.currentCarIndex] == 0)
                 {
                     l2SelectionIsOkay = false;
 
                 }
 
-                if (MainManager.p2Inventory[MainManager.currentCarIndex] > 0)
+                if (MainManager.playerInventory[1, MainManager.currentCarIndex] > 0)
 
-                 {
-                     buyingPossible = false;
-                 }
+                {
+                    buyingPossible = false;
+                }
 
-                else if (MainManager.p1Inventory[MainManager.currentCarIndex] > 0)
+                else if (MainManager.playerInventory[0, MainManager.currentCarIndex] > 0)
 
                 {
                     activePlayerhasToynopoly = true;
                 }
-                                
+
                 break;
 
             case 1:
-                if (MainManager.p2Inventory[MainManager.currentCarIndex] == 0)
+                if (MainManager.playerInventory[1, MainManager.currentCarIndex] == 0)
                 {
                     l2SelectionIsOkay = false;
 
                 }
 
-                if (MainManager.p1Inventory[MainManager.currentCarIndex] > 0)
+                if (MainManager.playerInventory[0, MainManager.currentCarIndex] > 0)
 
-                    {
-                        buyingPossible = false;
-                    }
+                {
+                    buyingPossible = false;
+                }
 
-                else if (MainManager.p2Inventory[MainManager.currentCarIndex] > 0)
+                else if (MainManager.playerInventory[1, MainManager.currentCarIndex] > 0)
 
                 {
                     activePlayerhasToynopoly = true;
@@ -458,17 +447,30 @@ public class GameManager : MonoBehaviour
         {
             case 0:
 
-                MainManager.player1Cash -= MainManager.carPrizes[MainManager.currentCarIndex];
-                cashP1.text = MainManager.player1Cash.ToString();
-                P1WinsCar();
+                MainManager.playerCash[0] -= MainManager.carPrizes[MainManager.currentCarIndex];
+                cashDisplay[0].text = MainManager.playerCash[0].ToString();
+                PlayerWinsCar(0);
+
+                if (MainManager.levelCounter == 2 && MainManager.playerInventory[1, MainManager.currentCarIndex] < 1)
+                {
+                    MainManager.playerWithBuyOption = 1;
+                    OfferBuyOption();
+                }
+
                 break;
 
 
             case 1:
 
-                MainManager.player2Cash -= MainManager.carPrizes[MainManager.currentCarIndex];
-                cashP2.text = MainManager.player2Cash.ToString();
-                P2WinsCar();
+                MainManager.playerCash[1] -= MainManager.carPrizes[MainManager.currentCarIndex];
+                cashDisplay[1].text = MainManager.playerCash[1].ToString();
+                PlayerWinsCar(1);
+
+                if (MainManager.levelCounter == 2 && MainManager.playerInventory[0, MainManager.currentCarIndex] < 1)
+                {
+                    MainManager.playerWithBuyOption = 0;
+                    OfferBuyOption();
+                }
                 break;
         }
 
@@ -477,7 +479,33 @@ public class GameManager : MonoBehaviour
         buyingPossible = true;
         playerHasBoughtCarThisRound = true;
 
+
     }
+
+    public void OfferBuyOption()
+    {
+        buyOptionPanel.SetActive(true);
+
+    }
+
+    public void AcceptBuyOption()
+
+    {
+
+        MainManager.playerCash[MainManager.playerWithBuyOption] -= MainManager.carPrizes[MainManager.currentCarIndex];
+        cashDisplay[MainManager.playerWithBuyOption].text = MainManager.playerCash[MainManager.playerWithBuyOption].ToString();
+        PlayerWinsCar(MainManager.playerWithBuyOption);
+
+
+        buyOptionPanel.SetActive(false);
+    }
+
+    public void PassBuyOption()
+    {
+        buyOptionPanel.SetActive(false);
+    }
+
+
 
     public void SetStateRaceInProgress()
 
@@ -514,7 +542,7 @@ public class GameManager : MonoBehaviour
         raceResultsPanel.SetActive(true);
         resultPanelActivePlayer.text = MainManager.playerNames[MainManager.activePlayer];
 
-        if(MainManager.levelCounter == 2)
+        if (MainManager.levelCounter == 2)
 
         {
             sliderDefeat.SetActive(true);
@@ -529,7 +557,7 @@ public class GameManager : MonoBehaviour
             sliderWin.SetActive(false);
         }
 
-        
+
 
     }
 
@@ -565,7 +593,9 @@ public class GameManager : MonoBehaviour
 
         fields[MainManager.pendingField].gameObject.SetActive(false);
 
-        
+        MainManager.fieldsLeftForCar[MainManager.currentCarIndex]--;
+
+
 
         raceResultsPanel.SetActive(false);
 
@@ -600,19 +630,8 @@ public class GameManager : MonoBehaviour
         if (MainManager.activePlayerWins == true)
 
         {
-            if (MainManager.activePlayer == 0)
 
-            {
-                P1WinsCar();
-
-            }
-
-            else if (MainManager.activePlayer == 1)
-
-            {
-
-                P2WinsCar();
-            }
+            PlayerWinsCar(MainManager.activePlayer);
 
         }
 
@@ -622,104 +641,44 @@ public class GameManager : MonoBehaviour
             if (MainManager.activePlayer == 0)
 
             {
-                P2WinsCar();
-                MainManager.player1Cash -= MainManager.carPrizes[MainManager.currentCarIndex];
-                cashP1.text = MainManager.player1Cash.ToString();
+                PlayerWinsCar(1);
+                MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
+                cashDisplay[MainManager.activePlayer].text = MainManager.playerCash[MainManager.activePlayer].ToString();
             }
 
             else if (MainManager.activePlayer == 1)
 
             {
-                P1WinsCar();
-                MainManager.player2Cash -= MainManager.carPrizes[MainManager.currentCarIndex];
-                cashP2.text = MainManager.player2Cash.ToString();
+                PlayerWinsCar(0);
+                MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
+                cashDisplay[MainManager.activePlayer].text = MainManager.playerCash[MainManager.activePlayer].ToString();
             }
         }
 
     }
 
-    void P1WinsCar()
 
+    void PlayerWinsCar(int winner)
     {
-        MainManager.p1Inventory[MainManager.currentCarIndex]++;
+        MainManager.playerInventory[winner, MainManager.currentCarIndex]++;
 
-        switch (MainManager.currentCarIndex)
+        switch (winner)
 
         {
             case 0:
-                invAP1.gameObject.SetActive(true);
-                invAP1.GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[MainManager.currentCarIndex].ToString();
+
+                invDisplayP1[MainManager.currentCarIndex].gameObject.SetActive(true);
+                invDisplayP1[MainManager.currentCarIndex].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[winner, MainManager.currentCarIndex].ToString();
                 break;
 
             case 1:
-                invBP1.gameObject.SetActive(true);
-                invBP1.GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[MainManager.currentCarIndex].ToString();
+                invDisplayP2[MainManager.currentCarIndex].gameObject.SetActive(true);
+                invDisplayP2[MainManager.currentCarIndex].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[winner, MainManager.currentCarIndex].ToString();
                 break;
-
-            case 2:
-                invCP1.gameObject.SetActive(true);
-                invCP1.GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[MainManager.currentCarIndex].ToString();
-                break;
-
-            case 3:
-                invDP1.gameObject.SetActive(true);
-                invDP1.GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[MainManager.currentCarIndex].ToString();
-                break;
-
-            case 4:
-                invEP1.gameObject.SetActive(true);
-                invEP1.GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[MainManager.currentCarIndex].ToString();
-                break;
-
-            case 5:
-                invFP1.gameObject.SetActive(true);
-                invFP1.GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[MainManager.currentCarIndex].ToString();
-                break;
-
-        }
-    }
-
-    void P2WinsCar()
-
-    {
-        MainManager.p2Inventory[MainManager.currentCarIndex]++;
-
-        switch (MainManager.currentCarIndex)
-
-        {
-            case 0:
-                invAP2.gameObject.SetActive(true);
-                invAP2.GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[MainManager.currentCarIndex].ToString();
-                break;
-
-            case 1:
-                invBP2.gameObject.SetActive(true);
-                invBP2.GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[MainManager.currentCarIndex].ToString();
-                break;
-
-            case 2:
-                invCP2.gameObject.SetActive(true);
-                invCP2.GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[MainManager.currentCarIndex].ToString();
-                break;
-
-            case 3:
-                invDP2.gameObject.SetActive(true);
-                invDP2.GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[MainManager.currentCarIndex].ToString();
-                break;
-
-            case 4:
-                invEP2.gameObject.SetActive(true);
-                invEP2.GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[MainManager.currentCarIndex].ToString();
-                break;
-
-            case 5:
-                invFP2.gameObject.SetActive(true);
-                invFP2.GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[MainManager.currentCarIndex].ToString();
-                break;
-
         }
 
     }
+
 
     void PostRaceRandomMarketProcedure()
 
@@ -730,58 +689,55 @@ public class GameManager : MonoBehaviour
 
         if (MainManager.carPrizes[MainManager.currentCarIndex] <= 0)
 
-        { MainManager.carPrizes[MainManager.currentCarIndex] = 0;
+        {
+            MainManager.carPrizes[MainManager.currentCarIndex] = 0;
 
             lastChangebeforeDefault = carValueChangeOptions[randomValue];
-            CarHasDefaulted();     
-                    
+            CarHasDefaulted();
+
         }
 
-              
-            postRaceMarketPanel.gameObject.SetActive(true);
+
+        postRaceMarketPanel.gameObject.SetActive(true);
         audioSource.PlayOneShot(coinFalling);
 
-            currentCarNameMarketPanel.text = selectedCar;
-            currentCarPrizeMarketPanel.text = oldCarValue.ToString();
-            carValueChangeDisplay.text = carValueChangeOptions[randomValue].ToString();
+        currentCarNameMarketPanel.text = selectedCar;
+        currentCarPrizeMarketPanel.text = oldCarValue.ToString();
+        carValueChangeDisplay.text = carValueChangeOptions[randomValue].ToString();
 
-            if (carValueChangeOptions[randomValue] > 0)
+        if (carValueChangeOptions[randomValue] > 0)
 
-            {
-                priceUpArrow.SetActive(true);
-                priceDownArrow.SetActive(false);
-                valueChangeMessage.text = "The price of this car has gone up";
+        {
+            priceUpArrow.SetActive(true);
+            priceDownArrow.SetActive(false);
+            valueChangeMessage.text = "The price of this car has gone up";
 
-                SetNewCarPrizes();
-            }
+            SetNewCarPrizes();
+        }
 
-            else if (carValueChangeOptions[randomValue] < 0)
+        else if (carValueChangeOptions[randomValue] < 0)
 
-            {
-                priceUpArrow.SetActive(false);
-                priceDownArrow.SetActive(true);
-                valueChangeMessage.text = "The price of this car has gone down";
+        {
+            priceUpArrow.SetActive(false);
+            priceDownArrow.SetActive(true);
+            valueChangeMessage.text = "The price of this car has gone down";
 
-            
+            SetNewCarPrizes();
+
+        }
+
+        else
+
+        {
+            priceUpArrow.SetActive(false);
+            priceDownArrow.SetActive(false);
+            valueChangeMessage.text = "The price of this car remains unchanged";
+
+            SetNewCarPrizes();
+
+        }
 
 
-
-                SetNewCarPrizes();
-
-            }
-
-            else
-
-            {
-                priceUpArrow.SetActive(false);
-                priceDownArrow.SetActive(false);
-                valueChangeMessage.text = "The price of this car remains unchanged";
-
-                SetNewCarPrizes();
-
-            }
-                          
-                  
 
     }
 
@@ -834,25 +790,65 @@ public class GameManager : MonoBehaviour
 
     {
         carInDefaultPanel.SetActive(true);
+        defautlDownArrow.SetActive(true);
 
         if (MainManager.levelCounter == 1)
 
         {
-            defautlDownArrow.SetActive(true);
+            MainManager.carIsInDefault[MainManager.currentCarIndex] = true;
+
             defaultCarValueChange.text = lastChangebeforeDefault.ToString();
+            defaultCarName.text = MainManager.cars[MainManager.currentCarIndex];
+
+            defaultPanelTextMessage.text = "This car has defaulted. If it is still in default after the first selling round, it will be eliminated from the game";
+
         }
 
-        else priceUpArrow.SetActive(false);
-            
-        defaultCarName.text = MainManager.cars[MainManager.currentCarIndex];
+        else
 
-        carPic[MainManager.currentCarIndex].image.sprite = carDefaultSprite;
-        MainManager.p1Inventory[MainManager.currentCarIndex] = 0;
-        MainManager.p2Inventory[MainManager.currentCarIndex] = 0;
+        {
+            defaultCarName.text = MainManager.cars[MainManager.TimeBattleCarIndex];
+            carPic[MainManager.TimeBattleCarIndex].image.sprite = carDefaultSprite;
+            defaultPanelTextMessage.text = "This car is in default and is eliminated from the game";
+
+            for (int i = 0; i < MainManager.playerNumber; i++)
+            {
+                MainManager.playerInventory[i, MainManager.TimeBattleCarIndex] = 0;
+            }
+
+            rows[MainManager.TimeBattleCarIndex].SetActive(false);
+            MainManager.DefProcedureCompleted[MainManager.TimeBattleCarIndex] = true;
+        }
+
 
         UpdateInventoryDisplay();
-               
+
         SetNewCarPrizes();
+    }
+
+
+    public void CheckForDefaultCars()
+
+    {
+        for (int i = 0; i < MainManager.carIsInDefault.Length; i++)
+        {
+            if (MainManager.carIsInDefault[i] && MainManager.DefProcedureCompleted[i] == false)
+
+            {
+                carInDefaultPanel.SetActive(true);
+                defautlDownArrow.SetActive(true);
+                defaultCarName.text = MainManager.cars[i];
+                defaultPanelTextMessage.text = "This car is in default and is eliminated from the game";
+                carPic[i].image.sprite = carDefaultSprite;
+
+                MainManager.playerInventory[0, i] = 0;
+                MainManager.playerInventory[1, i] = 0;
+                rows[i].SetActive(false);
+                MainManager.DefProcedureCompleted[i] = true;
+
+            }
+        }
+
     }
 
 
@@ -865,26 +861,26 @@ public class GameManager : MonoBehaviour
             if (MainManager.activePlayer == 0)
 
             {
-                if (MainManager.p2Inventory[MainManager.currentCarIndex] > 0)
+                if (MainManager.playerInventory[1, MainManager.currentCarIndex] > 0)
 
                 {
-                    P1WinsCar();
-                    MainManager.p2Inventory[MainManager.currentCarIndex]--;
+                    PlayerWinsCar(0);
+                    MainManager.playerInventory[1, MainManager.currentCarIndex]--;
                 }
 
-             }
+            }
 
             else if (MainManager.activePlayer == 1)
 
             {
-                if (MainManager.p1Inventory[MainManager.currentCarIndex] > 0)
+                if (MainManager.playerInventory[0, MainManager.currentCarIndex] > 0)
 
                 {
-                    P2WinsCar();
-                    MainManager.p1Inventory[MainManager.currentCarIndex]--;
+                    PlayerWinsCar(1);
+                    MainManager.playerInventory[0, MainManager.currentCarIndex]--;
                 }
             }
-                       
+
         }
 
         if (MainManager.activePlayerWins == false)
@@ -893,22 +889,22 @@ public class GameManager : MonoBehaviour
             if (MainManager.activePlayer == 0)
 
             {
-                if (MainManager.p2Inventory[MainManager.currentCarIndex] > 0)
+                if (MainManager.playerInventory[1, MainManager.currentCarIndex] > 0)
 
                 {
-                    P2WinsCar();
-                    MainManager.p1Inventory[MainManager.currentCarIndex]--;
+                    PlayerWinsCar(1);
+                    MainManager.playerInventory[0, MainManager.currentCarIndex]--;
                 }
             }
 
             else if (MainManager.activePlayer == 1)
 
             {
-                if (MainManager.p1Inventory[MainManager.currentCarIndex] > 0)
+                if (MainManager.playerInventory[0, MainManager.currentCarIndex] > 0)
 
                 {
-                    P1WinsCar();
-                    MainManager.p2Inventory[MainManager.currentCarIndex]--;
+                    PlayerWinsCar(0);
+                    MainManager.playerInventory[1, MainManager.currentCarIndex]--;
                 }
             }
         }
@@ -926,25 +922,21 @@ public class GameManager : MonoBehaviour
     public void UpdateInventoryDisplay()
 
     {
-        for (int i = 0; i < p1InventoryDisplay.Length; i++)
+        for (int i = 0; i < MainManager.cars.Length; i++)
 
         {
-            p1InventoryDisplay[i].GetComponentInChildren<TMP_Text>().text = MainManager.p1Inventory[i].ToString();
-            
-            if(MainManager.p1Inventory[i] < 1)
+            invDisplayP1[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[0, i].ToString();
+            invDisplayP2[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[1, i].ToString();
+
+            if (MainManager.playerInventory[0, i] < 1)
             {
-                p1InventoryDisplay[i].gameObject.SetActive(false);
+                invDisplayP1[i].gameObject.SetActive(false);
             }
-        }
 
-        for (int i = 0; i < p2InventoryDisplay.Length; i++)
+            if (MainManager.playerInventory[1, i] < 1)
 
-        {
-            p2InventoryDisplay[i].GetComponentInChildren<TMP_Text>().text = MainManager.p2Inventory[i].ToString();
-            
-            if (MainManager.p2Inventory[i] < 1)
             {
-                p2InventoryDisplay[i].gameObject.SetActive(false);
+                invDisplayP2[i].gameObject.SetActive(false);
             }
         }
 
@@ -971,7 +963,7 @@ public class GameManager : MonoBehaviour
 
         }
 
-        else 
+        else
 
             if (MainManager.activePlayer == 0)
         {
@@ -983,7 +975,7 @@ public class GameManager : MonoBehaviour
         {
             timeBattleWinner = 0;
         }
-            
+
 
 
         timeBattlePanel.SetActive(true);
@@ -998,7 +990,7 @@ public class GameManager : MonoBehaviour
             int gap;
             gap = System.Convert.ToInt32(winGap.value);
             MainManager.timeBattleSeconds = (gap);
-         }
+        }
 
         else
 
@@ -1061,7 +1053,7 @@ public class GameManager : MonoBehaviour
         UpdateCarPrizesDisplay();
         timeBattlePanel.SetActive(false);
         buffNerfPanel.SetActive(false);
-        
+
         if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
 
         {
@@ -1085,7 +1077,11 @@ public class GameManager : MonoBehaviour
 
     }
 
-    
+    public void ShowNextRoundButton()
+    {
+        SellDoneButton.gameObject.SetActive(true);
+        carInDefaultPanel.SetActive(false);
+    }
 
 
 
@@ -1108,6 +1104,26 @@ public class GameManager : MonoBehaviour
         buyingPossible = true;
         playerHasBoughtCarThisRound = false;
 
+
+        MainManager.activePlayer++;
+
+        if (MainManager.activePlayer > MainManager.playerNumber - 1)
+
+        {
+            MainManager.activePlayer = 0;
+
+        }
+
+        for (int i = 0; i < MainManager.playerNumber; i++)
+
+        {
+            turnIndicator[i].SetActive(false);
+        }
+
+        turnIndicator[MainManager.activePlayer].SetActive(true);
+
+
+        /*
         if (MainManager.activePlayer == 0)
 
         { MainManager.activePlayer = 1;
@@ -1122,6 +1138,7 @@ public class GameManager : MonoBehaviour
             turnIndicatorP2.SetActive(false);
 
         }
+        */
 
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
@@ -1131,6 +1148,7 @@ public class GameManager : MonoBehaviour
 
             {
                 dividendScript.DividendCheck();
+                OutOfOptionsCheck();
             }
         }
 
@@ -1138,21 +1156,21 @@ public class GameManager : MonoBehaviour
 
         {
             InventoryCheck();
+
+            toynopolyCalculatorScript.PerformToynopolyCalculations();
         }
 
         LevelCheck();
 
         BankruptCheck();
 
-       
-                 
 
-}
+    }
 
     void LevelCheck()
 
     {
-        if (MainManager.roundCounter > 12) 
+        if (MainManager.roundCounter > 12)
 
         {
             if (MainManager.levelCounter == 1)
@@ -1167,7 +1185,7 @@ public class GameManager : MonoBehaviour
                 MainManager.levelCounter = 2;
                 MainManager.roundCounter = 1;
 
-                
+
             }
 
             else if (MainManager.levelCounter == 2)
@@ -1197,8 +1215,12 @@ public class GameManager : MonoBehaviour
     public void AcceptDividend()
 
     {
-        cashP1.text = MainManager.player1Cash.ToString();
-        cashP2.text = MainManager.player2Cash.ToString();
+        for (int i = 0; i < cashDisplay.Length; i++)
+
+        {
+            cashDisplay[i].text = MainManager.playerCash[i].ToString();
+        }
+
     }
 
 
@@ -1210,11 +1232,13 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < MainManager.cars.Length; i++)
 
         {
-            if (MainManager.p1Inventory[i] > 0 && MainManager.p2Inventory[i] > 0)
+            if (MainManager.playerInventory[0, i] > 0 && MainManager.playerInventory[1, i] > 0)
 
             {
-                MainManager.p1Inventory[i] = 0;
-                MainManager.p2Inventory[i] = 0;
+                MainManager.playerInventory[0, i] = 0;
+                MainManager.playerInventory[1, i] = 0;
+                MainManager.carIsInDefault[i] = true;
+                rows[i].SetActive(false);
                 UpdateInventoryDisplay();
             }
 
@@ -1241,11 +1265,15 @@ public class GameManager : MonoBehaviour
             if (MainManager.activePlayer == 0)
 
             {
-                MainManager.player1Cash += MainManager.carPrizes[MainManager.currentCarIndex];
-                MainManager.player2Cash -= MainManager.carPrizes[MainManager.currentCarIndex];
+                MainManager.playerCash[MainManager.activePlayer] += MainManager.carPrizes[MainManager.currentCarIndex];
+                MainManager.playerCash[1] -= MainManager.carPrizes[MainManager.currentCarIndex];
 
-                cashP1.text = MainManager.player1Cash.ToString();
-                cashP2.text = MainManager.player2Cash.ToString();
+                for (int i = 0; i < MainManager.playerNumber - 1; i++)
+
+                {
+                    cashDisplay[i].text = MainManager.playerCash[i].ToString();
+                }
+
 
                 RoundChangeover();
 
@@ -1254,12 +1282,14 @@ public class GameManager : MonoBehaviour
             else if (MainManager.activePlayer == 1)
 
             {
-                MainManager.player2Cash += MainManager.carPrizes[MainManager.currentCarIndex];
-                MainManager.player1Cash -= MainManager.carPrizes[MainManager.currentCarIndex];
+                MainManager.playerCash[1] += MainManager.carPrizes[MainManager.currentCarIndex];
+                MainManager.playerCash[0] -= MainManager.carPrizes[MainManager.currentCarIndex];
 
-                cashP1.text = MainManager.player1Cash.ToString();
-                cashP2.text = MainManager.player2Cash.ToString();
+                for (int i = 0; i < MainManager.playerNumber - 1; i++)
 
+                {
+                    cashDisplay[i].text = MainManager.playerCash[i].ToString();
+                }
                 RoundChangeover();
             }
 
@@ -1273,8 +1303,8 @@ public class GameManager : MonoBehaviour
 
             {
                 {
-                   MainManager.p1Inventory[MainManager.currentCarIndex]--;
-                   UpdateInventoryDisplay();
+                    MainManager.playerInventory[0, MainManager.currentCarIndex]--;
+                    UpdateInventoryDisplay();
 
                     RoundChangeover();
                 }
@@ -1283,9 +1313,9 @@ public class GameManager : MonoBehaviour
             else if (MainManager.activePlayer == 1)
 
             {
-                
+
                 {
-                    MainManager.p2Inventory[MainManager.currentCarIndex]--;
+                    MainManager.playerInventory[1, MainManager.currentCarIndex]--;
                     UpdateInventoryDisplay();
 
                     RoundChangeover();
@@ -1295,17 +1325,69 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void BankruptCheck()
+    void OutOfOptionsCheck()
 
     {
-        if (MainManager.player1Cash < 1 || MainManager.player2Cash < 1)
+        for (int i = 0; i < MainManager.cars.Length; i++)
 
         {
-            MainManager.gameOver = true;
-            EndGame();
+            MainManager.playerOutofOptions[i] = false;
+
+
+            if (MainManager.playerInventory[MainManager.activePlayer, i] < 1 || MainManager.fieldsLeftForCar[i] < 1)
+
+            {
+                MainManager.playerOutofOptions[i] = true;
+            }
+
 
         }
 
+
+        switch (MainManager.activePlayer)
+
+        {
+            case 0:
+                if (MainManager.playerOutofOptions.Contains(false) == false)
+                {
+                    if (MainManager.playerCash[0] > MainManager.playerCash[1])
+
+                    { RoundChangeover(); }
+
+                    else
+
+                    { EndGame(); }
+                }
+                break;
+
+            case 1:
+                if (MainManager.playerOutofOptions.Contains(false) == false)
+                {
+                    if (MainManager.playerCash[1] > MainManager.playerCash[0])
+
+                    { RoundChangeover(); }
+
+                    else
+
+                    { EndGame(); }
+                }
+                break;
+        }
+
+    }
+
+
+    void BankruptCheck()
+
+    {
+        for (int i = 0; i < MainManager.playerNumber - 1; i++)
+
+        {
+            if (MainManager.playerCash[i] < 1)
+
+            { EndGame(); }
+
+        }
 
     }
 
@@ -1316,18 +1398,18 @@ public class GameManager : MonoBehaviour
         int sumInventoryp2 = 0;
 
         for (int i = 0; i < MainManager.cars.Length; i++)
-            {
-                sumInventoryp1 += MainManager.p1Inventory[i];
-                sumInventoryp2 += MainManager.p2Inventory[i];
-            }
+        {
+            sumInventoryp1 += MainManager.playerInventory[0, i];
+            sumInventoryp2 += MainManager.playerInventory[1, i];
+        }
 
         if (sumInventoryp1 + sumInventoryp2 == 0)
-            {
-                EndGame();
-            }
-        
+        {
+            EndGame();
+        }
+
         else if (sumInventoryp1 == 0 && MainManager.activePlayer == 0)
-            {
+        {
             RoundChangeover();
 
         }
@@ -1336,12 +1418,12 @@ public class GameManager : MonoBehaviour
         {
             RoundChangeover();
         }
-        
+
 
 
     }
 
-    void EndGame()
+    public void EndGame()
 
     {
         MainManager.gameOver = true;
@@ -1351,14 +1433,14 @@ public class GameManager : MonoBehaviour
 
         resultsP1Name.text = MainManager.playerNames[0];
         resultsP2Name.text = MainManager.playerNames[1];
-        resultsP1cashTotal.text = MainManager.player1Cash.ToString();
-        resultsP2cashTotal.text = MainManager.player2Cash.ToString();
+        resultsP1cashTotal.text = MainManager.playerCash[0].ToString();
+        resultsP2cashTotal.text = MainManager.playerCash[1].ToString();
 
 
     }
-       
 
 
-    }
+
+}
 
 

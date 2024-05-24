@@ -42,9 +42,11 @@ public class GridGenerator : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI player1NameField;
     [SerializeField] TextMeshProUGUI player2NameField;
+    [SerializeField] TextMeshProUGUI player3NameField;
 
     public TextMeshProUGUI p1NameInputField;
     public TextMeshProUGUI p2NameInputField;
+    public TextMeshProUGUI p3NameInputField;
 
 
     [SerializeField] Button carASprite;
@@ -470,11 +472,28 @@ public class GridGenerator : MonoBehaviour
 
     {
         gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+        
+        switch (MainManager.playerNumber)
 
-        MainManager.playerNames[0] = p1NameInputField.text.ToUpper();
-        MainManager.playerNames[1] = p2NameInputField.text.ToUpper();
-        player1NameField.text = MainManager.playerNames[0];
-        player2NameField.text = MainManager.playerNames[1];
+        {
+            case 2:
+                MainManager.playerNames[0] = p1NameInputField.text.ToUpper();
+                MainManager.playerNames[1] = p2NameInputField.text.ToUpper();
+                player1NameField.text = MainManager.playerNames[0];
+                player2NameField.text = MainManager.playerNames[1];
+                break;
+
+            case 3:
+                MainManager.playerNames[0] = p1NameInputField.text.ToUpper();
+                MainManager.playerNames[1] = p2NameInputField.text.ToUpper();
+                MainManager.playerNames[2] = p3NameInputField.text.ToUpper();
+                player1NameField.text = MainManager.playerNames[0];
+                player2NameField.text = MainManager.playerNames[1];
+                player3NameField.text = MainManager.playerNames[2];
+                break;
+
+        }    
+              
         enterPlayerNamesPanel.SetActive(false);
 
         gameManagerScript.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");

@@ -97,8 +97,13 @@ public class DividendGenerator : MonoBehaviour
         MainManager.currentCarIndex = actualDividendList[MainManager.roundCounter - 1];
         amountToPay = MainManager.carPrizes[actualDividendList[MainManager.roundCounter - 1]];
 
-        MainManager.player1Cash += (MainManager.p1Inventory[MainManager.currentCarIndex]) * amountToPay;
-        MainManager.player2Cash += (MainManager.p2Inventory[MainManager.currentCarIndex]) * amountToPay;
+        for (int i = 0; i < MainManager.playerNumber; i++)
+
+        {
+            MainManager.playerCash[i] += (MainManager.playerInventory[i, MainManager.currentCarIndex]) * amountToPay;
+        }
+       
+              
         }
 
     public void DividendAccepted()
