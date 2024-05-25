@@ -1268,7 +1268,7 @@ public class GameManager : MonoBehaviour
                 MainManager.playerCash[MainManager.activePlayer] += MainManager.carPrizes[MainManager.currentCarIndex];
                 MainManager.playerCash[1] -= MainManager.carPrizes[MainManager.currentCarIndex];
 
-                for (int i = 0; i < MainManager.playerNumber - 1; i++)
+                for (int i = 0; i < MainManager.playerNumber; i++)
 
                 {
                     cashDisplay[i].text = MainManager.playerCash[i].ToString();
@@ -1285,7 +1285,7 @@ public class GameManager : MonoBehaviour
                 MainManager.playerCash[1] += MainManager.carPrizes[MainManager.currentCarIndex];
                 MainManager.playerCash[0] -= MainManager.carPrizes[MainManager.currentCarIndex];
 
-                for (int i = 0; i < MainManager.playerNumber - 1; i++)
+                for (int i = 0; i < MainManager.playerNumber; i++)
 
                 {
                     cashDisplay[i].text = MainManager.playerCash[i].ToString();
