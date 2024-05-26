@@ -31,6 +31,10 @@ public class MainManager : MonoBehaviour
     public static int TimeBattleCarIndex = 0;
 
     public static int activePlayer = 0;
+
+    public static int[] inactivePlayers = { 0, 1, 2, 3, 4};
+    public static int defendingPlayer = 0;
+
     public static int roundCounter = 1;
     public static int levelCounter = 1;
 
