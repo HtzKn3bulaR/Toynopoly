@@ -24,7 +24,7 @@ public class SellingHandler : MonoBehaviour
     [SerializeField] GameObject p1SellButton;
     [SerializeField] GameObject p2SellButton;
     [SerializeField] GameObject sellerDisplay;
-
+       
 
     private int P1carsSoldFinalRound = 0;
     private int P2carsSoldFinalRound = 0;

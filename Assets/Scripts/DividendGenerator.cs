@@ -13,6 +13,7 @@ public class DividendGenerator : MonoBehaviour
     List<int> actualDividendList = new List<int> { 7, 7, 7, 7, 7, 7, 0, 1, 2, 3, 4, 5 };
 
     private GameManager gameManagerScript;
+    private PlayerManager3P playerManagerScript;
 
     [SerializeField] GameObject dividendPayPanel;
 
@@ -51,8 +52,14 @@ public class DividendGenerator : MonoBehaviour
 
     void Awake()
     {
+        if (MainManager.playerNumber < 3)
+        {
+            gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+        }
 
-        gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+        else
+
+        playerManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
 
 
     }
@@ -70,7 +77,17 @@ public class DividendGenerator : MonoBehaviour
 
         }
 
-        gameManagerScript.SetLevelChangePanelInactive();
+
+        if (MainManager.playerNumber < 3)
+
+        {
+            gameManagerScript.SetLevelChangePanelInactive();
+        }
+
+        if (MainManager.playerNumber > 2)
+        {
+            playerManagerScript.StartLevel2();
+        }
     }
 
 
@@ -109,8 +126,17 @@ public class DividendGenerator : MonoBehaviour
     public void DividendAccepted()
 
     {
-        gameManagerScript.AcceptDividend();
-        dividendPayPanel.gameObject.SetActive(false);
+        if (MainManager.playerNumber < 3)
+        {
+            gameManagerScript.AcceptDividend();
+            dividendPayPanel.gameObject.SetActive(false);
+        }
+
+        else
+        {
+            playerManagerScript.AcceptDividend();
+            dividendPayPanel.gameObject.SetActive(false);
+        }
 
     }
 
