@@ -164,6 +164,9 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] TextMeshProUGUI challengerNameL2;
     [SerializeField] TextMeshProUGUI defenderNameL2;
 
+    [SerializeField] TextMeshProUGUI challengerNameResultsChallenge;
+    [SerializeField] TextMeshProUGUI defenderNameResultsChallenge;
+
     [SerializeField] TextMeshProUGUI challengeWinnerDisplay;
     [SerializeField] TextMeshProUGUI challengeDefeatedDisplay;
     [SerializeField] TextMeshProUGUI challengeCarDisplay;
@@ -174,6 +177,8 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] TextMeshProUGUI[] timeBattleNameDisplay;
     [SerializeField] TextMeshProUGUI[] timeBattlePrizeDisplay;
 
+    [SerializeField] TextMeshProUGUI toynopolyHolderName;
+
     [SerializeField] TextMeshProUGUI resultsP1Name;
     [SerializeField] TextMeshProUGUI resultsP2Name;
     [SerializeField] TextMeshProUGUI resultsP3Name;
@@ -181,6 +186,8 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] TextMeshProUGUI resultsP1cashTotal;
     [SerializeField] TextMeshProUGUI resultsP2cashTotal;
     [SerializeField] TextMeshProUGUI resultsP3cashTotal;
+
+    
 
 
     [SerializeField] Sprite carDefaultSprite;
@@ -441,10 +448,12 @@ public class PlayerManager3P : MonoBehaviour
         MainManager.defendingPlayer = MainManager.inactivePlayers[defender];
 
         raceInProgressPanelChallenge.SetActive(true);
-        challengerNameL2.text = MainManager.playerNames[MainManager.activePlayer];
-        defenderNameL2.text = MainManager.playerNames[MainManager.defendingPlayer];
+        challengeRaceProgressCar.GetComponentInChildren<TMP_Text>().text = selectedCar;
+        challengeRaceProgressTrack.GetComponentInChildren<TMP_Text>().text = selectedTrack;
+        challengeProgressTextInfo.text = ("Level " + MainManager.levelCounter + ", Race " + MainManager.roundCounter + " / 12 in progress");
 
-
+       challengerNameL2.text = MainManager.playerNames[MainManager.activePlayer];
+       defenderNameL2.text = MainManager.playerNames[MainManager.defendingPlayer];
 
     }
 
@@ -598,23 +607,9 @@ public class PlayerManager3P : MonoBehaviour
             currentRaceOpponent1.text = MainManager.playerNames[MainManager.activePlayer];
         }
 
-        else
-        {
-            if (activePlayerHasToynopoly == false)
-            {
-                raceInProgressPanelChallenge.SetActive(true);
-                continueButtonNormal.SetActive(true);
-                continueButtonToynopoly.SetActive(false);
-                challengeRaceProgressCar.GetComponentInChildren<TMP_Text>().text = selectedCar;
-                challengeRaceProgressTrack.GetComponentInChildren<TMP_Text>().text = selectedTrack;
-                challengeProgressTextInfo.text = ("Level " + MainManager.levelCounter +", Race " + MainManager.roundCounter +" / 12 in progress");
-                challengerNameL2.text = MainManager.playerNames[MainManager.activePlayer];
-                
-                defenderNameL2.text = MainManager.playerNames[MainManager.defendingPlayer];
-            }
-
-            else
-
+        
+        else if (activePlayerHasToynopoly)
+            
             {
                 raceInProgressPanel.SetActive(true);
                 continueButtonNormal.SetActive(false);
@@ -627,10 +622,7 @@ public class PlayerManager3P : MonoBehaviour
 
 
             }
-
-
-
-        }
+                   
 
     }
 
@@ -660,6 +652,10 @@ public class PlayerManager3P : MonoBehaviour
         {
             raceResultsPanelL2.SetActive(true);
 
+            challengerNameResultsChallenge.text = MainManager.playerNames[MainManager.activePlayer];
+
+            defenderNameResultsChallenge.text = MainManager.playerNames[MainManager.defendingPlayer];
+                        
         }
 
 
@@ -668,19 +664,7 @@ public class PlayerManager3P : MonoBehaviour
     public void RegisterResults()
 
     {
-        Debug.Log(winnerDropdown.value);
-
-        if ((winnerDropdown.value) == (MainManager.activePlayer))
-
-        {
-            MainManager.activePlayerWins = true;
-        }
-
-        else
-
-        {
-            MainManager.activePlayerWins = false;
-        }
+        
 
 
 
@@ -695,6 +679,21 @@ public class PlayerManager3P : MonoBehaviour
 
         {
             case 1:
+
+                Debug.Log(winnerDropdown.value);
+
+                if ((winnerDropdown.value) == (MainManager.activePlayer))
+
+                {
+                    MainManager.activePlayerWins = true;
+                }
+
+                else
+
+                {
+                    MainManager.activePlayerWins = false;
+                }
+
                 raceResultsPanelL1.SetActive(false);
                 raceWinnerLevel1 = winnerDropdown.value;
                 runnerUpLevel1 = runnerUpDropdown.value;
@@ -705,6 +704,7 @@ public class PlayerManager3P : MonoBehaviour
             case 2:
 
                 raceResultsPanelL2.SetActive(true);
+                
 
                 if (challengeWon == true)
 
@@ -788,6 +788,9 @@ public class PlayerManager3P : MonoBehaviour
     {
         raceResultsPanelL2T.SetActive(true);
         raceInProgressPanel.SetActive(false);
+
+        toynopolyHolderName.text = MainManager.playerNames[MainManager.activePlayer];
+
 
     }
 
