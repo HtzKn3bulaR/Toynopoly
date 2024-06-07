@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public AudioClip coinFalling;
     public AudioClip jewelHit;
     public AudioClip transition;
+    public AudioClip heartbeat;
     public AudioSource audioSource;
 
     public GameObject[] rows;
@@ -1122,24 +1123,7 @@ public class GameManager : MonoBehaviour
         }
 
         turnIndicator[MainManager.activePlayer].SetActive(true);
-
-
-        /*
-        if (MainManager.activePlayer == 0)
-
-        { MainManager.activePlayer = 1;
-            turnIndicatorP1.SetActive(false);
-            turnIndicatorP2.SetActive(true);
-        }
-
-        else
-
-        { MainManager.activePlayer = 0;
-            turnIndicatorP1.SetActive(true);
-            turnIndicatorP2.SetActive(false);
-
-        }
-        */
+                     
 
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
@@ -1428,6 +1412,7 @@ public class GameManager : MonoBehaviour
 
     {
         MainManager.gameOver = true;
+        audioSource.PlayOneShot(heartbeat);
         Debug.Log("Game Over");
 
         gameOverPanel.SetActive(true);

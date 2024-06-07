@@ -40,16 +40,34 @@ public class ToynopolyCalculator : MonoBehaviour
         for (int i = 0; i < MainManager.cars.Length; i++)
 
         {
+            int inventoryCheck = 0;
+
+            for (int j = 0; j < MainManager.playerNumber; j++)
+
+            {
+                inventoryCheck += MainManager.playerInventory[j, i];
+                Debug.Log(inventoryCheck);
+            }
+
+
             maxToynopolyIncome[i] = MainManager.carPrizes[i] * MainManager.fieldsLeftForCar[i];
 
-            if (maxToynopolyIncome[i] > 0)
+            if (maxToynopolyIncome[i] > 0 && inventoryCheck > 0)
 
             {
                 toynopolyMaxIncomeDisplay[i].gameObject.SetActive(true);
                 maxIncomeButtons[i].SetActive(true);
                 toynopolyMaxIncomeDisplay[i].text = maxToynopolyIncome[i].ToString();
             }
+
+            else if (inventoryCheck < 1)
+
+            {
+                toynopolyMaxIncomeDisplay[i].gameObject.SetActive(false);
+            }
+
         }
+                     
 
 
     }

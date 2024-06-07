@@ -28,6 +28,14 @@ public class WinnerDropdown : MonoBehaviour
         winnerDropdown.options.Add(option3);
 
 
+        if (MainManager.playerNumber > 3)
+
+        {
+            var option4 = new TMP_Dropdown.OptionData(MainManager.playerNames[3]);
+            winnerDropdown.options.Add(option4);
+        }
+
+
         winnerDropdown.RefreshShownValue();
 
 

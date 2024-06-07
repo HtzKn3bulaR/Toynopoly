@@ -79,6 +79,13 @@ public class PreGameFlowManager : MonoBehaviour
 
 
     // Update is called once per frame
+
+    public void QuitGame()
+
+    {
+        Application.Quit();
+
+    }
     void Update()
     {
         

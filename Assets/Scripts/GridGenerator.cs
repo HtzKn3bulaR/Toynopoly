@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 
 public class GridGenerator : MonoBehaviour
-      
-    {
+
+{
 
     public Button carPicA;
     public Button carPicB;
@@ -16,8 +16,11 @@ public class GridGenerator : MonoBehaviour
     public Button carPicE;
     public Button carPicF;
 
+    [SerializeField] GameObject carCarrousel;
+
     public AudioClip carPopulateSound;
     public AudioClip stageReady;
+    public AudioClip transition;
     public AudioSource gameSounds;
 
 
@@ -56,15 +59,27 @@ public class GridGenerator : MonoBehaviour
     [SerializeField] Button carESprite;
     [SerializeField] Button carFSprite;
 
+    [SerializeField] Button carrouselSprite;
+
     [SerializeField] Button playerNamesSubmit;
 
     [SerializeField] GameObject enterPlayerNamesPanel;
 
     private GameManager gameManagerScript;
 
-    
+    private Animator carAPresentation;
+    private Animator carBPresentation;
+    private Animator carCPresentation;
+    private Animator carDPresentation;
+    private Animator carEPresentation;
+    private Animator carFPresentation;
+
+
+
 
     private int carCardsPopulated = 0;
+
+    private int rowShown = 0;
 
     List<string> trackList = new List<string>
 
@@ -189,14 +204,24 @@ public class GridGenerator : MonoBehaviour
 
     void Awake()
     {
-        CarSelect();
 
         TrackSelect();
 
         gameSounds = GetComponent<AudioSource>();
+
+        carAPresentation = carPicA.GetComponent<Animator>();
+        carBPresentation = carPicB.GetComponent<Animator>();
+        carCPresentation = carPicC.GetComponent<Animator>();
+        carDPresentation = carPicD.GetComponent<Animator>();
+        carEPresentation = carPicE.GetComponent<Animator>();
+        carFPresentation = carPicF.GetComponent<Animator>();
+
+        CarSelect();
+
+
     }
 
-   
+
 
 
     void Shuffle<T>(List<T> inputList)
@@ -217,38 +242,38 @@ public class GridGenerator : MonoBehaviour
     {
         switch (MainManager.classSelected)
 
-            {
-                case 0:
-                    activeList = rookieNamesList;
-                    activeSpriteList = rookieSpriteList;
-                    break;
+        {
+            case 0:
+                activeList = rookieNamesList;
+                activeSpriteList = rookieSpriteList;
+                break;
 
-                case 1:
-                    activeList = amateurNamesList;
-                    activeSpriteList = amateurSpriteList;
-                    break;
+            case 1:
+                activeList = amateurNamesList;
+                activeSpriteList = amateurSpriteList;
+                break;
 
-                case 2:
-                    activeList = advancedNamesList;
-                    activeSpriteList = advancedSpriteList;
-                    break;
+            case 2:
+                activeList = advancedNamesList;
+                activeSpriteList = advancedSpriteList;
+                break;
 
-                case 3:
-                    activeList = semiProNamesList;
+            case 3:
+                activeList = semiProNamesList;
                 activeSpriteList = semiProSpriteList;
-                    break;
+                break;
 
-                case 4:
-                    activeList = proNamesList;
+            case 4:
+                activeList = proNamesList;
                 activeSpriteList = proSpriteList;
-                    break;
+                break;
 
-                case 5:
-                    activeList = superProNamesList;
+            case 5:
+                activeList = superProNamesList;
                 activeSpriteList = superProSpriteList;
-                    break;
+                break;
 
-            }
+        }
 
 
 
@@ -258,14 +283,18 @@ public class GridGenerator : MonoBehaviour
 
         {
             MainManager.cars[i] = uniqueRandomList[i];
-            
+
 
         }
 
         Debug.Log("First Car" + MainManager.cars[0]);
-        
-        PopulateCarCardA();
-            
+
+        StartCarrousel();
+
+
+        StartCoroutine(FirstCarPresentationDelay());
+
+
     }
 
     //populate without delay:
@@ -310,10 +339,57 @@ public class GridGenerator : MonoBehaviour
         }
     }
 
-    void PopulateCarCardA()
+    void StartCarrousel()
+
     {
+        carCarrousel.SetActive(true);
+
+
+
+        InvokeRepeating("ChangePicture", 1.0f, 0.2f);
+
+
+
+    }
+
+    void ChangePicture()
+
+    {
+
+        if (carCardsPopulated < 6)
+
+        {
+
+            carrouselSprite.image.sprite = activeSpriteList[Random.Range(0, activeSpriteList.Count)];
+
+        }
+
+        else
+        {
+            carCarrousel.SetActive(false);
+        }
+
+    }
+
+
+    IEnumerator FirstCarPresentationDelay()
+
+    {
+        yield return new WaitForSeconds(5.0f);
+
+        PopulateCarCardA();
+
+    }
+
+
+    void PopulateCarCardA()
+
+    {
+
+
         carAText.text = MainManager.cars[0];
         gameSounds.PlayOneShot(carPopulateSound);
+        carAPresentation.SetTrigger("PresentCarA");
 
         for (int i = 0; i < activeList.Count; i++)
 
@@ -333,6 +409,7 @@ public class GridGenerator : MonoBehaviour
     {
         carBText.text = MainManager.cars[1];
         gameSounds.PlayOneShot(carPopulateSound);
+        carBPresentation.SetTrigger("PresentCarB");
 
         for (int i = 0; i < activeList.Count; i++)
 
@@ -351,6 +428,7 @@ public class GridGenerator : MonoBehaviour
     {
         carCText.text = MainManager.cars[2];
         gameSounds.PlayOneShot(carPopulateSound);
+        carCPresentation.SetTrigger("PresentCarC");
 
         for (int i = 0; i < activeList.Count; i++)
 
@@ -381,6 +459,7 @@ public class GridGenerator : MonoBehaviour
 
         carCardsPopulated++;
         StartCoroutine(TablePopulateDelayRoutine());
+        carDPresentation.SetTrigger("PresentCarD");
 
     }
 
@@ -401,6 +480,7 @@ public class GridGenerator : MonoBehaviour
 
         carCardsPopulated++;
         StartCoroutine(TablePopulateDelayRoutine());
+        carEPresentation.SetTrigger("PresentCarE");
 
     }
 
@@ -419,8 +499,10 @@ public class GridGenerator : MonoBehaviour
 
         }
 
-        enterPlayerNamesPanel.SetActive(true);
-        gameSounds.PlayOneShot(stageReady);
+        carCardsPopulated++;
+        StartCoroutine(TablePopulateDelayRoutine());
+        carFPresentation.SetTrigger("PresentCarF");
+        //gameSounds.PlayOneShot(stageReady);
 
     }
 
@@ -431,15 +513,15 @@ public class GridGenerator : MonoBehaviour
     void TrackSelect()
 
     {
-        
-            var uniqueRandomList = GetUniqueRandomElements(trackList, 9);
 
-                        
-            for (int i = 0; i < uniqueRandomList.Count; i++)
+        var uniqueRandomList = GetUniqueRandomElements(trackList, 9);
 
-            {
-                MainManager.activeTracks[i] = uniqueRandomList[i];
-            }
+
+        for (int i = 0; i < uniqueRandomList.Count; i++)
+
+        {
+            MainManager.activeTracks[i] = uniqueRandomList[i];
+        }
 
 
         int rand = Random.Range(0, bonusTrackList.Count);
@@ -465,14 +547,14 @@ public class GridGenerator : MonoBehaviour
 
         bonusTrack.text = MainManager.bonusTrack;
 
-        
+
     }
 
     public void PopulatePlayerPanel()
 
     {
         gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
-        
+
         switch (MainManager.playerNumber)
 
         {
@@ -492,11 +574,27 @@ public class GridGenerator : MonoBehaviour
                 player3NameField.text = MainManager.playerNames[2];
                 break;
 
-        }    
-              
+        }
+
         enterPlayerNamesPanel.SetActive(false);
 
+        gameSounds.PlayOneShot(transition);
+
+        ShowNextRow();
+
         gameManagerScript.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+    }
+
+    void ShowNextRow()
+    {
+        if (rowShown < 6)
+
+        {
+            gameManagerScript.rows[rowShown].SetActive(true);
+
+            StartCoroutine(FieldsAppearingDelay());
+        }
+
     }
 
 
@@ -506,13 +604,13 @@ public class GridGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     IEnumerator TablePopulateDelayRoutine()
 
     {
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(6.0f);
 
         switch (carCardsPopulated)
 
@@ -529,10 +627,22 @@ public class GridGenerator : MonoBehaviour
             case 4:
                 PopulateCarCardE();
                 break;
-            default:
+            case 5:
                 PopulateCarCardF();
                 break;
+            default:
+                enterPlayerNamesPanel.SetActive(true);
+                break;
         }
+    }
+
+    IEnumerator FieldsAppearingDelay()
+
+    {
+        yield return new WaitForSeconds(0.8f);
+
+        rowShown++;
+        ShowNextRow();
     }
 
 }

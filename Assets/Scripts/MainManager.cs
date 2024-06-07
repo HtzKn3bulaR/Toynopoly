@@ -43,18 +43,12 @@ public class MainManager : MonoBehaviour
 
     public static bool activePlayerWins = false;
 
-    //game Scores Old
-
-    public static int player1Cash = 150;
-    public static int player2Cash = 150;
-
-    public static int[] p1Inventory = { 0, 0, 0, 0, 0, 0 };
-    public static int[] p2Inventory = { 0, 0, 0, 0, 0, 0 };
-
+    
     //game Scores New
 
     public static int[] playerCash = {150, 150, 150, 150, 150, 150};
     public static int[,] playerInventory = { { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };
+    //inventory format is player, number of cars
 
 
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 
 public class PlayerManager3P : MonoBehaviour
@@ -14,10 +15,11 @@ public class PlayerManager3P : MonoBehaviour
 
     public Button challengeButtonFirstInactive;
     public Button challengeButtonSecondInactive;
+    public Button challengeButtonThirdInactive;
 
     public Button challengeRaceProgressCar;
     public Button challengeRaceProgressTrack;
-
+   
     public GameObject[] rows;
 
     private bool l2SelectionIsOkay = true;
@@ -42,12 +44,14 @@ public class PlayerManager3P : MonoBehaviour
     public AudioClip panelOpen;
     public AudioClip stageReady;
     public AudioClip coinFalling;
+    public AudioClip heartbeat;
 
     public TextMeshProUGUI[] cashDisplay;
 
     [SerializeField] Button[] invDisplayP1;
     [SerializeField] Button[] invDisplayP2;
     [SerializeField] Button[] invDisplayP3;
+    [SerializeField] Button[] invDisplayP4;
 
     [SerializeField] Button buyCarButton;
 
@@ -99,7 +103,7 @@ public class PlayerManager3P : MonoBehaviour
 
     [SerializeField] GameObject gameOverPanel;
 
-    [SerializeField] Button[] sellButtons = { };
+    //[SerializeField] Button[] sellButtons = { };
 
     public TMP_Dropdown winnerDropdown;
     public TMP_Dropdown runnerUpDropdown;
@@ -155,10 +159,12 @@ public class PlayerManager3P : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI firstinactivePlayerName;
     [SerializeField] TextMeshProUGUI secondinactivePlayerName;
+    [SerializeField] TextMeshProUGUI thirdInactivePlayerName;
 
     [SerializeField] TextMeshProUGUI challengefirstInactive;
     [SerializeField] TextMeshProUGUI challengeSecondInactive;
-
+    [SerializeField] TextMeshProUGUI challengeThirdInactive;
+ 
     [SerializeField] TextMeshProUGUI challengeProgressTextInfo;
 
     [SerializeField] TextMeshProUGUI challengerNameL2;
@@ -182,12 +188,14 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] TextMeshProUGUI resultsP1Name;
     [SerializeField] TextMeshProUGUI resultsP2Name;
     [SerializeField] TextMeshProUGUI resultsP3Name;
+    [SerializeField] TextMeshProUGUI resultsP4Name;
 
     [SerializeField] TextMeshProUGUI resultsP1cashTotal;
     [SerializeField] TextMeshProUGUI resultsP2cashTotal;
     [SerializeField] TextMeshProUGUI resultsP3cashTotal;
+    [SerializeField] TextMeshProUGUI resultsP4cashTotal;
 
-    
+
 
 
     [SerializeField] Sprite carDefaultSprite;
@@ -418,10 +426,20 @@ public class PlayerManager3P : MonoBehaviour
     {
         challengeButtonFirstInactive.gameObject.SetActive(true);
         challengeButtonSecondInactive.gameObject.SetActive(true);
+
+        if (MainManager.playerNumber == 4)
+        {
+            challengeButtonThirdInactive.gameObject.SetActive(true);
+        }
         nextRaceComingUpPanel.SetActive(false);
         challengePanel.SetActive(true);
         challengefirstInactive.text = MainManager.playerNames[MainManager.inactivePlayers[0]];
         challengeSecondInactive.text = MainManager.playerNames[MainManager.inactivePlayers[1]];
+        if (MainManager.playerNumber == 4)
+        {
+            challengeThirdInactive.text = MainManager.playerNames[MainManager.inactivePlayers[2]];
+        }
+
 
 
         if (MainManager.playerInventory[MainManager.inactivePlayers[0], MainManager.currentCarIndex] < 1)
@@ -435,6 +453,16 @@ public class PlayerManager3P : MonoBehaviour
 
         {
             challengeButtonSecondInactive.gameObject.SetActive(false);
+        }
+
+        if (MainManager.playerNumber == 4)
+
+        {
+            if (MainManager.playerInventory[MainManager.inactivePlayers[2], MainManager.currentCarIndex] < 1)
+
+            {
+                challengeButtonThirdInactive.gameObject.SetActive(false);
+            }
         }
 
 
@@ -1068,6 +1096,11 @@ public class PlayerManager3P : MonoBehaviour
             invDisplayP2[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[1, i].ToString();
             invDisplayP3[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[2, i].ToString();
 
+            if (MainManager.playerNumber == 4)
+            {
+                invDisplayP4[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[3, i].ToString();
+            }
+
             if (MainManager.playerInventory[0, i] < 1)
             {
                 invDisplayP1[i].gameObject.SetActive(false);
@@ -1091,6 +1124,17 @@ public class PlayerManager3P : MonoBehaviour
 
             else invDisplayP3[i].gameObject.SetActive(true);
 
+            if (MainManager.playerNumber == 4)
+
+            {
+                if (MainManager.playerInventory[3, i] < 1)
+
+                {
+                    invDisplayP4[i].gameObject.SetActive(false);
+                }
+
+                else invDisplayP4[i].gameObject.SetActive(true);
+            }
         }
 
     }
@@ -1376,9 +1420,12 @@ public class PlayerManager3P : MonoBehaviour
 
     {
         preSellingInfoPanel.SetActive(false);
-        sellButtons[0].gameObject.SetActive(true);
-        sellButtons[1].gameObject.SetActive(true);
-        sellButtons[2].gameObject.SetActive(true);
+
+        for (int i = 0; i < MainManager.playerNumber; i++)
+
+        { playerSellButton[i].gameObject.SetActive(true); }
+
+        
         SellDoneButton.gameObject.SetActive(true);
 
     }
@@ -1407,6 +1454,23 @@ public class PlayerManager3P : MonoBehaviour
             if (MainManager.playerInventory[MainManager.activePlayer, i] < 1 || MainManager.fieldsLeftForCar[i] < 1)
 
             {
+                int numberOfOwners = 0;
+
+                for (int j=0; j < MainManager.inactivePlayers.Length; j++)
+
+                {                   
+
+                    if (MainManager.playerInventory[MainManager.inactivePlayers[j], i] > 0)
+                    { numberOfOwners++; }
+
+                }
+
+
+                if (numberOfOwners > 1 && MainManager.fieldsLeftForCar[i] > 0)
+                { MainManager.playerOutofOptions[i] = false; }
+
+                else 
+
                 MainManager.playerOutofOptions[i] = true;
             }
 
@@ -1445,6 +1509,7 @@ public class PlayerManager3P : MonoBehaviour
         Debug.Log("Game Over");
 
         gameOverPanel.SetActive(true);
+        audioSource.PlayOneShot(heartbeat);
 
         resultsP1Name.text = MainManager.playerNames[0];
         resultsP2Name.text = MainManager.playerNames[1];
@@ -1452,9 +1517,21 @@ public class PlayerManager3P : MonoBehaviour
         resultsP1cashTotal.text = MainManager.playerCash[0].ToString();
         resultsP2cashTotal.text = MainManager.playerCash[1].ToString();
         resultsP3cashTotal.text = MainManager.playerCash[2].ToString();
-        resultsP3cashTotal.text = MainManager.playerCash[2].ToString();
+        
 
+        if (MainManager.playerNumber > 3)
 
+        {
+            resultsP4Name.text = MainManager.playerNames[3];
+            resultsP4cashTotal.text = MainManager.playerCash[3].ToString();
+        }
+
+    }
+
+    public void BackToMainMenu()
+
+    {
+        SceneManager.LoadScene(0);
     }
 
 

@@ -27,6 +27,13 @@ public class RunnerUpDropdown : MonoBehaviour
         var option3 = new TMP_Dropdown.OptionData(MainManager.playerNames[2]);
         runnerUpDropdown.options.Add(option3);
 
+        if (MainManager.playerNumber > 3)
+
+        {
+            var option4 = new TMP_Dropdown.OptionData(MainManager.playerNames[3]);
+            runnerUpDropdown.options.Add(option4);
+        }
+
 
         runnerUpDropdown.RefreshShownValue();
 
