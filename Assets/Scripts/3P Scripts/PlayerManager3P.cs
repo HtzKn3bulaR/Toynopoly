@@ -36,7 +36,7 @@ public class PlayerManager3P : MonoBehaviour
 
     private int[] carValueChangeOptions = { -10, -7, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 7, 10 };
 
-    private List<int> roundsWithCarSellingOption = new List<int> { 3, 6, 9, 12 };
+    //private List<int> roundsWithCarSellingOption = new List<int> { 3, 6, 9, 12 };
 
     public int lastChangebeforeDefault = 0;
 
@@ -871,14 +871,22 @@ public class PlayerManager3P : MonoBehaviour
     {
 
 
-        if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
+        /*if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
+
+        {
+            preSellingInfoPanel.SetActive(true);
+            audioSource.PlayOneShot(panelOpen);
+        }
+        */
+
+        if (MainManager.roundCounter % MainManager.playerNumber == 0)
 
         {
             preSellingInfoPanel.SetActive(true);
             audioSource.PlayOneShot(panelOpen);
         }
 
-        else
+        else                  
 
             RoundChangeover();
 
@@ -1035,7 +1043,17 @@ public class PlayerManager3P : MonoBehaviour
         timeBattlePanel.SetActive(false);
         buffNerfPanel.SetActive(false);
 
-        if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
+        /*if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
+
+        {
+            preSellingInfoPanel.SetActive(true);
+            audioSource.PlayOneShot(panelOpen);
+        }
+
+        else
+        */
+
+        if (MainManager.roundCounter % MainManager.playerNumber == 0)
 
         {
             preSellingInfoPanel.SetActive(true);
@@ -1061,7 +1079,17 @@ public class PlayerManager3P : MonoBehaviour
         timeBattlePanel.SetActive(false);
         buffNerfPanel.SetActive(false);
 
-        if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
+        /*if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
+
+        {
+            preSellingInfoPanel.SetActive(true);
+            audioSource.PlayOneShot(panelOpen);
+        }
+
+        else
+        */
+
+        if (MainManager.roundCounter % MainManager.playerNumber == 0)
 
         {
             preSellingInfoPanel.SetActive(true);
@@ -1309,6 +1337,9 @@ public class PlayerManager3P : MonoBehaviour
 
     public void RoundChangeover()
     {
+
+        Save();
+
         carInDefaultPanel.SetActive(false);
         postRaceMarketPanel.SetActive(false);
 
@@ -1535,7 +1566,110 @@ public class PlayerManager3P : MonoBehaviour
     }
 
 
+    private void Save()
+    {
+        int[] concatenatedInventory = new int[36];
+        int x = 0;
+        int y = 0;
+        int z = 0;
+        int a = 0;
+        int b = 0;
 
+        for (int i = 0; i < concatenatedInventory.Length; i++)
+
+        {
+            if (i < 6)
+            { concatenatedInventory[i] = MainManager.playerInventory[0, i]; }
+
+            else if (i < 12)
+            {
+                concatenatedInventory[i] = MainManager.playerInventory[1, x];
+                x++;
+            }
+
+            else if (i < 18)
+            {
+                concatenatedInventory[i] = MainManager.playerInventory[2, y];
+                y++;
+            }
+
+            else if (i < 24)
+            {
+                concatenatedInventory[i] = MainManager.playerInventory[3, z];
+                z++;
+            }
+
+            else if (i < 30)
+
+            {
+                concatenatedInventory[i] = MainManager.playerInventory[4, a];
+                a++;
+            }
+
+            else
+            {
+                concatenatedInventory[i] = MainManager.playerInventory[5, b];
+                a++;
+            }
+
+
+        }
+
+
+        SaveGameData playerData = new SaveGameData
+        {
+            playerNumber = MainManager.playerNumber,
+            playerNames = MainManager.playerNames,
+            playerCash = MainManager.playerCash,
+
+            playerInventory = concatenatedInventory,
+            classSelected = MainManager.classSelected,
+            cars = MainManager.cars,
+            carPrizes = MainManager.carPrizes,
+            fieldsLeftForCar = MainManager.fieldsLeftForCar,
+            fieldAvailable = MainManager.fieldAvailable,
+            activeTracks = MainManager.activeTracks,
+            bonusTrack = MainManager.bonusTrack,
+            activePlayer = MainManager.activePlayer,
+            level = MainManager.levelCounter,
+            round = MainManager.roundCounter
+
+        };
+
+        string json = JsonUtility.ToJson(playerData);
+        Debug.Log(json);
+
+        SaveSystem.Save(json);
+
+        SaveGameData loadedPlayerData = JsonUtility.FromJson<SaveGameData>(json);
+
+
+    }
+
+
+
+    public class SaveGameData
+    {
+        public int playerNumber;
+        public string[] playerNames;
+        public int[] playerCash;
+
+        public int[] playerInventory;
+        public int classSelected;
+        public string[] cars;
+        public int[] carPrizes;
+        public int[] fieldsLeftForCar;
+        public bool[] fieldAvailable;
+
+        public string[] activeTracks;
+        public string bonusTrack;
+
+        public int activePlayer;
+        public int level;
+        public int round;
+
+
+    }
 
 
 }

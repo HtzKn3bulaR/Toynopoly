@@ -7,6 +7,8 @@ public class MainManager : MonoBehaviour
 {
     public static MainManager Instance;
 
+    public static bool gameResumed = false;
+    
     public static int playerNumber = 0;
 
     public static int classSelected = 0;
@@ -24,6 +26,7 @@ public class MainManager : MonoBehaviour
     public static string[] playerNames = { "Player1", "Player2", "Player3", "Player4", "Player5", "Player6" };
 
     public static int[] fieldsLeftForCar = { 10, 10, 10, 10, 10, 10 };
+    public static bool[] fieldAvailable = new bool[59];
 
     public static int pendingField = 0;
     public static int currentCarIndex = 0;

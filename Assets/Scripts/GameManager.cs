@@ -1,13 +1,14 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 
 public class GameManager : MonoBehaviour
 {
+
+    
 
     public AudioClip panelOpen;
     public AudioClip stageReady;
@@ -15,6 +16,7 @@ public class GameManager : MonoBehaviour
     public AudioClip jewelHit;
     public AudioClip transition;
     public AudioClip heartbeat;
+    public AudioClip newGame;
     public AudioSource audioSource;
 
     public GameObject[] rows;
@@ -80,14 +82,14 @@ public class GameManager : MonoBehaviour
     public Button[] carPic;
     [SerializeField] Sprite carDefaultSprite;
 
-    [SerializeField] TextMeshProUGUI cashP1;
-    [SerializeField] TextMeshProUGUI cashP2;
+    public TextMeshProUGUI cashP1;
+    public TextMeshProUGUI cashP2;
     public TextMeshProUGUI[] cashDisplay;
 
     [SerializeField] TextMeshProUGUI gapDefeatSecondsDisplay;
     [SerializeField] TextMeshProUGUI gapWinSecondsDisplay;
 
-        
+
     //New
     [SerializeField] Button[] invDisplayP1;
     [SerializeField] Button[] invDisplayP2;
@@ -140,6 +142,7 @@ public class GameManager : MonoBehaviour
 
     private List<int> roundsWithCarSellingOption = new List<int> { 2, 4, 6, 8, 10, 12 };
 
+    
     private TimeBattleButtons timeBattlePanelScript;
     private DividendGenerator dividendScript;
     private ToynopolyCalculator toynopolyCalculatorScript;
@@ -151,6 +154,33 @@ public class GameManager : MonoBehaviour
         dividendScript = GameObject.Find("DividendGenerator").GetComponent<DividendGenerator>();
         toynopolyCalculatorScript = GameObject.Find("ToynopolyCalculator").GetComponent<ToynopolyCalculator>();
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+
+        if (MainManager.gameResumed)
+        {
+            for (int i = 0; i < MainManager.cars.Length; i++)
+
+            {
+                invDisplayP1[i].gameObject.SetActive(true);
+                invDisplayP2[i].gameObject.SetActive(true);
+            }
+                        
+            UpdateInventoryDisplay();
+            UpdateCarPrizesDisplay();
+            RoundChangeover();
+            UpdateCashDisplay();
+        }
+
+        else { audioSource.PlayOneShot(newGame);
+
+            for (int i = 0; i < MainManager.fieldAvailable.Length; i++)
+
+            {
+                MainManager.fieldAvailable[i] = true;
+            }
+            }
+
+
+        SaveSystem.Init();
     }
 
     // Update is called once per frame
@@ -594,6 +624,7 @@ public class GameManager : MonoBehaviour
 
 
         fields[MainManager.pendingField].gameObject.SetActive(false);
+        MainManager.fieldAvailable[MainManager.pendingField] = false;
 
         MainManager.fieldsLeftForCar[MainManager.currentCarIndex]--;
 
@@ -927,6 +958,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < MainManager.cars.Length; i++)
 
         {
+                        
             invDisplayP1[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[0, i].ToString();
             invDisplayP2[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[1, i].ToString();
 
@@ -944,7 +976,7 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void UpdateCarPrizesDisplay()
+    public void UpdateCarPrizesDisplay()
 
     {
         for (int i = 0; i < carPrizeDisplays.Length; i++)
@@ -1090,6 +1122,9 @@ public class GameManager : MonoBehaviour
     public void RoundChangeover()
 
     {
+
+        Save();
+
         carInDefaultPanel.SetActive(false);
         p1SellButton.gameObject.SetActive(false);
         p2SellButton.gameObject.SetActive(false);
@@ -1123,7 +1158,7 @@ public class GameManager : MonoBehaviour
         }
 
         turnIndicator[MainManager.activePlayer].SetActive(true);
-                     
+
 
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
@@ -1146,11 +1181,19 @@ public class GameManager : MonoBehaviour
         }
 
         LevelCheck();
-
+                
         BankruptCheck();
 
-
     }
+
+    void UpdateCashDisplay()
+    {
+        cashDisplay[0].text = MainManager.playerCash[0].ToString();
+        cashDisplay[1].text = MainManager.playerCash[1].ToString();
+    }
+
+
+
 
     void LevelCheck()
 
@@ -1431,6 +1474,109 @@ public class GameManager : MonoBehaviour
     }
 
 
+    private void Save()
+    {
+        int[] concatenatedInventory = new int[36];
+        int x = 0;
+        int y = 0;
+        int z = 0;
+        int a = 0;
+        int b = 0;
+
+        for (int i=0; i<concatenatedInventory.Length; i++)
+
+        {
+            if (i<6)
+            { concatenatedInventory[i] = MainManager.playerInventory[0, i]; }
+
+            else if (i<12)
+            { concatenatedInventory[i] = MainManager.playerInventory[1, x];
+                x++;
+            }
+
+            else if (i<18)
+            {
+                concatenatedInventory[i] = MainManager.playerInventory[2, y];
+                y++;
+            }
+
+            else if (i<24)
+            {
+                concatenatedInventory[i] = MainManager.playerInventory[3, z];
+                z++;
+            }
+
+            else if (i<30)
+
+            {
+                concatenatedInventory[i] = MainManager.playerInventory[4, a];
+                a++;
+            }
+
+            else
+            {
+                concatenatedInventory[i] = MainManager.playerInventory[5, b];
+                a++;
+            }
+
+
+        }
+        
+          
+        SaveGameData playerData = new SaveGameData
+        {
+            playerNumber = MainManager.playerNumber,
+            playerNames = MainManager.playerNames,
+            playerCash = MainManager.playerCash,
+
+            playerInventory = concatenatedInventory,
+            classSelected = MainManager.classSelected,
+            cars = MainManager.cars,
+            carPrizes = MainManager.carPrizes,
+            fieldsLeftForCar = MainManager.fieldsLeftForCar,
+            fieldAvailable = MainManager.fieldAvailable,
+            activeTracks = MainManager.activeTracks,
+            bonusTrack = MainManager.bonusTrack,
+            activePlayer = MainManager.activePlayer,
+            level = MainManager.levelCounter,
+            round = MainManager.roundCounter
+
+        };
+
+        string json = JsonUtility.ToJson(playerData);
+        Debug.Log(json);
+
+        SaveSystem.Save(json);
+
+        SaveGameData loadedPlayerData = JsonUtility.FromJson<SaveGameData>(json);
+           
+        
+    }
+
+    
+
+    public class SaveGameData
+        {
+        public int playerNumber;
+        public string[] playerNames;
+        public int[] playerCash;
+
+        public int[] playerInventory;
+        public int classSelected;
+        public string[] cars;
+        public int[] carPrizes;
+        public int[] fieldsLeftForCar;
+        public bool[] fieldAvailable;
+
+        public string[] activeTracks;
+        public string bonusTrack;
+
+        public int activePlayer;
+        public int level;
+        public int round;
+
+
+        }
 
 }
 

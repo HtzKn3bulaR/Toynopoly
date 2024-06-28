@@ -23,6 +23,19 @@ public class PreGameFlowManager : MonoBehaviour
     [SerializeField] TMP_Dropdown playerNumberMenu;
 
 
+    [SerializeField] GameObject playerNamesPanel2P;
+    [SerializeField] GameObject playerNamesPanel3P;
+
+    [SerializeField] TextMeshProUGUI p1NameInputFieldP2;
+    [SerializeField] TextMeshProUGUI p2NameInputFieldP2;
+
+    [SerializeField] TextMeshProUGUI p1NameInputFieldP3;
+    [SerializeField] TextMeshProUGUI p2NameInputFieldP3;   
+    [SerializeField] TextMeshProUGUI p3NameInputFieldP3;
+
+    [SerializeField] TextMeshProUGUI p4NameInputField;
+    [SerializeField] TextMeshProUGUI p5NameInputField;
+    [SerializeField] TextMeshProUGUI p6NameInputField;
 
 
     // Start is called before the first frame update
@@ -41,16 +54,140 @@ public class PreGameFlowManager : MonoBehaviour
     }
 
 
-    public void ContinueToMain()
+    public void EnterPlayerNames()
 
     {
         MainManager.classSelected = (carClassMenu.value);
         MainManager.playerNumber = (playerNumberMenu.value) + 2;
 
-        SceneManager.LoadScene(MainManager.playerNumber - 1);
+        switch (MainManager.playerNumber)
 
+        {
+            case 2:
+                playerNamesPanel2P.SetActive(true);
+                break;
+
+            case 3:
+                playerNamesPanel3P.SetActive(true);
+                break;
+        }
         
+        
+        
+                             
     }
+
+    public void ContinueToMain()
+
+    {
+
+        switch (MainManager.playerNumber)
+
+            {
+                case 2:
+                    MainManager.playerNames[0] = p1NameInputFieldP2.text.ToUpper();
+                    MainManager.playerNames[1] = p2NameInputFieldP2.text.ToUpper();
+                    
+                    break;
+
+                case 3:
+                    MainManager.playerNames[0] = p1NameInputFieldP3.text.ToUpper();
+                    MainManager.playerNames[1] = p2NameInputFieldP3.text.ToUpper();
+                    MainManager.playerNames[2] = p3NameInputFieldP3.text.ToUpper();
+                    
+                    break;
+
+            }
+
+
+            SceneManager.LoadScene(MainManager.playerNumber - 1);
+    }
+
+    public void ResumePreviousGame()
+    {
+        Load();
+        MainManager.gameResumed = true;
+        SceneManager.LoadScene(MainManager.playerNumber - 1);
+    }
+
+    private void Load()
+    {
+        int x = 0;
+        int y = 0;
+        int z = 0;
+        int a = 0;
+        int b = 0;
+
+        string saveString = SaveSystem.Load();
+
+        if (saveString != null)
+        {
+
+            GameManager.SaveGameData playerData = JsonUtility.FromJson<GameManager.SaveGameData>(saveString);
+
+            MainManager.playerNumber = playerData.playerNumber;
+            MainManager.playerNames = playerData.playerNames;
+            MainManager.playerCash = playerData.playerCash;
+                        
+            MainManager.classSelected = playerData.classSelected;
+            MainManager.cars = playerData.cars;
+            MainManager.carPrizes = playerData.carPrizes;
+            MainManager.fieldsLeftForCar = playerData.fieldsLeftForCar;
+            MainManager.fieldAvailable = playerData.fieldAvailable;
+            MainManager.activeTracks = playerData.activeTracks;
+            MainManager.bonusTrack = playerData.bonusTrack;
+            MainManager.activePlayer = playerData.activePlayer;
+            MainManager.levelCounter = playerData.level;
+            MainManager.roundCounter = playerData.round;
+
+            for (int i = 0; i < playerData.playerInventory.Length; i++)
+
+            {
+                if (i < 6)
+                { MainManager.playerInventory[0, i] = playerData.playerInventory[i]; }
+
+                else if (i < 12)
+                {
+                    MainManager.playerInventory[1, x] = playerData.playerInventory[i];
+                    x++;
+                }
+
+                else if (i < 18)
+                {
+                    MainManager.playerInventory[2, y] = playerData.playerInventory[i];
+                    y++;
+                }
+
+                else if (i < 24)
+                {
+                    MainManager.playerInventory[3, z] = playerData.playerInventory[i];
+                    z++;
+                }
+
+                else if (i < 30)
+
+                {
+                    MainManager.playerInventory[4, a] = playerData.playerInventory[i];
+                    a++;
+                }
+
+                else
+                {
+                    MainManager.playerInventory[5, b] = playerData.playerInventory[i];
+                    a++;
+                }
+
+
+            }
+
+
+        }
+
+        else
+
+            ContinueToMain();
+    }
+
 
     public void OpenHelp()
     {
