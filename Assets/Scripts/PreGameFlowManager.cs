@@ -25,6 +25,7 @@ public class PreGameFlowManager : MonoBehaviour
 
     [SerializeField] GameObject playerNamesPanel2P;
     [SerializeField] GameObject playerNamesPanel3P;
+    [SerializeField] GameObject playerNamesPanel4P;
 
     [SerializeField] TextMeshProUGUI p1NameInputFieldP2;
     [SerializeField] TextMeshProUGUI p2NameInputFieldP2;
@@ -33,7 +34,11 @@ public class PreGameFlowManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI p2NameInputFieldP3;   
     [SerializeField] TextMeshProUGUI p3NameInputFieldP3;
 
-    [SerializeField] TextMeshProUGUI p4NameInputField;
+    [SerializeField] TextMeshProUGUI p1NameInputFieldP4;
+    [SerializeField] TextMeshProUGUI p2NameInputFieldP4;
+    [SerializeField] TextMeshProUGUI p3NameInputFieldP4;
+    [SerializeField] TextMeshProUGUI p4NameInputFieldP4;
+    
     [SerializeField] TextMeshProUGUI p5NameInputField;
     [SerializeField] TextMeshProUGUI p6NameInputField;
 
@@ -70,6 +75,10 @@ public class PreGameFlowManager : MonoBehaviour
             case 3:
                 playerNamesPanel3P.SetActive(true);
                 break;
+
+            case 4:
+                playerNamesPanel4P.SetActive(true);
+                break;
         }
         
         
@@ -87,17 +96,22 @@ public class PreGameFlowManager : MonoBehaviour
                 case 2:
                     MainManager.playerNames[0] = p1NameInputFieldP2.text.ToUpper();
                     MainManager.playerNames[1] = p2NameInputFieldP2.text.ToUpper();
-                    
                     break;
 
                 case 3:
                     MainManager.playerNames[0] = p1NameInputFieldP3.text.ToUpper();
                     MainManager.playerNames[1] = p2NameInputFieldP3.text.ToUpper();
                     MainManager.playerNames[2] = p3NameInputFieldP3.text.ToUpper();
-                    
                     break;
 
-            }
+            case 4:
+                MainManager.playerNames[0] = p1NameInputFieldP4.text.ToUpper();
+                MainManager.playerNames[1] = p2NameInputFieldP4.text.ToUpper();
+                MainManager.playerNames[2] = p3NameInputFieldP4.text.ToUpper();
+                MainManager.playerNames[3] = p4NameInputFieldP4.text.ToUpper();
+                break;
+
+        }
 
 
             SceneManager.LoadScene(MainManager.playerNumber - 1);

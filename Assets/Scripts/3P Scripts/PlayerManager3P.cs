@@ -219,6 +219,41 @@ public class PlayerManager3P : MonoBehaviour
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
         toggleGroup = GetComponent<ToggleGroup>();
         dividendScript = GameObject.Find("DividendGenerator").GetComponent<DividendGenerator>();
+
+        if (MainManager.gameResumed)
+        {
+            for (int i = 0; i < MainManager.cars.Length; i++)
+
+            {
+                invDisplayP1[i].gameObject.SetActive(true);
+                invDisplayP2[i].gameObject.SetActive(true);
+                invDisplayP3[i].gameObject.SetActive(true);
+
+                if (MainManager.playerNumber == 4)
+                { invDisplayP4[i].gameObject.SetActive(true); }
+            }
+
+            UpdateInventoryDisplay();
+            UpdateCarPrizesDisplay();
+            RoundChangeover();
+            UpdateCashDisplay();
+        }
+
+        else
+        {
+            audioSource.PlayOneShot(heartbeat);
+
+            for (int i = 0; i < MainManager.fieldAvailable.Length; i++)
+
+            {
+                MainManager.fieldAvailable[i] = true;
+            }
+        }
+
+
+        SaveSystem.Init();
+
+
     }
 
     // Update is called once per frame
@@ -698,6 +733,7 @@ public class PlayerManager3P : MonoBehaviour
 
 
         fields[MainManager.pendingField].gameObject.SetActive(false);
+        MainManager.fieldAvailable[MainManager.pendingField] = false;
 
         MainManager.fieldsLeftForCar[MainManager.currentCarIndex]--;
 

@@ -48,11 +48,12 @@ public class GridGenerator3P : MonoBehaviour
     [SerializeField] TextMeshProUGUI player3NameField;
     [SerializeField] TextMeshProUGUI player4NameField;
 
+     /*
     public TextMeshProUGUI p1NameInputField;
     public TextMeshProUGUI p2NameInputField;
     public TextMeshProUGUI p3NameInputField;
     public TextMeshProUGUI p4NameInputField;
-
+   */
 
     [SerializeField] Button carASprite;
     [SerializeField] Button carBSprite;
@@ -214,6 +215,10 @@ public class GridGenerator3P : MonoBehaviour
             player1NameField.text = MainManager.playerNames[0];
             player2NameField.text = MainManager.playerNames[1];
             player3NameField.text = MainManager.playerNames[2];
+
+            if (MainManager.playerNumber == 4)
+            { player4NameField.text = MainManager.playerNames[3]; }
+
             carCarrousel.SetActive(false);
 
             foreach (GameObject row in gameManagerScript.rows)
@@ -374,6 +379,42 @@ public class GridGenerator3P : MonoBehaviour
     void PopulateCarCards()
 
     {
+
+        switch (MainManager.classSelected)
+
+        {
+            case 0:
+                activeList = rookieNamesList;
+                activeSpriteList = rookieSpriteList;
+                break;
+
+            case 1:
+                activeList = amateurNamesList;
+                activeSpriteList = amateurSpriteList;
+                break;
+
+            case 2:
+                activeList = advancedNamesList;
+                activeSpriteList = advancedSpriteList;
+                break;
+
+            case 3:
+                activeList = semiProNamesList;
+                activeSpriteList = semiProSpriteList;
+                break;
+
+            case 4:
+                activeList = proNamesList;
+                activeSpriteList = proSpriteList;
+                break;
+
+            case 5:
+                activeList = superProNamesList;
+                activeSpriteList = superProSpriteList;
+                break;
+
+        }
+
         carAText.text = MainManager.cars[0];
         carBText.text = MainManager.cars[1];
         carCText.text = MainManager.cars[2];
@@ -586,8 +627,7 @@ public class GridGenerator3P : MonoBehaviour
 
         {
             case 2:
-                MainManager.playerNames[0] = p1NameInputField.text.ToUpper();
-                MainManager.playerNames[1] = p2NameInputField.text.ToUpper();
+                
                 player1NameField.text = MainManager.playerNames[0];
                 player2NameField.text = MainManager.playerNames[1];
                 break;
