@@ -72,7 +72,7 @@ public class SellingHandlerP3 : MonoBehaviour
                 gameManagerScript.cashDisplay[MainManager.seller].text = MainManager.playerCash[MainManager.seller].ToString();
                 sellCarDialoguePanel.SetActive(false);
 
-                if (MainManager.roundCounter == 12)
+                if (MainManager.roundCounter == MainManager.raceThreshold -1)
 
                 {
 

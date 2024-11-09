@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject gameOverPanel;
     [SerializeField] GameObject carInDefaultPanel;
     [SerializeField] GameObject buyOptionPanel;
+    [SerializeField] GameObject pausePanel;
 
     [SerializeField] GameObject sliderDefeat;
     [SerializeField] GameObject sliderWin;
@@ -114,6 +115,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] GameObject[] turnIndicator;
     public TextMeshProUGUI statusInfoTextBar;
+    public TextMeshProUGUI helpText;
 
     [SerializeField] TextMeshProUGUI currentRaceInfoTrack;
     [SerializeField] TextMeshProUGUI currentRaceInfoCar;
@@ -186,8 +188,18 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            pausePanel.gameObject.SetActive(true);
+        }
 
+    }
 
+    public void Resume()
+
+    {
+        pausePanel.gameObject.SetActive(false);
     }
 
 
@@ -276,6 +288,7 @@ public class GameManager : MonoBehaviour
 
         { selectedTrack = MainManager.bonusTrack; }
 
+        helpText.gameObject.SetActive(false);
 
         ShowNextRacePanel();
 
@@ -1376,7 +1389,7 @@ public class GameManager : MonoBehaviour
 
         {
             case 0:
-                if (MainManager.playerOutofOptions.Contains(false) == false)
+                if (MainManager.playerOutofOptions[0] == true)
                 {
                     if (MainManager.playerCash[0] > MainManager.playerCash[1])
 
@@ -1389,7 +1402,7 @@ public class GameManager : MonoBehaviour
                 break;
 
             case 1:
-                if (MainManager.playerOutofOptions.Contains(false) == false)
+                if (MainManager.playerOutofOptions[1] == true)
                 {
                     if (MainManager.playerCash[1] > MainManager.playerCash[0])
 
@@ -1470,7 +1483,14 @@ public class GameManager : MonoBehaviour
 
     public void BackToMenu()
     {
+        pausePanel.gameObject.SetActive(false);
         SceneManager.LoadScene(0);
+    }
+
+    public void QuitGame()
+
+    {
+        Application.Quit();
     }
 
 

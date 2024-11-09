@@ -47,13 +47,14 @@ public class GridGenerator3P : MonoBehaviour
     [SerializeField] TextMeshProUGUI player2NameField;
     [SerializeField] TextMeshProUGUI player3NameField;
     [SerializeField] TextMeshProUGUI player4NameField;
+    [SerializeField] TextMeshProUGUI player5NameField;
 
-     /*
-    public TextMeshProUGUI p1NameInputField;
-    public TextMeshProUGUI p2NameInputField;
-    public TextMeshProUGUI p3NameInputField;
-    public TextMeshProUGUI p4NameInputField;
-   */
+    /*
+   public TextMeshProUGUI p1NameInputField;
+   public TextMeshProUGUI p2NameInputField;
+   public TextMeshProUGUI p3NameInputField;
+   public TextMeshProUGUI p4NameInputField;
+  */
 
     [SerializeField] Button carASprite;
     [SerializeField] Button carBSprite;
@@ -216,8 +217,11 @@ public class GridGenerator3P : MonoBehaviour
             player2NameField.text = MainManager.playerNames[1];
             player3NameField.text = MainManager.playerNames[2];
 
-            if (MainManager.playerNumber == 4)
+            if (MainManager.playerNumber > 3)
             { player4NameField.text = MainManager.playerNames[3]; }
+
+            if (MainManager.playerNumber > 4)
+            { player5NameField.text = MainManager.playerNames[4]; }
 
             carCarrousel.SetActive(false);
 
@@ -647,13 +651,28 @@ public class GridGenerator3P : MonoBehaviour
                 player4NameField.text = MainManager.playerNames[3];
                 break;
 
-                
+            case 5:
+
+                player1NameField.text = MainManager.playerNames[0];
+                player2NameField.text = MainManager.playerNames[1];
+                player3NameField.text = MainManager.playerNames[2];
+                player4NameField.text = MainManager.playerNames[3];
+                player5NameField.text = MainManager.playerNames[4];
+                break;
+
         }
 
         StartCoroutine(WaitAfterLineupSelected());
                 
 
-        gameManagerScript.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+        if (MainManager.playerNumber == 5)
+        {
+            gameManagerScript.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {11 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+        }
+        else
+        {
+            gameManagerScript.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+        }
     }
 
     void ShowNextRow()
@@ -724,6 +743,7 @@ public class GridGenerator3P : MonoBehaviour
         gameStartingPanel.SetActive(false);
 
         gameSounds.PlayOneShot(transition);
+        gameManagerScript.helpText.gameObject.SetActive(true);
 
         ShowNextRow();
     }

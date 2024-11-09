@@ -16,6 +16,7 @@ public class PlayerManager3P : MonoBehaviour
     public Button challengeButtonFirstInactive;
     public Button challengeButtonSecondInactive;
     public Button challengeButtonThirdInactive;
+    public Button challengeButtonFourthInactive;
 
     public Button challengeRaceProgressCar;
     public Button challengeRaceProgressTrack;
@@ -28,7 +29,7 @@ public class PlayerManager3P : MonoBehaviour
     private bool playerHasBoughtCarThisRound = false;
     private bool activePlayerHasToynopoly = false;
 
-    private bool[] wantsToBuy = { false, false };
+    private bool[] wantsToBuy = { false, false, false, false, false };
     private bool stolenWin = false;
 
     private bool challengeWon = true;
@@ -52,6 +53,7 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] Button[] invDisplayP2;
     [SerializeField] Button[] invDisplayP3;
     [SerializeField] Button[] invDisplayP4;
+    [SerializeField] Button[] invDisplayP5;
 
     [SerializeField] Button buyCarButton;
 
@@ -103,10 +105,13 @@ public class PlayerManager3P : MonoBehaviour
 
     [SerializeField] GameObject gameOverPanel;
 
+    [SerializeField] GameObject pausePanel;
+
     //[SerializeField] Button[] sellButtons = { };
 
     public TMP_Dropdown winnerDropdown;
     public TMP_Dropdown runnerUpDropdown;
+    public TMP_Dropdown thirdPlaceDropdown;
 
     public TMP_Dropdown playersL2WinnerDropdown;
 
@@ -130,6 +135,7 @@ public class PlayerManager3P : MonoBehaviour
 
 
     [SerializeField] TextMeshProUGUI activePlayerMessage;
+    public TextMeshProUGUI helpText;
 
 
 
@@ -159,11 +165,13 @@ public class PlayerManager3P : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI firstinactivePlayerName;
     [SerializeField] TextMeshProUGUI secondinactivePlayerName;
-    [SerializeField] TextMeshProUGUI thirdInactivePlayerName;
+    [SerializeField] TextMeshProUGUI thirdinactivePlayerName;
+    [SerializeField] TextMeshProUGUI fourthinactivePlayerName;
 
     [SerializeField] TextMeshProUGUI challengefirstInactive;
     [SerializeField] TextMeshProUGUI challengeSecondInactive;
     [SerializeField] TextMeshProUGUI challengeThirdInactive;
+    [SerializeField] TextMeshProUGUI challengeFourthInactive;
  
     [SerializeField] TextMeshProUGUI challengeProgressTextInfo;
 
@@ -189,11 +197,13 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] TextMeshProUGUI resultsP2Name;
     [SerializeField] TextMeshProUGUI resultsP3Name;
     [SerializeField] TextMeshProUGUI resultsP4Name;
+    [SerializeField] TextMeshProUGUI resultsP5Name;
 
     [SerializeField] TextMeshProUGUI resultsP1cashTotal;
     [SerializeField] TextMeshProUGUI resultsP2cashTotal;
     [SerializeField] TextMeshProUGUI resultsP3cashTotal;
     [SerializeField] TextMeshProUGUI resultsP4cashTotal;
+    [SerializeField] TextMeshProUGUI resultsP5cashTotal;
 
 
 
@@ -207,6 +217,7 @@ public class PlayerManager3P : MonoBehaviour
 
     private int raceWinnerLevel1 = 0;
     private int runnerUpLevel1 = 0;
+    private int thirdLevel1 = 0;
 
     private DividendGenerator dividendScript;
 
@@ -216,7 +227,10 @@ public class PlayerManager3P : MonoBehaviour
     void Awake()
     {
         audioSource = GetComponent<AudioSource>();
-        statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+                     
+            statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+        
+
         toggleGroup = GetComponent<ToggleGroup>();
         dividendScript = GameObject.Find("DividendGenerator").GetComponent<DividendGenerator>();
 
@@ -229,10 +243,23 @@ public class PlayerManager3P : MonoBehaviour
                 invDisplayP2[i].gameObject.SetActive(true);
                 invDisplayP3[i].gameObject.SetActive(true);
 
-                if (MainManager.playerNumber == 4)
+                if (MainManager.playerNumber > 3)
                 { invDisplayP4[i].gameObject.SetActive(true); }
+
+                if (MainManager.playerNumber > 4)
+                { invDisplayP5[i].gameObject.SetActive(true); }
             }
 
+            if (MainManager.playerNumber == 5)
+            {
+                MainManager.raceThreshold = 11;
+            }
+
+            else
+
+                MainManager.raceThreshold = 13;
+            
+            
             UpdateInventoryDisplay();
             UpdateCarPrizesDisplay();
             RoundChangeover();
@@ -259,7 +286,16 @@ public class PlayerManager3P : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            pausePanel.gameObject.SetActive(true);
+        }
+    }
 
+    public void Resume()
+
+    {
+        pausePanel.gameObject.SetActive(false);
     }
 
     public void FieldClicked(int fieldNumber)
@@ -347,6 +383,7 @@ public class PlayerManager3P : MonoBehaviour
 
         { selectedTrack = MainManager.bonusTrack; }
 
+        helpText.gameObject.SetActive(false);
 
         ShowNextRacePanel();
 
@@ -462,21 +499,25 @@ public class PlayerManager3P : MonoBehaviour
         challengeButtonFirstInactive.gameObject.SetActive(true);
         challengeButtonSecondInactive.gameObject.SetActive(true);
 
-        if (MainManager.playerNumber == 4)
+        if (MainManager.playerNumber > 3)
         {
             challengeButtonThirdInactive.gameObject.SetActive(true);
         }
+
+        if (MainManager.playerNumber > 4)
+
+        {
+            challengeButtonFourthInactive.gameObject.SetActive(true);
+        }
+
+
         nextRaceComingUpPanel.SetActive(false);
         challengePanel.SetActive(true);
         challengefirstInactive.text = MainManager.playerNames[MainManager.inactivePlayers[0]];
         challengeSecondInactive.text = MainManager.playerNames[MainManager.inactivePlayers[1]];
-        if (MainManager.playerNumber == 4)
-        {
-            challengeThirdInactive.text = MainManager.playerNames[MainManager.inactivePlayers[2]];
-        }
-
-
-
+        challengeThirdInactive.text = MainManager.playerNames[MainManager.inactivePlayers[2]];
+        challengeFourthInactive.text = MainManager.playerNames[MainManager.inactivePlayers[3]];
+                
         if (MainManager.playerInventory[MainManager.inactivePlayers[0], MainManager.currentCarIndex] < 1)
 
         {
@@ -490,7 +531,7 @@ public class PlayerManager3P : MonoBehaviour
             challengeButtonSecondInactive.gameObject.SetActive(false);
         }
 
-        if (MainManager.playerNumber == 4)
+        if (MainManager.playerNumber > 3)
 
         {
             if (MainManager.playerInventory[MainManager.inactivePlayers[2], MainManager.currentCarIndex] < 1)
@@ -500,7 +541,23 @@ public class PlayerManager3P : MonoBehaviour
             }
         }
 
+        if (MainManager.playerNumber > 4)
 
+        {
+            if (MainManager.playerInventory[MainManager.inactivePlayers[3], MainManager.currentCarIndex] < 1)
+
+            {
+                challengeButtonFourthInactive.gameObject.SetActive(false);
+            }
+        }
+
+
+    }
+
+    public void ChallengeCancel()
+
+    {
+        challengePanel.SetActive(false);
     }
 
 
@@ -536,7 +593,7 @@ public class PlayerManager3P : MonoBehaviour
         playerHasBoughtCarThisRound = true;
 
         FillInactivePlayersArray();
-        Debug.Log($"Inactive players are {MainManager.inactivePlayers[0]} + {MainManager.inactivePlayers[1]}");
+        Debug.Log($"Inactive players are {MainManager.inactivePlayers[0]} + {MainManager.inactivePlayers[1]} + {MainManager.inactivePlayers[2]} + {MainManager.inactivePlayers[3]}");
         PerformLevel2Check();
 
         if (activePlayerHasToynopoly == true)
@@ -555,6 +612,17 @@ public class PlayerManager3P : MonoBehaviour
 
         firstinactivePlayerName.text = MainManager.playerNames[MainManager.inactivePlayers[0]];
         secondinactivePlayerName.text = MainManager.playerNames[MainManager.inactivePlayers[1]];
+
+        if (MainManager.playerNumber > 3)
+        {
+            thirdinactivePlayerName.text = MainManager.playerNames[MainManager.inactivePlayers[2]];
+        }
+
+        if (MainManager.playerNumber > 4)
+
+        {
+            fourthinactivePlayerName.text = MainManager.playerNames[MainManager.inactivePlayers[3]];
+        }
 
 
     }
@@ -664,7 +732,18 @@ public class PlayerManager3P : MonoBehaviour
             continueButtonNormal.SetActive(true);
             continueButtonToynopoly.SetActive(false);
             audioSource.PlayOneShot(stageReady);
-            currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} / 12 in progress");
+
+            if (MainManager.playerNumber == 5)
+            {
+                currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} / 10 in progress");
+            }
+
+            else
+
+            {
+                currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} / 12 in progress");
+            }
+
             currentRaceInfoTrack.text = selectedTrack;
             currentRaceInfoCar.text = selectedCar;
             currentRaceOpponent1.text = MainManager.playerNames[MainManager.activePlayer];
@@ -678,7 +757,7 @@ public class PlayerManager3P : MonoBehaviour
                 continueButtonNormal.SetActive(false);
                 continueButtonToynopoly.SetActive(true);
                 audioSource.PlayOneShot(stageReady);
-                currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} / 12 in progress");
+                currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} in progress");
                 currentRaceInfoTrack.text = selectedTrack;
                 currentRaceInfoCar.text = selectedCar;
                 currentRaceOpponent1.text = MainManager.playerNames[MainManager.activePlayer];
@@ -728,10 +807,6 @@ public class PlayerManager3P : MonoBehaviour
 
     {
         
-
-
-
-
         fields[MainManager.pendingField].gameObject.SetActive(false);
         MainManager.fieldAvailable[MainManager.pendingField] = false;
 
@@ -761,6 +836,12 @@ public class PlayerManager3P : MonoBehaviour
                 raceResultsPanelL1.SetActive(false);
                 raceWinnerLevel1 = winnerDropdown.value;
                 runnerUpLevel1 = runnerUpDropdown.value;
+
+                if (MainManager.playerNumber > 3)
+                {
+                    thirdLevel1 = thirdPlaceDropdown.value;
+                }
+                                
                 Level1Scoring();
                 PostRaceRandomMarketProcedure();
                 break;
@@ -1002,33 +1083,53 @@ public class PlayerManager3P : MonoBehaviour
 
     void Level1Scoring()
 
-    {
-        if (MainManager.activePlayerWins)
+    { switch (MainManager.playerNumber)
 
         {
-            PlayerWinsCar(MainManager.activePlayer);
+            case 5:
 
+                PlayerWinsCar(raceWinnerLevel1);
+                PlayerWinsCar(runnerUpLevel1);
+
+                if (MainManager.activePlayer != raceWinnerLevel1 && MainManager.activePlayer != runnerUpLevel1 && MainManager.activePlayer != thirdLevel1)
+
+                {
+                    MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
+                    UpdateCashDisplay();
+                }
+                break;
+
+            default:
+
+
+                if (MainManager.activePlayerWins)
+
+                {
+                    PlayerWinsCar(MainManager.activePlayer);
+
+                }
+
+                else if (runnerUpLevel1 == MainManager.activePlayer)
+                {
+                    PlayerWinsCar(raceWinnerLevel1);
+                    PlayerWinsCar(MainManager.activePlayer);
+
+                    MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
+                }
+
+                else
+
+                {
+                    PlayerWinsCar(raceWinnerLevel1);
+                    MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
+
+
+                }
+
+                UpdateCashDisplay();
+                
+                break;
         }
-
-        else if (runnerUpLevel1 == MainManager.activePlayer)
-        {
-            PlayerWinsCar(raceWinnerLevel1);
-            PlayerWinsCar(MainManager.activePlayer);
-
-            MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
-        }
-
-        else
-
-        {
-            PlayerWinsCar(raceWinnerLevel1);
-            MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
-
-
-        }
-
-        UpdateCashDisplay();
-
     }
 
     public void TimeBattleOutcome()
@@ -1160,10 +1261,17 @@ public class PlayerManager3P : MonoBehaviour
             invDisplayP2[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[1, i].ToString();
             invDisplayP3[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[2, i].ToString();
 
-            if (MainManager.playerNumber == 4)
+            if (MainManager.playerNumber > 3)
             {
                 invDisplayP4[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[3, i].ToString();
             }
+
+            if (MainManager.playerNumber > 4)
+
+            {
+                invDisplayP5[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[4, i].ToString();
+            }
+
 
             if (MainManager.playerInventory[0, i] < 1)
             {
@@ -1188,7 +1296,7 @@ public class PlayerManager3P : MonoBehaviour
 
             else invDisplayP3[i].gameObject.SetActive(true);
 
-            if (MainManager.playerNumber == 4)
+            if (MainManager.playerNumber > 3)
 
             {
                 if (MainManager.playerInventory[3, i] < 1)
@@ -1198,6 +1306,18 @@ public class PlayerManager3P : MonoBehaviour
                 }
 
                 else invDisplayP4[i].gameObject.SetActive(true);
+            }
+
+            if (MainManager.playerNumber > 4)
+
+            {
+                if (MainManager.playerInventory[4, i] < 1)
+
+                {
+                    invDisplayP5[i].gameObject.SetActive(false);
+                }
+
+                else invDisplayP5[i].gameObject.SetActive(true);
             }
         }
 
@@ -1398,7 +1518,6 @@ public class PlayerManager3P : MonoBehaviour
 
         {
             MainManager.activePlayer = 0;
-
         }
 
         for (int i = 0; i < MainManager.playerNumber; i++)
@@ -1409,11 +1528,11 @@ public class PlayerManager3P : MonoBehaviour
 
         turnIndicator[MainManager.activePlayer].SetActive(true);
 
-        statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+        statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
         if (MainManager.levelCounter == 2)
         {
-            if (MainManager.roundCounter < 13)
+            if (MainManager.roundCounter < MainManager.raceThreshold)
 
             {
                 dividendScript.DividendCheck();
@@ -1439,13 +1558,13 @@ public class PlayerManager3P : MonoBehaviour
     void LevelCheck()
 
     {
-        if (MainManager.roundCounter > 12)
+        if (MainManager.roundCounter > MainManager.raceThreshold - 1)
 
         {
             if (MainManager.levelCounter == 1)
 
             {
-                if (MainManager.roundCounter == 13)
+                if (MainManager.roundCounter == MainManager.raceThreshold)
 
                 {
                     level2StartPanel.gameObject.SetActive(true);
@@ -1460,7 +1579,7 @@ public class PlayerManager3P : MonoBehaviour
             else if (MainManager.levelCounter == 2)
 
             {
-                if (MainManager.roundCounter == 13)
+                if (MainManager.roundCounter == MainManager.raceThreshold)
 
                 {
                     EndGame();
@@ -1478,7 +1597,7 @@ public class PlayerManager3P : MonoBehaviour
 
     {
         level2StartPanel.SetActive(false);
-        statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+        statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
     }
 
@@ -1593,6 +1712,14 @@ public class PlayerManager3P : MonoBehaviour
             resultsP4cashTotal.text = MainManager.playerCash[3].ToString();
         }
 
+        if (MainManager.playerNumber > 4)
+
+        {
+            resultsP5Name.text = MainManager.playerNames[4];
+            resultsP5cashTotal.text = MainManager.playerCash[4].ToString();
+        }
+
+
     }
 
     public void BackToMainMenu()
@@ -1651,6 +1778,8 @@ public class PlayerManager3P : MonoBehaviour
 
         }
 
+        
+
 
         SaveGameData playerData = new SaveGameData
         {
@@ -1682,7 +1811,17 @@ public class PlayerManager3P : MonoBehaviour
 
     }
 
+    public void BackToMenu()
+    {
+        pausePanel.gameObject.SetActive(false);
+        SceneManager.LoadScene(0);
+    }
 
+    public void QuitGame()
+
+    {
+        Application.Quit();
+    }
 
     public class SaveGameData
     {

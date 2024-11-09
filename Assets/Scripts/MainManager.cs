@@ -26,7 +26,7 @@ public class MainManager : MonoBehaviour
     public static string[] playerNames = { "Player1", "Player2", "Player3", "Player4", "Player5", "Player6" };
 
     public static int[] fieldsLeftForCar = { 10, 10, 10, 10, 10, 10 };
-    public static bool[] fieldAvailable = new bool[59];
+    public static bool[] fieldAvailable = new bool[60];
 
     public static int pendingField = 0;
     public static int currentCarIndex = 0;
@@ -40,6 +40,7 @@ public class MainManager : MonoBehaviour
 
     public static int roundCounter = 1;
     public static int levelCounter = 1;
+    public static int raceThreshold = 0;
 
     public static int raceWinner = 0;
     public static int seller = 0;
@@ -79,10 +80,5 @@ public class MainManager : MonoBehaviour
     }
 
 
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+       
 }

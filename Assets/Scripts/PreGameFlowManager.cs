@@ -26,6 +26,7 @@ public class PreGameFlowManager : MonoBehaviour
     [SerializeField] GameObject playerNamesPanel2P;
     [SerializeField] GameObject playerNamesPanel3P;
     [SerializeField] GameObject playerNamesPanel4P;
+    [SerializeField] GameObject playerNamesPanel5P;
 
     [SerializeField] TextMeshProUGUI p1NameInputFieldP2;
     [SerializeField] TextMeshProUGUI p2NameInputFieldP2;
@@ -38,8 +39,13 @@ public class PreGameFlowManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI p2NameInputFieldP4;
     [SerializeField] TextMeshProUGUI p3NameInputFieldP4;
     [SerializeField] TextMeshProUGUI p4NameInputFieldP4;
+
+    [SerializeField] TextMeshProUGUI p1NameInputFieldP5;
+    [SerializeField] TextMeshProUGUI p2NameInputFieldP5;
+    [SerializeField] TextMeshProUGUI p3NameInputFieldP5;
+    [SerializeField] TextMeshProUGUI p4NameInputFieldP5;
+    [SerializeField] TextMeshProUGUI p5NameInputFieldP5;
     
-    [SerializeField] TextMeshProUGUI p5NameInputField;
     [SerializeField] TextMeshProUGUI p6NameInputField;
 
 
@@ -70,14 +76,22 @@ public class PreGameFlowManager : MonoBehaviour
         {
             case 2:
                 playerNamesPanel2P.SetActive(true);
+                MainManager.raceThreshold = 13;
                 break;
 
             case 3:
                 playerNamesPanel3P.SetActive(true);
+                MainManager.raceThreshold = 13;
                 break;
 
             case 4:
                 playerNamesPanel4P.SetActive(true);
+                MainManager.raceThreshold = 13;
+                break;
+
+            case 5:
+                playerNamesPanel5P.SetActive(true);
+                MainManager.raceThreshold = 11;
                 break;
         }
         
@@ -111,6 +125,13 @@ public class PreGameFlowManager : MonoBehaviour
                 MainManager.playerNames[3] = p4NameInputFieldP4.text.ToUpper();
                 break;
 
+            case 5:
+                MainManager.playerNames[0] = p1NameInputFieldP5.text.ToUpper();
+                MainManager.playerNames[1] = p2NameInputFieldP5.text.ToUpper();
+                MainManager.playerNames[2] = p3NameInputFieldP5.text.ToUpper();
+                MainManager.playerNames[3] = p4NameInputFieldP5.text.ToUpper();
+                MainManager.playerNames[4] = p5NameInputFieldP5.text.ToUpper();
+                break;
         }
 
 

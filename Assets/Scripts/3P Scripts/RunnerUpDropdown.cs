@@ -34,6 +34,14 @@ public class RunnerUpDropdown : MonoBehaviour
             runnerUpDropdown.options.Add(option4);
         }
 
+        if (MainManager.playerNumber > 4)
+
+        {
+
+            var option5 = new TMP_Dropdown.OptionData(MainManager.playerNames[4]);
+            runnerUpDropdown.options.Add(option5);
+
+        }
 
         runnerUpDropdown.RefreshShownValue();
 

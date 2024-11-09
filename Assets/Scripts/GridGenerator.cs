@@ -714,6 +714,7 @@ public class GridGenerator : MonoBehaviour
         gameStartingPanel.SetActive(false);
 
         gameSounds.PlayOneShot(transition);
+        gameManagerScript.helpText.gameObject.SetActive(true);
 
         ShowNextRow();
     }
