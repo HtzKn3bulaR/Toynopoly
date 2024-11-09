@@ -11901,6 +11901,91 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 287946539}
   m_CullTransparentMesh: 1
+--- !u!1 &291894679
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 291894680}
+  - component: {fileID: 291894683}
+  - component: {fileID: 291894682}
+  - component: {fileID: 291894681}
+  m_Layer: 5
+  m_Name: CoinImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &291894680
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291894679}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.1146874, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 971362754}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -247, y: -17}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &291894681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291894679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abba348e15ca8f140b1f26a0b90d9a3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &291894682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291894679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 0
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 2800000, guid: 7ab7a2417cfb710428178a954b0474a8, type: 3}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &291894683
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291894679}
+  m_CullTransparentMesh: 1
 --- !u!1 &298234251
 GameObject:
   m_ObjectHideFlags: 0
@@ -21292,6 +21377,7 @@ MonoBehaviour:
   player2NameField: {fileID: 1033544705}
   player3NameField: {fileID: 1724413753}
   player4NameField: {fileID: 1557448229}
+  player5NameField: {fileID: 0}
   carASprite: {fileID: 986596923}
   carBSprite: {fileID: 655943266}
   carCSprite: {fileID: 1704721745}
@@ -36928,6 +37014,7 @@ RectTransform:
   - {fileID: 1920323313}
   - {fileID: 1032101021}
   - {fileID: 655273285}
+  - {fileID: 291894680}
   m_Father: {fileID: 2069182145}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -69265,6 +69352,7 @@ MonoBehaviour:
   challengeButtonFirstInactive: {fileID: 604931376}
   challengeButtonSecondInactive: {fileID: 1601594493}
   challengeButtonThirdInactive: {fileID: 241809580}
+  challengeButtonFourthInactive: {fileID: 0}
   challengeRaceProgressCar: {fileID: 1427997772}
   challengeRaceProgressTrack: {fileID: 1704475280}
   rows:
@@ -69313,6 +69401,7 @@ MonoBehaviour:
   - {fileID: 912089295}
   - {fileID: 1353837966}
   - {fileID: 419685911}
+  invDisplayP5: []
   buyCarButton: {fileID: 1710448906}
   carPic:
   - {fileID: 986596923}
@@ -69360,6 +69449,7 @@ MonoBehaviour:
   pausePanel: {fileID: 1235636518}
   winnerDropdown: {fileID: 567314002}
   runnerUpDropdown: {fileID: 1239888294}
+  thirdPlaceDropdown: {fileID: 0}
   playersL2WinnerDropdown: {fileID: 1040078474}
   resultsPanelL2ActivePlayerDisplay: {fileID: 355768582}
   gapToDefender: {fileID: 1324163420}
@@ -69393,10 +69483,12 @@ MonoBehaviour:
   defaultPanelTextMessage: {fileID: 1353994397}
   firstinactivePlayerName: {fileID: 1935815577}
   secondinactivePlayerName: {fileID: 422213547}
-  thirdInactivePlayerName: {fileID: 1393003668}
+  thirdinactivePlayerName: {fileID: 0}
+  fourthinactivePlayerName: {fileID: 0}
   challengefirstInactive: {fileID: 797544288}
   challengeSecondInactive: {fileID: 1935612533}
   challengeThirdInactive: {fileID: 763339235}
+  challengeFourthInactive: {fileID: 0}
   challengeProgressTextInfo: {fileID: 719154654}
   challengerNameL2: {fileID: 1396088913}
   defenderNameL2: {fileID: 2097138038}
@@ -69426,10 +69518,12 @@ MonoBehaviour:
   resultsP2Name: {fileID: 1690903810}
   resultsP3Name: {fileID: 350760749}
   resultsP4Name: {fileID: 83887065}
+  resultsP5Name: {fileID: 0}
   resultsP1cashTotal: {fileID: 84252910}
   resultsP2cashTotal: {fileID: 773776077}
   resultsP3cashTotal: {fileID: 394631927}
   resultsP4cashTotal: {fileID: 409351561}
+  resultsP5cashTotal: {fileID: 0}
   carDefaultSprite: {fileID: 21300000, guid: 96081f790876e3a45931fbe291e05ddb, type: 3}
   challengeToggles:
   - {fileID: 703993358}

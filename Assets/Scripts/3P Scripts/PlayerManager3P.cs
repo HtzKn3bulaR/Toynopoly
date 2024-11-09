@@ -837,7 +837,7 @@ public class PlayerManager3P : MonoBehaviour
                 raceWinnerLevel1 = winnerDropdown.value;
                 runnerUpLevel1 = runnerUpDropdown.value;
 
-                if (MainManager.playerNumber > 3)
+                if (MainManager.playerNumber > 4)
                 {
                     thirdLevel1 = thirdPlaceDropdown.value;
                 }

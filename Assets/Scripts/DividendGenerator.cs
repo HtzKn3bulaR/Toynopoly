@@ -8,10 +8,14 @@ using TMPro;
 
 public class DividendGenerator : MonoBehaviour
 {
-    List<int> dividendList = new List<int> { 7, 7, 7, 7, 7, 7, 0, 1, 2, 3, 4, 5 };
 
-    List<int> actualDividendList = new List<int> { 7, 7, 7, 7, 7, 7, 0, 1, 2, 3, 4, 5 };
+    List<int> dividendList = new List<int> {  };
 
+    List<int> actualDividendList = new List<int> {  };
+
+    int[] dividendsTenRounds = { 7, 7, 7, 7, 0, 1, 2, 3, 4, 5 };
+    int[] dividendsTwelveRounds = { 7, 7, 7, 7, 7, 7, 0, 1, 2, 3, 4, 5 };
+       
     private GameManager gameManagerScript;
     private PlayerManager3P playerManagerScript;
 
@@ -61,13 +65,24 @@ public class DividendGenerator : MonoBehaviour
 
         playerManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
 
+        if (MainManager.playerNumber == 5)
+        {
+            dividendList.AddRange(dividendsTenRounds);
+            actualDividendList.AddRange(dividendsTenRounds);
+        }
+
+        else
+        {
+            dividendList.AddRange(dividendsTwelveRounds);
+            actualDividendList.AddRange(dividendsTwelveRounds);
+        }
 
     }
 
     public void RandomizeDividend()
 
     {
-        var uniqueRandomList = GetUniqueRandomElements(dividendList, 12);
+        var uniqueRandomList = GetUniqueRandomElements(dividendList, MainManager.raceThreshold-1);
 
         for (int i = 0; i < uniqueRandomList.Count; i++)
 
