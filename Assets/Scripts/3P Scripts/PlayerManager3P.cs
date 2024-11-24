@@ -516,7 +516,11 @@ public class PlayerManager3P : MonoBehaviour
         challengefirstInactive.text = MainManager.playerNames[MainManager.inactivePlayers[0]];
         challengeSecondInactive.text = MainManager.playerNames[MainManager.inactivePlayers[1]];
         challengeThirdInactive.text = MainManager.playerNames[MainManager.inactivePlayers[2]];
-        challengeFourthInactive.text = MainManager.playerNames[MainManager.inactivePlayers[3]];
+
+        if (MainManager.playerNumber > 4)
+        {
+            challengeFourthInactive.text = MainManager.playerNames[MainManager.inactivePlayers[3]];
+        }
                 
         if (MainManager.playerInventory[MainManager.inactivePlayers[0], MainManager.currentCarIndex] < 1)
 

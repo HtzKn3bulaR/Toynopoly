@@ -6040,7 +6040,7 @@ MonoBehaviour:
     price at the beginning of each turn (Only 1 car per turn). \r\nAfter each full
     round (all players had their turn), everyone has the option to sell one of their
     cars.\r\n\r\nAfter the final race, all players can sell up to 3 more cars.\r\n\r\nTOYNOPOLIES\r\n\r\nAs
-    soon as a single player is the exclusive owner of a car type, this car can no
+    soon as a single player is the exclusive owner of a car type, that car can no
     longer be bought and the player can't be challenged anymore. The player now has
     a \"Toynopoly\". \r\n\r\nHowever, the value of the car can still be changed by
     other players as described in the \"Time Battle\" rule.  The Toynopoly owner
@@ -17433,15 +17433,41 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Toynopoly - Rules\r\n\r\nThe game table consists of 6 randomly selected
+  m_text: 'Toynopoly - Rules
+
+    
+
+    The game table consists of 6 randomly selected
     cars of the same category and 10 tracks. Everyone starts with 150 cash. Every
-    car has a value of 20 at the beginning of LEVEL 1.\r\n\r\nlevel 1\r\n\r\nWhen
-    it's your turn, pick a car / track combination (You are the \"active player\").
-    Everyone will drive the same car that was picked. The winner (and sometimes one
-    or two runner-ups, depending on the total number of players) will get the car
-    added to their inventory. \r\n\r\nRace length is 3 laps for all tracks!\r\n\r\nAfter
-    each race, the price of the chosen car will randomly go up or down by +10, +7,
-    +5 to -5, -7 or -10.\r\n\r\nLevel 1 usually consists of 12 races.\r\n"
+    car has a value of 20 at the beginning of LEVEL 1.
+
+    
+
+    level 1
+
+    
+
+    The
+    active player picks a car / track combination. Everyone will drive the same car
+    that was picked. The winner (and runner-ups, depending on the total number of
+    players) will get the car added to their inventory.
+
+    
+
+    Race length is
+    3 laps for all tracks!
+
+    
+
+    After each race, the price of the chosen
+    car will randomly go up or down by +10, +7, +5 to -5, -7 or -10.
+
+    
+
+    Level
+    1 usually consists of 12 races.
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: af17111b7c862414b9b0a68fc902f709, type: 2}
   m_sharedMaterial: {fileID: 7486160777593221014, guid: af17111b7c862414b9b0a68fc902f709, type: 2}

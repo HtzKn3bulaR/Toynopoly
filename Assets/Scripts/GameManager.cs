@@ -155,7 +155,7 @@ public class GameManager : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         dividendScript = GameObject.Find("DividendGenerator").GetComponent<DividendGenerator>();
         toynopolyCalculatorScript = GameObject.Find("ToynopolyCalculator").GetComponent<ToynopolyCalculator>();
-        statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+        statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
         if (MainManager.gameResumed)
         {
@@ -1173,7 +1173,7 @@ public class GameManager : MonoBehaviour
         turnIndicator[MainManager.activePlayer].SetActive(true);
 
 
-        statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+        statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
         if (MainManager.levelCounter == 2)
         {
@@ -1384,37 +1384,12 @@ public class GameManager : MonoBehaviour
 
         }
 
-
-        switch (MainManager.activePlayer)
+        if (!MainManager.playerOutofOptions.Contains(false))
 
         {
-            case 0:
-                if (MainManager.playerOutofOptions[0] == true)
-                {
-                    if (MainManager.playerCash[0] > MainManager.playerCash[1])
-
-                    { RoundChangeover(); }
-
-                    else
-
-                    { EndGame(); }
-                }
-                break;
-
-            case 1:
-                if (MainManager.playerOutofOptions[1] == true)
-                {
-                    if (MainManager.playerCash[1] > MainManager.playerCash[0])
-
-                    { RoundChangeover(); }
-
-                    else
-
-                    { EndGame(); }
-                }
-                break;
+            RoundChangeover();
         }
-
+                
     }
 
 
