@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 
 
 public class GridGenerator3P : MonoBehaviour
@@ -68,8 +69,10 @@ public class GridGenerator3P : MonoBehaviour
     //[SerializeField] Button playerNamesSubmit;
 
     [SerializeField] GameObject gameStartingPanel;
+    [SerializeField] GameObject timerPanel;
 
     private PlayerManager3P gameManagerScript;
+    private Timer timerScript;
 
     private Animator carAPresentation;
     private Animator carBPresentation;
@@ -210,6 +213,7 @@ public class GridGenerator3P : MonoBehaviour
         if (MainManager.gameResumed)
         {
             gameManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
+            timerScript = GameObject.Find("Timer").GetComponent<Timer>();
 
             PopulateCarCards();
             PopulateTrackPanel();
@@ -270,7 +274,7 @@ public class GridGenerator3P : MonoBehaviour
 
         {
             T temp = inputList[i];
-            int rand = Random.Range(i, inputList.Count);
+            int rand = UnityEngine.Random.Range(i, inputList.Count);
             inputList[i] = inputList[rand];
             inputList[rand] = temp;
         }
@@ -357,7 +361,7 @@ public class GridGenerator3P : MonoBehaviour
 
         {
 
-            carrouselSprite.image.sprite = activeSpriteList[Random.Range(0, activeSpriteList.Count)];
+            carrouselSprite.image.sprite = activeSpriteList[UnityEngine.Random.Range(0, activeSpriteList.Count)];
 
         }
 
@@ -596,7 +600,7 @@ public class GridGenerator3P : MonoBehaviour
         }
 
 
-        int rand = Random.Range(0, bonusTrackList.Count);
+        int rand = UnityEngine.Random.Range(0, bonusTrackList.Count);
         MainManager.bonusTrack = bonusTrackList[rand];
 
 
@@ -744,6 +748,9 @@ public class GridGenerator3P : MonoBehaviour
 
         gameSounds.PlayOneShot(transition);
         gameManagerScript.helpText.gameObject.SetActive(true);
+
+        timerPanel.gameObject.SetActive(true);
+        
 
         ShowNextRow();
     }

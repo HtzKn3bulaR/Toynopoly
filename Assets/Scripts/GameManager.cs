@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System;
 
 
 public class GameManager : MonoBehaviour
@@ -52,6 +53,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject carInDefaultPanel;
     [SerializeField] GameObject buyOptionPanel;
     [SerializeField] GameObject pausePanel;
+    [SerializeField] GameObject timerPanel;
 
     [SerializeField] GameObject sliderDefeat;
     [SerializeField] GameObject sliderWin;
@@ -144,10 +146,11 @@ public class GameManager : MonoBehaviour
 
     private List<int> roundsWithCarSellingOption = new List<int> { 2, 4, 6, 8, 10, 12 };
 
-    
+        
     private TimeBattleButtons timeBattlePanelScript;
     private DividendGenerator dividendScript;
     private ToynopolyCalculator toynopolyCalculatorScript;
+    private Timer timerScript;
 
     // Start is called before the first frame update
     void Awake()
@@ -155,7 +158,12 @@ public class GameManager : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         dividendScript = GameObject.Find("DividendGenerator").GetComponent<DividendGenerator>();
         toynopolyCalculatorScript = GameObject.Find("ToynopolyCalculator").GetComponent<ToynopolyCalculator>();
+        timerScript = GameObject.Find("Timer").GetComponent<Timer>();
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+
+        timerPanel.gameObject.SetActive(true);
+        
+
 
         if (MainManager.gameResumed)
         {
@@ -291,6 +299,13 @@ public class GameManager : MonoBehaviour
         helpText.gameObject.SetActive(false);
 
         ShowNextRacePanel();
+
+        if (MainManager.matchTimeDisplayed)
+
+        {
+            timerScript.DisplayToggle(false);
+            timerPanel.gameObject.SetActive(false);
+        }
 
     }
 
@@ -730,7 +745,7 @@ public class GameManager : MonoBehaviour
 
     {
         int oldCarValue = MainManager.carPrizes[MainManager.currentCarIndex];
-        int randomValue = Random.Range(0, 14);
+        int randomValue = UnityEngine.Random.Range(0, 14);
         MainManager.carPrizes[MainManager.currentCarIndex] = (MainManager.carPrizes[MainManager.currentCarIndex] + (carValueChangeOptions[randomValue]));
 
         if (MainManager.carPrizes[MainManager.currentCarIndex] <= 0)
@@ -1196,6 +1211,14 @@ public class GameManager : MonoBehaviour
         LevelCheck();
                 
         BankruptCheck();
+
+        int randomNumber = UnityEngine.Random.Range(1, 4);
+        if (randomNumber == 3)
+        {
+                timerPanel.gameObject.SetActive(true);
+                timerScript.DisplayToggle(true);
+                  
+        }
 
     }
 

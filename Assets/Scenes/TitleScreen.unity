@@ -2386,8 +2386,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4284899840
+  m_fontColor: {r: 0, g: 0.38431373, b: 0.4, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3980,8 +3980,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4284899840
+  m_fontColor: {r: 0, g: 0.38431373, b: 0.4, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -5938,7 +5938,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1, y: -314.71826}
+  m_AnchoredPosition: {x: -29, y: -314.71826}
   m_SizeDelta: {x: -1060.9249, y: -697.1182}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &613111655
@@ -5961,7 +5961,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: afa65c1882c381845bc13a2e85a8e28a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6338263ff37b8be4c9bc0de22516dd69, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6683,7 +6683,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 1, g: 0.65882355, b: 0.003921569, a: 0.8235294}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.105882354, g: 0.078431375, b: 0.39215687, a: 1}
+    m_SelectedColor: {r: 1, g: 0.65882355, b: 0.003921569, a: 0.9411765}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -7077,7 +7077,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 1, g: 0.65882355, b: 0.003921569, a: 0.8235294}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.105882354, g: 0.078431375, b: 0.39215687, a: 1}
+    m_SelectedColor: {r: 1, g: 0.65882355, b: 0.003921569, a: 0.9411765}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -9874,8 +9874,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4284899840
+  m_fontColor: {r: 0, g: 0.38431373, b: 0.4, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -10339,8 +10339,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4284899840
+  m_fontColor: {r: 0, g: 0.38431373, b: 0.4, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -11168,8 +11168,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4284899840
+  m_fontColor: {r: 0, g: 0.38431373, b: 0.4, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -17403,15 +17403,15 @@ RectTransform:
   m_GameObject: {fileID: 1781237527}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.2, y: 1.6, z: 1}
+  m_LocalScale: {x: 1.25304, y: 1.67072, z: 1.0442}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1440110890}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 244.6416, y: 185.41907}
-  m_SizeDelta: {x: 1128.5664, y: 362.2482}
+  m_AnchoredPosition: {x: 186.6795, y: 83.23163}
+  m_SizeDelta: {x: 1036.052, y: 484.5756}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1781237529
 MonoBehaviour:
@@ -17435,37 +17435,31 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Toynopoly - Rules
 
-    
 
     The game table consists of 6 randomly selected
     cars of the same category and 10 tracks. Everyone starts with 150 cash. Every
     car has a value of 20 at the beginning of LEVEL 1.
 
-    
 
     level 1
 
-    
 
-    The
-    active player picks a car / track combination. Everyone will drive the same car
-    that was picked. The winner (and runner-ups, depending on the total number of
-    players) will get the car added to their inventory.
+    The active
+    player picks a car / track combination. Everyone will drive the same car that
+    was picked. The winner (and runner-ups, depending on the total number of players)
+    will get the car added to their inventory.
 
-    
 
-    Race length is
-    3 laps for all tracks!
+    Race length is 3 laps for all
+    tracks!
 
-    
 
-    After each race, the price of the chosen
-    car will randomly go up or down by +10, +7, +5 to -5, -7 or -10.
+    After each race, the price of the chosen car will randomly go up
+    or down by +10, +7, +5 to -5, -7 or -10.
 
-    
 
-    Level
-    1 usually consists of 12 races.
+    Level 1 usually consists of 12
+    races.
 
 '
   m_isRightToLeft: 0
@@ -19372,8 +19366,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4284899840
+  m_fontColor: {r: 0, g: 0.38431373, b: 0.4, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -20891,8 +20885,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4284899840
+  m_fontColor: {r: 0, g: 0.38431373, b: 0.4, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

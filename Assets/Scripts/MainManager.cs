@@ -17,6 +17,7 @@ public class MainManager : MonoBehaviour
     public static bool[] carIsInDefault = { false, false, false, false, false, false };
     public static bool[] DefProcedureCompleted = { false, false, false, false, false, false };
     public static List<bool> playerOutofOptions = new List<bool> { false, false, false, false, false, false };
+    public static bool[] spectator = { false, false, false, false, false, false };
     public static int playerWithBuyOption = 0;
 
     public static string[] activeTracks = { "Track1", "Track2", "Track3", "Track4", "Track5", "Track6", "Track7", "Track8", "Track9" };
@@ -44,6 +45,7 @@ public class MainManager : MonoBehaviour
 
     public static int raceWinner = 0;
     public static int seller = 0;
+    public static int buyer = 0;
 
     public static bool activePlayerWins = false;
 
@@ -63,6 +65,8 @@ public class MainManager : MonoBehaviour
     public static int timeBattleSeconds = 0;
 
     public static bool gameOver = false;
+
+    public static bool matchTimeDisplayed = true;
 
 
     // Start is called before the first frame update

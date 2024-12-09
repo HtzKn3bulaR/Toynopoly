@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
 
 
 public class PlayerManager3P : MonoBehaviour
@@ -106,6 +107,9 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] GameObject gameOverPanel;
 
     [SerializeField] GameObject pausePanel;
+    [SerializeField] GameObject hostOptionsPanel;
+
+    [SerializeField] GameObject timerPanel;
 
     //[SerializeField] Button[] sellButtons = { };
 
@@ -218,8 +222,10 @@ public class PlayerManager3P : MonoBehaviour
     private int raceWinnerLevel1 = 0;
     private int runnerUpLevel1 = 0;
     private int thirdLevel1 = 0;
-
+          
     private DividendGenerator dividendScript;
+    private EmptyInventoryHandler emptyInventoryScript;
+    private Timer timerScript;
 
 
 
@@ -233,6 +239,8 @@ public class PlayerManager3P : MonoBehaviour
 
         toggleGroup = GetComponent<ToggleGroup>();
         dividendScript = GameObject.Find("DividendGenerator").GetComponent<DividendGenerator>();
+        emptyInventoryScript = GameObject.Find("EmptyInventoryHandler").GetComponent<EmptyInventoryHandler>();
+        timerScript = GameObject.Find("Timer").GetComponent<Timer>();
 
         if (MainManager.gameResumed)
         {
@@ -275,6 +283,9 @@ public class PlayerManager3P : MonoBehaviour
             {
                 MainManager.fieldAvailable[i] = true;
             }
+
+            
+            
         }
 
 
@@ -289,9 +300,11 @@ public class PlayerManager3P : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             pausePanel.gameObject.SetActive(true);
+            
         }
     }
 
+    
     public void Resume()
 
     {
@@ -387,6 +400,14 @@ public class PlayerManager3P : MonoBehaviour
 
         ShowNextRacePanel();
 
+        if (MainManager.matchTimeDisplayed)
+
+        {
+            timerScript.DisplayToggle(false);
+            timerPanel.gameObject.SetActive(false);
+        }
+
+
     }
 
     void ShowNextRacePanel()
@@ -411,6 +432,7 @@ public class PlayerManager3P : MonoBehaviour
 
                 FillInactivePlayersArray();
                 PerformLevel2Check();
+               
 
                 switch (activePlayerHasToynopoly)
                 {
@@ -515,7 +537,12 @@ public class PlayerManager3P : MonoBehaviour
         challengePanel.SetActive(true);
         challengefirstInactive.text = MainManager.playerNames[MainManager.inactivePlayers[0]];
         challengeSecondInactive.text = MainManager.playerNames[MainManager.inactivePlayers[1]];
-        challengeThirdInactive.text = MainManager.playerNames[MainManager.inactivePlayers[2]];
+
+        if (MainManager.playerNumber > 3)
+
+        {
+            challengeThirdInactive.text = MainManager.playerNames[MainManager.inactivePlayers[2]];
+        }
 
         if (MainManager.playerNumber > 4)
         {
@@ -574,7 +601,7 @@ public class PlayerManager3P : MonoBehaviour
         raceInProgressPanelChallenge.SetActive(true);
         challengeRaceProgressCar.GetComponentInChildren<TMP_Text>().text = selectedCar;
         challengeRaceProgressTrack.GetComponentInChildren<TMP_Text>().text = selectedTrack;
-        challengeProgressTextInfo.text = ("Level " + MainManager.levelCounter + ", Race " + MainManager.roundCounter + " / 12 in progress");
+        challengeProgressTextInfo.text = ("Level " + MainManager.levelCounter + ", Race " + MainManager.roundCounter + " / " + MainManager.raceThreshold + " in progress");
 
        challengerNameL2.text = MainManager.playerNames[MainManager.activePlayer];
        defenderNameL2.text = MainManager.playerNames[MainManager.defendingPlayer];
@@ -609,7 +636,7 @@ public class PlayerManager3P : MonoBehaviour
 
     }
 
-    void OfferBuyOption()
+    public void OfferBuyOption()
 
     {
         buyOptionPanel.SetActive(true);
@@ -686,8 +713,10 @@ public class PlayerManager3P : MonoBehaviour
     }
 
 
-    void PerformLevel2Check()
+    public void PerformLevel2Check()
     {
+        emptyInventoryScript.CheckInactivePlayersInventory();
+
         int numberOfOwners = 0;
 
         for (int i = 0; i < MainManager.playerNumber; i++)
@@ -991,14 +1020,10 @@ public class PlayerManager3P : MonoBehaviour
     public void ToynopolyTimeBattleConclude()
     {
 
+        fields[MainManager.pendingField].gameObject.SetActive(false);
+        MainManager.fieldAvailable[MainManager.pendingField] = false;
 
-        /*if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
-
-        {
-            preSellingInfoPanel.SetActive(true);
-            audioSource.PlayOneShot(panelOpen);
-        }
-        */
+        MainManager.fieldsLeftForCar[MainManager.currentCarIndex]--;
 
         if (MainManager.roundCounter % MainManager.playerNumber == 0)
 
@@ -1012,6 +1037,8 @@ public class PlayerManager3P : MonoBehaviour
             RoundChangeover();
 
         raceResultsPanelL2T.SetActive(false);
+
+        
 
     }
 
@@ -1342,7 +1369,7 @@ public class PlayerManager3P : MonoBehaviour
     }
 
 
-    void PlayerWinsCar(int winner)
+    public void PlayerWinsCar(int winner)
     {
         MainManager.playerInventory[winner, MainManager.currentCarIndex]++;
 
@@ -1361,7 +1388,7 @@ public class PlayerManager3P : MonoBehaviour
 
     {
         int oldCarValue = MainManager.carPrizes[MainManager.currentCarIndex];
-        int randomValue = Random.Range(0, 15);
+        int randomValue = UnityEngine.Random.Range(0, 15);
         MainManager.carPrizes[MainManager.currentCarIndex] = (MainManager.carPrizes[MainManager.currentCarIndex] + (carValueChangeOptions[randomValue]));
 
         if (MainManager.carPrizes[MainManager.currentCarIndex] <= 0)
@@ -1462,7 +1489,7 @@ public class PlayerManager3P : MonoBehaviour
     {
         for (int i = 0; i < MainManager.carIsInDefault.Length; i++)
         {
-            if (MainManager.carIsInDefault[i] && MainManager.DefProcedureCompleted[i] == false)
+            if (MainManager.carIsInDefault[i] && MainManager.DefProcedureCompleted[i] == false && MainManager.carPrizes[i] < 1)
 
             {
                 carInDefaultPanel.SetActive(true);
@@ -1502,6 +1529,9 @@ public class PlayerManager3P : MonoBehaviour
 
         carInDefaultPanel.SetActive(false);
         postRaceMarketPanel.SetActive(false);
+        hostOptionsPanel.SetActive(false);
+        pausePanel.SetActive(false);
+
 
         for (int i = 0; i < MainManager.playerNumber; i++)
         {
@@ -1555,7 +1585,15 @@ public class PlayerManager3P : MonoBehaviour
 
         LevelCheck();
 
-        
+        int randomNumber = UnityEngine.Random.Range(1, 4);
+        if (randomNumber == 3)
+        {
+            timerPanel.gameObject.SetActive(true);
+            timerScript.DisplayToggle(true);
+            
+        }
+
+
     }
 
 
@@ -1656,7 +1694,7 @@ public class PlayerManager3P : MonoBehaviour
                 }
 
 
-                if (numberOfOwners > 1 && MainManager.fieldsLeftForCar[i] > 0)
+                if (numberOfOwners != 1 && MainManager.fieldsLeftForCar[i] > 0)
                 { MainManager.playerOutofOptions[i] = false; }
 
                 else 
@@ -1668,7 +1706,7 @@ public class PlayerManager3P : MonoBehaviour
         }
 
 
-        if (MainManager.playerOutofOptions.Contains(false) == false)
+        if (!MainManager.playerOutofOptions.Contains(false))
 
         { RoundChangeover(); }
                   
@@ -1820,6 +1858,17 @@ public class PlayerManager3P : MonoBehaviour
         pausePanel.gameObject.SetActive(false);
         SceneManager.LoadScene(0);
     }
+
+    public void CloseHostOptionsPanel()
+    {
+        hostOptionsPanel.gameObject.SetActive(false);
+    }
+
+    public void OpenHostOptionsPanel()
+    {
+        hostOptionsPanel.gameObject.SetActive(true);
+    }
+
 
     public void QuitGame()
 

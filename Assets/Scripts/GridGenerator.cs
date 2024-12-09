@@ -65,8 +65,10 @@ public class GridGenerator : MonoBehaviour
     //[SerializeField] Button playerNamesSubmit;
 
     [SerializeField] GameObject gameStartingPanel;
+    [SerializeField] GameObject timerPanel;
 
     private GameManager gameManagerScript;
+    
 
     private Animator carAPresentation;
     private Animator carBPresentation;
@@ -209,7 +211,7 @@ public class GridGenerator : MonoBehaviour
         if (MainManager.gameResumed)
         {
             gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
-
+            
             PopulateCarCards();
             PopulateTrackPanel();
             player1NameField.text = MainManager.playerNames[0];
@@ -715,7 +717,9 @@ public class GridGenerator : MonoBehaviour
 
         gameSounds.PlayOneShot(transition);
         gameManagerScript.helpText.gameObject.SetActive(true);
-
+        
+        timerPanel.gameObject.SetActive(true);
+        
         ShowNextRow();
     }
 

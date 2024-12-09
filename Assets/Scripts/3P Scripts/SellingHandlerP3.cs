@@ -23,6 +23,7 @@ public class SellingHandlerP3 : MonoBehaviour
 
 
     private int[] carsSoldFinalRound = { 0, 0, 0, 0, 0, 0 };
+    private bool[] inventoryNotEmpty = { true, true, true, true, true, true };
      
     private PlayerManager3P gameManagerScript;
 
@@ -39,8 +40,26 @@ public class SellingHandlerP3 : MonoBehaviour
         sellCarDialoguePanel.SetActive(true);
         MainManager.seller = seller;
 
+        CheckSellOptions();
         UpdateDisplays();
 
+    }
+
+
+    private void CheckSellOptions()
+    {
+        for (int i = 0; i < MainManager.cars.Length; i++)
+            
+            {
+            
+            inventoryNotEmpty[i] = true;
+            
+            if (MainManager.playerInventory[MainManager.seller, i] < 1)
+            {
+                inventoryNotEmpty[i] = false;
+            }
+
+            }
     }
 
 
@@ -66,30 +85,37 @@ public class SellingHandlerP3 : MonoBehaviour
     public void SellCar(int car)
 
     {
-                MainManager.playerInventory[MainManager.seller, car]--;
-                MainManager.playerCash[MainManager.seller] += MainManager.carPrizes[car];
-                gameManagerScript.UpdateInventoryDisplay();
-                gameManagerScript.cashDisplay[MainManager.seller].text = MainManager.playerCash[MainManager.seller].ToString();
-                sellCarDialoguePanel.SetActive(false);
+        if (inventoryNotEmpty[car])
+        {
+            MainManager.playerInventory[MainManager.seller, car]--;
+            MainManager.playerCash[MainManager.seller] += MainManager.carPrizes[car];
+            gameManagerScript.UpdateInventoryDisplay();
+            gameManagerScript.cashDisplay[MainManager.seller].text = MainManager.playerCash[MainManager.seller].ToString();
+            sellCarDialoguePanel.SetActive(false);
 
-                if (MainManager.roundCounter == MainManager.raceThreshold -1)
+            if (MainManager.roundCounter == MainManager.raceThreshold - 1)
+
+            {
+
+                carsSoldFinalRound[MainManager.seller]++;
+
+                if (carsSoldFinalRound[MainManager.seller] >= 3)
 
                 {
-
-                    carsSoldFinalRound[MainManager.seller]++;
-                                                           
-                    if (carsSoldFinalRound[MainManager.seller] >= 3)
-
-                    {
-                        sellButtons[MainManager.seller].SetActive(false);
-                    }
-
+                    sellButtons[MainManager.seller].SetActive(false);
                 }
 
-                else
+            }
 
-                { sellButtons[MainManager.seller].SetActive(false); }
-                   
+            else
+
+            { sellButtons[MainManager.seller].SetActive(false); }
+
+        }
+
+        else
+
+            sellCarDialoguePanel.SetActive(false);
             
     }
 

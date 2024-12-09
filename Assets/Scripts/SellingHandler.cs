@@ -31,6 +31,8 @@ public class SellingHandler : MonoBehaviour
 
     private GameManager gameManagerScript;
 
+    private bool[] inventoryNotEmpty = { true, true, true, true, true, true };
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -44,10 +46,27 @@ public class SellingHandler : MonoBehaviour
         sellCarDialoguePanel.SetActive(true);
         MainManager.seller = seller;
 
+        CheckSellOptions();
         UpdateDisplays();
 
      }
 
+
+    private void CheckSellOptions()
+    {
+        for (int i = 0; i < MainManager.cars.Length; i++)
+
+        {
+
+            inventoryNotEmpty[i] = true;
+
+            if (MainManager.playerInventory[MainManager.seller, i] < 1)
+            {
+                inventoryNotEmpty[i] = false;
+            }
+
+        }
+    }
 
     public void UpdateDisplays()
 
@@ -72,60 +91,71 @@ public class SellingHandler : MonoBehaviour
     public void SellCar(int car)
 
     {
-        switch (MainManager.seller)
+        if (inventoryNotEmpty[car])
+
         {
-            case 0:
-                MainManager.playerInventory[0,car]--;
-                MainManager.playerCash[0] += MainManager.carPrizes[car];
-                gameManagerScript.UpdateInventoryDisplay();
-                gameManagerScript.cashDisplay[0].text = MainManager.playerCash[0].ToString();
-                sellCarDialoguePanel.SetActive(false);
 
-                if (MainManager.roundCounter == 12)
+            switch (MainManager.seller)
+            {
 
-                {
-                    P1carsSoldFinalRound++;
+                case 0:
+                    MainManager.playerInventory[0, car]--;
+                    MainManager.playerCash[0] += MainManager.carPrizes[car];
+                    gameManagerScript.UpdateInventoryDisplay();
+                    gameManagerScript.cashDisplay[0].text = MainManager.playerCash[0].ToString();
+                    sellCarDialoguePanel.SetActive(false);
 
-                    if (P1carsSoldFinalRound >= 3)
-
-                    {
-                        p1SellButton.SetActive(false);
-                    }
-
-                }
-
-                else
-
-                { p1SellButton.SetActive(false); }
-
-                break;
-
-            case 1:
-                MainManager.playerInventory[1,car]--;
-                MainManager.playerCash[1] += MainManager.carPrizes[car];
-                gameManagerScript.UpdateInventoryDisplay();
-                gameManagerScript.cashDisplay[1].text = MainManager.playerCash[1].ToString();
-                sellCarDialoguePanel.SetActive(false);
-               
-                if (MainManager.roundCounter == 12)
-
-                {
-                    P2carsSoldFinalRound++;
-
-                    if (P2carsSoldFinalRound >= 3)
+                    if (MainManager.roundCounter == 12)
 
                     {
-                        p2SellButton.SetActive(false);
+                        P1carsSoldFinalRound++;
+
+                        if (P1carsSoldFinalRound >= 3)
+
+                        {
+                            p1SellButton.SetActive(false);
+                        }
+
                     }
 
-                }
+                    else
 
-                else
+                    { p1SellButton.SetActive(false); }
 
-                { p2SellButton.SetActive(false); }
-                break;
+                    break;
+
+                case 1:
+                    MainManager.playerInventory[1, car]--;
+                    MainManager.playerCash[1] += MainManager.carPrizes[car];
+                    gameManagerScript.UpdateInventoryDisplay();
+                    gameManagerScript.cashDisplay[1].text = MainManager.playerCash[1].ToString();
+                    sellCarDialoguePanel.SetActive(false);
+
+                    if (MainManager.roundCounter == 12)
+
+                    {
+                        P2carsSoldFinalRound++;
+
+                        if (P2carsSoldFinalRound >= 3)
+
+                        {
+                            p2SellButton.SetActive(false);
+                        }
+
+                    }
+
+                    else
+
+                    { p2SellButton.SetActive(false); }
+                    break;
+            
+            }
 
         }
+
+        else
+
+        { sellCarDialoguePanel.SetActive(false); }
     }
 
 
