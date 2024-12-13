@@ -6050,8 +6050,8 @@ MonoBehaviour:
     added to the car value.\r\n \r\nDIVIDENDS\r\n\r\nDuring Level 2, each car will
     pay a dividend once, at a random moment. Each owner will immediately get the
     dividend in cash, according to the number of cars owned and the car value.\r\n\r\nEND\r\n\r\nLevel
-    2 usually consists of 12 races.\r\nPlayer with highest cash wins the match and
-    will become Toynopoly Champion. \r\n"
+    2 ends after 10 races in a 5-player match, and after 12 races with 2-4 players.\r\nPlayer
+    with highest cash wins the match and will become Toynopoly Champion. \r\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: af17111b7c862414b9b0a68fc902f709, type: 2}
   m_sharedMaterial: {fileID: 7486160777593221014, guid: af17111b7c862414b9b0a68fc902f709, type: 2}
@@ -17450,16 +17450,12 @@ MonoBehaviour:
     will get the car added to their inventory.
 
 
-    Race length is 3 laps for all
-    tracks!
+    After each race, the price of
+    the chosen car will randomly go up or down by +10, +7, +5 to -5, -7 or -10.
 
 
-    After each race, the price of the chosen car will randomly go up
-    or down by +10, +7, +5 to -5, -7 or -10.
-
-
-    Level 1 usually consists of 12
-    races.
+    Level
+    1 ends after 10 races in a 5-player match, and after 12 races with 2-4 players.
 
 '
   m_isRightToLeft: 0

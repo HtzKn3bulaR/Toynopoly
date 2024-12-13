@@ -118,7 +118,7 @@ public class GridGenerator3P : MonoBehaviour
     List<string> rookieNamesList = new List<string>
 
     {
-        "Angus 400", "Albatross GT", "BigVolt","Blobster","Chubble","Ciagnik","Col. Moss","Condor GRV","Crazy Pat","Dust Mite","El Gekko","El Rapido","Funk Flea", "E-Razr","Funziona","Get Air",
+        "Angus 400", "Albatross GT", "BigVolt","Blobster","Chubble","Ciagnik","Col. Moss","Condor GRV","Crazy Pat","Dust Mite","El Gekko","El Rapido","E-Razr","Funk Flea","Funziona","Get Air",
         "Genghis Kar", "Harvester","High-Rod","Hot Spot","HSF-1","Hurricane","Junky","Kanberra Kruiser","Lancer","LR 64","Micro","Mr. Bedtime","Myrmech","Naranja Turbo","Nesbitt","Nimbus","Panorama","Phat Slug",
         "Phat Trucker","Pipsqueak","Quaqa Turbo","RC Phink","Rebound 4x4","Road Star","Rouge","Show-Off","Splat","Starfire GT","Sunset Light","Super Wheat","Tesla","Toukka 4x4","Updraft","Vaanbus",
         "Volken Turbo"
@@ -749,8 +749,10 @@ public class GridGenerator3P : MonoBehaviour
         gameSounds.PlayOneShot(transition);
         gameManagerScript.helpText.gameObject.SetActive(true);
 
+        
         timerPanel.gameObject.SetActive(true);
         
+
 
         ShowNextRow();
     }
