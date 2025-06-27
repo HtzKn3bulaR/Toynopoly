@@ -161,7 +161,7 @@ public class GameManager : MonoBehaviour
         timerScript = GameObject.Find("Timer").GetComponent<Timer>();
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
-        timerPanel.gameObject.SetActive(true);
+        //timerPanel.gameObject.SetActive(true);
         
 
 

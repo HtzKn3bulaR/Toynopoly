@@ -25,24 +25,24 @@ public class GridGenerator : MonoBehaviour
     public AudioSource gameSounds;
 
 
-    [SerializeField] TextMeshProUGUI track1;
-    [SerializeField] TextMeshProUGUI track2;
-    [SerializeField] TextMeshProUGUI track3;
-    [SerializeField] TextMeshProUGUI track4;
-    [SerializeField] TextMeshProUGUI track5;
-    [SerializeField] TextMeshProUGUI track6;
-    [SerializeField] TextMeshProUGUI track7;
-    [SerializeField] TextMeshProUGUI track8;
-    [SerializeField] TextMeshProUGUI track9;
+    public  TextMeshProUGUI track1;
+    public  TextMeshProUGUI track2;
+    public  TextMeshProUGUI track3;
+    public  TextMeshProUGUI track4;
+    public  TextMeshProUGUI track5;
+    public  TextMeshProUGUI track6;
+    public  TextMeshProUGUI track7;
+    public  TextMeshProUGUI track8;
+    public  TextMeshProUGUI track9;
 
-    [SerializeField] TextMeshProUGUI bonusTrack;
+    public TextMeshProUGUI bonusTrack;
 
-    [SerializeField] TextMeshProUGUI carAText;
-    [SerializeField] TextMeshProUGUI carBText;
-    [SerializeField] TextMeshProUGUI carCText;
-    [SerializeField] TextMeshProUGUI carDText;
-    [SerializeField] TextMeshProUGUI carEText;
-    [SerializeField] TextMeshProUGUI carFText;
+    public TextMeshProUGUI carAText;
+    public TextMeshProUGUI carBText;
+    public TextMeshProUGUI carCText;
+    public TextMeshProUGUI carDText;
+    public TextMeshProUGUI carEText;
+    public TextMeshProUGUI carFText;
 
     [SerializeField] TextMeshProUGUI player1NameField;
     [SerializeField] TextMeshProUGUI player2NameField;
@@ -91,34 +91,36 @@ public class GridGenerator : MonoBehaviour
         "Museum 1","Toy World Aquatica: Redux","Ghost Town 1","Rooftops 1","Rooftops","Castle 1","HMS Invincible Redux","Aspenside",
         "Ranch","Airport","Fairground 1","Port Limano 2","StadVolt","Toytanic 2","Casino RV","Supermarket 1","Biohazard Factory","Toys In The Hood 2",
         "Toy World Mayhem","Smashride Circuit","RV Temple","Meltdown","Petro Volt","Botanical Garden ","Mysterious Toy-Volt Factory 1","Snowland 1","Home 2",
-        "Subway 2","Mysterious Toy-Volt Factory 2","School's Out 2","Moon Dawn","Radioactive Garden","Toy World 1","Holiday Camp California Edition","ToySoldierz",
+        "Subway 2","School's Out 2","Moon Dawn","Radioactive Garden","Toy World 1","Holiday Camp California Edition","ToySoldierz",
         "Santorini","Kadish Sprint","The Great Silence","Spa-Volt 1","Lunar","Skating Toys Redux","Museum EX","Library","Sakura","Wildland","Hospital 2","Museum 3",
         "Home 1","Rooftop Chase Redux","Hospital 1","Game Room 2","Venice","Quake!","Mid-sea Island","Metro-Volt","urbanX","Toytanic 1","Industry","Snowy River","Toy World 3",
         "Game Room 1","Botanical Garden EX","Helios","Subway","Paper Town 1","Route-77","Castle 2","Urban Sprint 1","Wonderful Skylands 1","Hull Breach 3000","Fairground 2",
         "Supermarket 2","White Rose Chapel","Grisville","Spaceship","RC Stadium 2","Images Of Giza: Redux","Toy World 2","Toys in The Hood 1","The Bunker","Spa-Volt 2",
-        "Medieval Redux","Port Limano 1","SBX Alpine","Jailhouse Rock","Ghost Town 2","Museum 2","Shoppe","Re-Ville","Cliffside","POD: Roc","High Rollers","Cliffside Court",
-        "Floating World","Synthwave","Battered Mansion 2","Desolate District 1","Downtown 1","Downtown 2","Port Limano EX"
+        "Medieval Redux","Port Limano 1","SBX Alpine","Jailhouse Rock","Ghost Town 2","Museum 2","Shoppe","Re-Ville","Cliffside","POD: Roc","Cliffside Court",
+        "Floating World","Synthwave","Battered Mansion 2","Desolate District 1","Downtown 1","Downtown 2","Port Limano EX","Elementary 1","Elementary 2","Swan Street",
+        "Genghis Kastle","Spring Visit","Aquarium 1","Frostpeak","Galaxy World 1","Galaxy World 2"
     };
 
     List<string> bonusTrackList = new List<string>
 
     { "Airport 2","Battered Mansion 1","Battered Mansion 2","Best-Milk Farm","Chilled to the Bone","Cumulonimbus Clouds","Donut Plains 3","Freestoyle 2","GBA Bowser Castle 3",
         "Hallow's Eve","High Rollers","Illusion","Junkyard 2","Market Mayhem","Miami Manic","Molten Caverns","Mid-sea Island","Palm Marsh","Paper Town 1","Penny Racers - Caves"
-        ,"Penny Racers - Harbour","POD: Roc","Port Limano EX","RC Stadium 1","Rigs Highway","Road in the Sky","Spooky-Volt","Subway","Swan Street","Temple of the Burning Darkness"
+        ,"Penny Racers - Harbour","POD: Roc","Port Limano EX","RC Stadium 1","Rigs Highway","Road in the Sky","Spooky-Volt","Subway","Temple of the Burning Darkness"
         ,"Tetris Festival","Terminus","The Felling Yard","Toy World EX","Toys in the Hood EX","Wonderful Skylands 2","Avalon","Belgium","Blood on the Rooftops","Broken Sunlight"
         ,"Cake","Chess Night","Christmas Snow Globe","Christmas Special Stage","Cliffside","Cliffside Court","Desolate District 1","Downhill Jam (THUG2)","Endgame","Floating World",
-        "Fools Mate 2","Fukushima","Genghis Kastle","Go Play Outside!","Ground N Smash 2","Harbor Lights"
+        "Fools Mate 2","Fukushima","Go Play Outside!","Ground N Smash 2","Harbor Lights","Appalachian RC","Forest Mansion 3 (Redux)","Hanging Gaps","Horror Doinky 2","Isola Verde: Redux","MineZcraft",
+        "Skatepark F20","Treehouse Camping","Toys in the Hood 1.5","Mansion","Mysterious Toy-Volt Factory 2","Supermarket 5: Redux","Toys In The Hood 4 (RVA)","Winter Air"
     };
 
 
-    List<string> activeList;
-    List<Sprite> activeSpriteList;
+    public List<string> activeList;
+    public List<Sprite> activeSpriteList;
 
-    List<string> rookieNamesList = new List<string>
+    public List<string> rookieNamesList = new List<string>
 
     {
         "Toukka 4x4","Starfire GT","Lancer","El Gekko","Condor GRV","Junky","Rouge","Get Air","BigVolt","Road Star","Sunset Light","Show-Off","Nimbus","Harvester","Rebound 4x4","Albatross GT",
-        "Updraft","Chubble","El Rapido","Vaanbus","Kanberra Kruiser","Blobster","Col. Moss","Angus 400","Nesbitt","Hot Spot","Micro","Phat Slug","Hurricane","LR 64","Super Wheat","Dust Mite","High-Rod",
+        "Updraft","Chubble","El Rapido","Vaanbus","Blobster","Col. Moss","Angus 400","Nesbitt","Hot Spot","Micro","Phat Slug","Hurricane","LR 64","Super Wheat","Dust Mite","High-Rod",
         "Crazy Pat","Myrmech","Mr. Bedtime","Tesla","Funziona","Phat Trucker","Splat","Panorama","Ciagnik","Genghis Kar","Quaqa Turbo","Volken Turbo","HSF-1","Pipsqueak","Naranja Turbo","RC Phink","E-Razr","FunkFlea"
     };
 
@@ -129,7 +131,7 @@ public class GridGenerator : MonoBehaviour
     List<string> amateurNamesList = new List<string>
 
     {
-        "AMCO TC","Bad Bison","Badd RC","Baja Dash","Breadfast","Bumblebee","Candy Pebbles","Dr. Grudge","Eatium","Emilia","Evil Weasel","Exceed","Flatter 4V","Frograph","Groovster","Harmor","Honeybee",
+        "AMCO TC","Bad Bison","Badd RC","Baja Dash","Breadfast","Bumblebee","Candy Pebbles","Chapman","Dr. Grudge","Eatium","Emilia","Evil Weasel","Exceed","Flatter 4V","Frograph","Fun Zone","Groovster","Harmor","Honeybee",
         "Hotknife","Ignit-9","Koin Karp","Kyarus","LA 54","LMW","Locker","Madness","Manfred","Moby Trick","Mongoose","Mouse","Muller GT","Nevermore","Nitro Crusher","NY 54","Off Gear","Phantum","Power Cap",
         "Queen Bee","RC Bandit","Reddlum","Red Kermit","Reliance","Road King","Rotor","RV Loco","Silvarooky","Smokie","Sprinter XL","Star Carbs","Strax","Tempest","Toy-Volt Towing","Triton","Ultima","Ultra Gamma",
         "Vixen","Wild Ride"
@@ -146,7 +148,7 @@ public class GridGenerator : MonoBehaviour
         "75C","Aerozad","Akagi Attacker","Alice","APC L-13","Aquamarina","Aquasonic","Bajaette","Bendor","Bertha Ballistics","BossVolt","Breaker","Camelia","Cerveth","Donnie TC","Drawall","DRJ-61","Duck Sky",
         "Ember","Emperor","Flower Power","Frostbite","Frosted Delight","Fulon X","Grimlock","Hammerhead","Hyper XL","Junker","Le Pastel","Lithmus","Llag Sat","Marauder","Matra XL","Micro Tache","Panga TC","Panther",
         "Pest Control","Phenom","Pole Poz","Prizmer","R6 Turbo","Raudy","RC 1999","RC San","Recon MK1","Rice Ball","Road Rage","Romeo","Sarge","Shocker","Spearhead","Springtrap","ST 1","Sturm","Sunnyboy","Swizz Cheezer",
-        "Thunder","Twyster","Unicorn","Urban Jungle","Vibe Box","Wave Dancer","Weaver","Whiplash","YNZ"
+        "Thunder","Twilight GT","Twyster","Unicorn","Urban Jungle","Vibe Box","Wave Dancer","Weaver","Whiplash","YNZ"
     };
 
     public List<Sprite> advancedSpriteList = new List<Sprite>
@@ -156,10 +158,10 @@ public class GridGenerator : MonoBehaviour
     List<string> semiProNamesList = new List<string>
 
     {
-        "5TP","Acclaim GT","Adeon","Aeromaster","AMW","Ancile","Arnoux","Artifact","BHV 1","Big Load","Big Match Jim","Blazar","Blaze V8","Bushido RS","CHC 305","Chubba","Cobra Max","Cossie","Danger","Dragoon",
+        "5TP","Acclaim GT","Adeon","Aeromaster","AMW","Ancile","Arnoux","Artifact","Ballista","BHV 1","Big Load","Big Match Jim","Blazar","Blaze V8","Bushido RS","CHC 305","Chubba","Cobra Max","Cossie","Current","Danger","Dragoon",
         "Dual Signal","Ducktail","Fat Agnus","Gravel Basher","Heritage","Hydrox","Iron-Z","Jackal","Jet Astro","JG-7","Jungle Beast","Karlington","KC-3","Locust","LV 54","Mambra","Maxam RS","Max Attack","Middle5",
-        "Nitromare","Norwood","Ontogen","Oval Ace","Pemto","Predator","Quazar","RC-Erra","RC Vector","RG1","Riptor","Rothams Racing","Runner 2000","Rustique","Sasquatch","Serrate","Sizzler","Sokudo","Speed Balancer","Styn",
-        "Swede","Touga", "Tri-Enter","Tribute","Trundle Buster","Victoria","Voltz XL","Winger","Yuurei V8","Zipper"
+        "Nitromare","Norwood","Ontogen","Pemto","Predator","Quazar","RC-Erra","RC Vector","RG1","Riptor","Rothams Racing","Runner 2000","Rustique","Sasquatch","Serrate","Sizzler","Sokudo","Speed Balancer","Styn",
+        "Swede","Toy-World GT","Tri-Enter","Tribute","Trundle Buster","Victoria","Voltz XL","Winger","Yuurei V8","Zipper"
      };
 
     public List<Sprite> semiProSpriteList = new List<Sprite>
@@ -170,9 +172,9 @@ public class GridGenerator : MonoBehaviour
 
     {
         "After Image","Artair","Ayrton SP","BajaVolt","BanKing","Black Widow","Cerberus","Cherencov","Chimera TC","Cintach","Cougar","Drome Champ","Duflame","Eaglet","Electric Sheep","EXE TC","G3X","Gust","Humma"
-        ,"Hydro Flame","Indy B","Jet Spike","Karen","Keyakizaka","Maverick","Mean Streak","Mid-Musc","N-Sharp","Outlaw","Panga","Patriot","Power Loader","Prime Target","Probe-24","Proto Combo","Puma","Purp XL",
-        "Quinx","RC Bulldog","RC Winglet","Redhead","Ridgeback","RVRC 20","RVXXL 5","Ryu","S13 Alltune","Sandstorm","Shark Bite","Shinobi","Sin","Sir Gleam","SNW 35","Spectrum","SR-8000","Star Oil","Steezy",
-        "Sucker Punch","Sunrise","The Knight","Tier 15","Toro GT84","Toyeca","TT Raider","Ultra Drive","Velter Ultron","Visconti R","Vitesse","Warrion","Wattage","Wildstar"
+        ,"Hydro Flame","Indy B","Jet Spike","Karen","Keyakizaka","Maverick","Mean Streak","Mid-Musc","N-Sharp","Outlaw","Panga","Patriot","Power Loader","Prime Target","Proto Combo","Puma","Purp XL",
+        "Quinx","RC Bulldog","RC Winglet","Ridgeback","RVRC 20","RVXXL 5","Ryu","S13 Alltune","Sandstorm","Shark Bite","Shinobi","Sin","Sir Gleam","SNW 35","Spectrum","SR-8000","Star Oil","Steezy",
+        "Sucker Punch","Sunrise","The Knight","Tier 15","Tizzoni","Toro GT84","Toyeca","TT Raider","Ultra Drive","Velter Ultron","Visconti R","Vitesse","Wattage","Wildstar"
 
     };
 
@@ -183,10 +185,10 @@ public class GridGenerator : MonoBehaviour
     List<string> superProNamesList = new List<string>
 
     {
-        "Anaconda GT","Armand","AU-8","Calcure","Cambold R","Commandine","Daemmon","Dragheat","Elyta","Endo","Exclaim GT Mk.2","FD-400","FLIR","Golden Eye","Gungnir","Hanabira","Hemera","Hetgarde GT1","Horizenna",
+        "Anaconda GT","Armand","AU-8","Calcure","Cambold R","Commandine","Daemmon","Dragheat","Elyta","Endo","Exclaim GT Mk.2","FD-400","FLIR","Golden Eye","Gungnir","Hanabira","Hemera","Hetgarde GT1","Horizenna","Hoshino",
         "Identity X","King Kaiju","King Moloko","Komet","La Rossa","Madax GT","Maxxas XLR8","Megalodon XL","Mudman","Nakajima","Napalm","Nyx","Orbitron","Orion","P4 Super","Prototype FX77","Quicksilver","Raven",
-        "Reiser","Revel","Rinne","RVRC","Saeger","Selsia Turbo","Sentaro XL","Sideswipe","Skarlet","Skull Crusher","Slingshot","Spectron","Starmac","Sterling F77","Stinger","Sylea","Tesseract","Ultra-RV","U.V.G.S.",
-        "Voltrex","Wind Slicer","Wyvern","XM250","Yinisa"
+        "Reiser","Revel","Rinne","RVRC","Saeger","Selsia Turbo","Sentaro XL","Sideswipe","Skarlet","Skull Crusher","Slingshot","Spectron","Spedion","Starmac","Sterling F77","Stinger","Sylea","Tesseract","Ultra-RV","U.V.G.S.",
+        "Voltrex","Wind Slicer","Wyvern","XM250","Yinisa",
     };
 
     public List<Sprite> superProSpriteList = new List<Sprite>

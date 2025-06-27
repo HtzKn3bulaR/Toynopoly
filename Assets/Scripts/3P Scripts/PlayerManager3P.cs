@@ -222,7 +222,9 @@ public class PlayerManager3P : MonoBehaviour
     private int raceWinnerLevel1 = 0;
     private int runnerUpLevel1 = 0;
     private int thirdLevel1 = 0;
-          
+
+    private int stealer;
+
     private DividendGenerator dividendScript;
     private EmptyInventoryHandler emptyInventoryScript;
     private Timer timerScript;
@@ -422,7 +424,7 @@ public class PlayerManager3P : MonoBehaviour
 
         {
             case 1:
-                activePlayerMessage.text = ($"{ MainManager.playerNames[MainManager.activePlayer]} has made their selection:");
+                activePlayerMessage.text = ($"{ MainManager.playerNames[MainManager.activePlayer]} has selected:");
                 break;
 
             case 2:
@@ -601,7 +603,7 @@ public class PlayerManager3P : MonoBehaviour
         raceInProgressPanelChallenge.SetActive(true);
         challengeRaceProgressCar.GetComponentInChildren<TMP_Text>().text = selectedCar;
         challengeRaceProgressTrack.GetComponentInChildren<TMP_Text>().text = selectedTrack;
-        challengeProgressTextInfo.text = ("Level " + MainManager.levelCounter + ", Race " + MainManager.roundCounter + " / " + MainManager.raceThreshold + " in progress");
+        challengeProgressTextInfo.text = ("Level " + MainManager.levelCounter + ", Race " + MainManager.roundCounter + " / " + ((MainManager.raceThreshold)-1) + " in progress");
 
        challengerNameL2.text = MainManager.playerNames[MainManager.activePlayer];
        defenderNameL2.text = MainManager.playerNames[MainManager.defendingPlayer];
@@ -768,13 +770,13 @@ public class PlayerManager3P : MonoBehaviour
 
             if (MainManager.playerNumber == 5)
             {
-                currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} / 10 in progress");
+                currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} / {(MainManager.raceThreshold)-1} in progress");
             }
 
             else
 
             {
-                currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} / 12 in progress");
+                currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} / {(MainManager.raceThreshold)-1} in progress");
             }
 
             currentRaceInfoTrack.text = selectedTrack;
@@ -890,7 +892,7 @@ public class PlayerManager3P : MonoBehaviour
                     PlayerWinsCar(MainManager.activePlayer);
                     PlayerLosesCar(MainManager.defendingPlayer);
 
-                    if (stolenWin == false)
+                    if (!stolenWin)
                     {
                         MainManager.raceWinner = MainManager.activePlayer;
                         int gap;
@@ -901,7 +903,7 @@ public class PlayerManager3P : MonoBehaviour
                     else
 
                     {
-                        MainManager.raceWinner = MainManager.inactivePlayers[playersL2WinnerDropdown.value];
+                        MainManager.raceWinner = stealer;
                         int gap;
                         gap = System.Convert.ToInt32(gapStolenWin.value);
                         MainManager.timeBattleSeconds = (gap);
@@ -918,7 +920,7 @@ public class PlayerManager3P : MonoBehaviour
                     PlayerLosesCar(MainManager.activePlayer);
 
 
-                    if (stolenWin == false)
+                    if (!stolenWin)
                     {
                         MainManager.raceWinner = MainManager.defendingPlayer;
                         int gap2;
@@ -929,7 +931,7 @@ public class PlayerManager3P : MonoBehaviour
                     else
 
                     {
-                        MainManager.raceWinner = MainManager.inactivePlayers[playersL2WinnerDropdown.value];
+                        MainManager.raceWinner = stealer;
                         int gap;
                         gap = System.Convert.ToInt32(gapStolenWin.value);
                         MainManager.timeBattleSeconds = (gap);
@@ -961,6 +963,12 @@ public class PlayerManager3P : MonoBehaviour
         }
 
     }
+
+    public void RegisterSteal()
+    {
+        stealer = playersL2WinnerDropdown.value;
+    }
+
 
     public void OpenToynopolyTimeBattlePanel()
     {
@@ -998,8 +1006,18 @@ public class PlayerManager3P : MonoBehaviour
 
             {
                 MainManager.carPrizes[MainManager.currentCarIndex] = 0;
-                CarHasDefaulted();
-            }
+
+                carPic[MainManager.currentCarIndex].image.sprite = carDefaultSprite;
+                
+                for (int i = 0; i < MainManager.playerNumber; i++)
+                {
+                    MainManager.playerInventory[i, MainManager.currentCarIndex] = 0;
+                }
+
+                rows[MainManager.currentCarIndex].SetActive(false);
+                MainManager.DefProcedureCompleted[MainManager.currentCarIndex] = true;
+
+             }
             
             
             UpdateCarPrizesDisplay();
@@ -1068,7 +1086,7 @@ public class PlayerManager3P : MonoBehaviour
     public void SetStolenWinBool()
 
     {
-        if (stolenWin == false)
+        if (!stolenWin)
 
         {
             stolenWin = true;
@@ -1638,6 +1656,8 @@ public class PlayerManager3P : MonoBehaviour
     public void StartLevel2()
 
     {
+                            
+
         level2StartPanel.SetActive(false);
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 

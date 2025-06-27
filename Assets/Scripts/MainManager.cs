@@ -11,6 +11,8 @@ public class MainManager : MonoBehaviour
     
     public static int playerNumber = 0;
 
+    public static bool shortMatch = false;
+
     public static int classSelected = 0;
 
     public static string[] cars = { "CarA", "CarB", "CarC", "CarD", "CarE", "CarF" };
@@ -67,6 +69,8 @@ public class MainManager : MonoBehaviour
     public static bool gameOver = false;
 
     public static bool matchTimeDisplayed = true;
+
+    
 
 
     // Start is called before the first frame update

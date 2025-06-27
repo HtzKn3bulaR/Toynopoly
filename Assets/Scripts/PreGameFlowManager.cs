@@ -19,8 +19,8 @@ public class PreGameFlowManager : MonoBehaviour
     [SerializeField] GameObject helpPanel2;
     [SerializeField] GameObject helpPanel3;
     [SerializeField] TMP_Dropdown carClassMenu;
-
     [SerializeField] TMP_Dropdown playerNumberMenu;
+    [SerializeField] TMP_Dropdown matchLengthMenu;
 
 
     [SerializeField] GameObject playerNamesPanel2P;
@@ -81,23 +81,56 @@ public class PreGameFlowManager : MonoBehaviour
 
             case 3:
                 playerNamesPanel3P.SetActive(true);
+
+                if (MainManager.shortMatch)
+                {
+                    MainManager.raceThreshold = 7;
+                }
+
+                else
+
                 MainManager.raceThreshold = 13;
                 break;
 
             case 4:
                 playerNamesPanel4P.SetActive(true);
-                MainManager.raceThreshold = 13;
+                if (MainManager.shortMatch)
+                {
+                    MainManager.raceThreshold = 9;
+                }
+
+                else
+                    MainManager.raceThreshold = 13;
                 break;
 
             case 5:
                 playerNamesPanel5P.SetActive(true);
-                MainManager.raceThreshold = 11;
+                if (MainManager.shortMatch)
+                {
+                    MainManager.raceThreshold = 6;
+                }
+
+                else
+                    MainManager.raceThreshold = 11;
                 break;
         }
         
-        
-        
+              
                              
+    }
+
+    public void SetMatchLength()
+    {
+        switch (matchLengthMenu.value)
+        {
+            case 0:
+                MainManager.shortMatch = false;
+                break;
+
+            case 1:
+                MainManager.shortMatch = true;
+                break;
+        }
     }
 
     public void ContinueToMain()

@@ -82,13 +82,27 @@ public class DividendGenerator : MonoBehaviour
     public void RandomizeDividend()
 
     {
+        if (MainManager.playerNumber == 5)
+
+        {
+            MainManager.raceThreshold = 11;
+        }
+
+        else
+
+        {
+            MainManager.raceThreshold = 13;
+        }
+
+
         var uniqueRandomList = GetUniqueRandomElements(dividendList, MainManager.raceThreshold-1);
 
         for (int i = 0; i < uniqueRandomList.Count; i++)
 
         {
             actualDividendList[i] = uniqueRandomList[i];
-
+            Debug.Log(MainManager.raceThreshold - 1);
+            Debug.Log(actualDividendList[i]);
 
         }
 
