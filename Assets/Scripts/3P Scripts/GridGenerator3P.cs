@@ -133,7 +133,7 @@ public class GridGenerator3P : MonoBehaviour
     List<string> amateurNamesList = new List<string>
 
     {
-        "AMCO TC","Bad Bison","Badd RC","Baja Dash","Breadfast","Bumblebee","Candy Pebbles","Chapman","Dr. Grudge","Eatium","Emilia","Evil Weasel","Exceed","Flatter 4V","Frograph","Fun Zone","Groovster","Harmor","Honeybee",
+        "AMCO TC","Bad Bison","Badd RC","Baja Dash","Breadfast","Bumblebee","Candy Pebbles","Chapman","Dr. Grudge","Eatum","Emilia","Evil Weasel","Exceed","Flatter 4V","Frograph","Fun Zone","Groovster","Harmor","Honeybee",
         "Hotknife","Ignit-9","Koin Karp","Kyarus","LA 54","LMW","Locker","Madness","Manfred","Moby Trick","Mongoose","Mouse","Muller GT","Nevermore","Nitro Crusher","NY 54","Off Gear","Phantum","Power Cap",
         "Queen Bee","RC Bandit","Reddlum","Red Kermit","Reliance","Road King","Rotor","RV Loco","Silvarooky","Smokie","Sprinter XL","Star Carbs","Strax","Tempest","Toy-Volt Towing","Triton","Ultima","Ultra Gamma",
         "Vixen","Wild Ride"

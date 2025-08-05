@@ -1407,6 +1407,7 @@ public class PlayerManager3P : MonoBehaviour
     {
         int oldCarValue = MainManager.carPrizes[MainManager.currentCarIndex];
         int randomValue = UnityEngine.Random.Range(0, 15);
+        int newCarValue = (MainManager.carPrizes[MainManager.currentCarIndex] + (carValueChangeOptions[randomValue]));
         MainManager.carPrizes[MainManager.currentCarIndex] = (MainManager.carPrizes[MainManager.currentCarIndex] + (carValueChangeOptions[randomValue]));
 
         if (MainManager.carPrizes[MainManager.currentCarIndex] <= 0)
@@ -1424,7 +1425,7 @@ public class PlayerManager3P : MonoBehaviour
         audioSource.PlayOneShot(coinFalling);
 
         currentCarNameMarketPanel.text = selectedCar;
-        currentCarPrizeMarketPanel.text = oldCarValue.ToString();
+        currentCarPrizeMarketPanel.text = newCarValue.ToString();
         carValueChangeDisplay.text = carValueChangeOptions[randomValue].ToString();
 
         if (carValueChangeOptions[randomValue] > 0)
@@ -1755,30 +1756,59 @@ public class PlayerManager3P : MonoBehaviour
     {
         MainManager.gameOver = true;
         Debug.Log("Game Over");
-
+       
         gameOverPanel.SetActive(true);
         audioSource.PlayOneShot(heartbeat);
 
-        resultsP1Name.text = MainManager.playerNames[0];
-        resultsP2Name.text = MainManager.playerNames[1];
-        resultsP3Name.text = MainManager.playerNames[2];
-        resultsP1cashTotal.text = MainManager.playerCash[0].ToString();
-        resultsP2cashTotal.text = MainManager.playerCash[1].ToString();
-        resultsP3cashTotal.text = MainManager.playerCash[2].ToString();
+        List<float> cashRanking = new List<float>
+        { };
+
+        List<string> playerRanking = new List<string>
+        { };
+
+
+        for (int i = 0; i < MainManager.playerNumber; i++)
+
+        {
+            cashRanking.Add(MainManager.playerCash[i]);
+            cashRanking.Sort();
+            cashRanking.Reverse();
+
+        }
+
+        for (int i = 0; i < MainManager.playerNumber; i++)
+        {
+            for (int y = 0; y < MainManager.playerNumber; y++)
+            {
+                if (cashRanking[i] == MainManager.playerCash[y])
+                {
+                    playerRanking.Add(MainManager.playerNames[y]);
+                }
+            }
+
+        }
+
+
+        resultsP1Name.text = playerRanking[0];
+        resultsP2Name.text = playerRanking[1];
+        resultsP3Name.text = playerRanking[2];
+        resultsP1cashTotal.text = cashRanking[0].ToString();
+        resultsP2cashTotal.text = cashRanking[1].ToString();
+        resultsP3cashTotal.text = cashRanking[2].ToString();
         
 
         if (MainManager.playerNumber > 3)
 
         {
-            resultsP4Name.text = MainManager.playerNames[3];
-            resultsP4cashTotal.text = MainManager.playerCash[3].ToString();
+            resultsP4Name.text = playerRanking[3];
+            resultsP4cashTotal.text = cashRanking[3].ToString();
         }
 
         if (MainManager.playerNumber > 4)
 
         {
-            resultsP5Name.text = MainManager.playerNames[4];
-            resultsP5cashTotal.text = MainManager.playerCash[4].ToString();
+            resultsP5Name.text = playerRanking[4];
+            resultsP5cashTotal.text = cashRanking[4].ToString();
         }
 
 

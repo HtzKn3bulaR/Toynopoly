@@ -57,6 +57,8 @@ public class MainManager : MonoBehaviour
     public static int[] playerCash = {150, 150, 150, 150, 150, 150};
     public static int[,] playerInventory = { { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };
     //inventory format is player, number of cars
+    
+
 
 
 

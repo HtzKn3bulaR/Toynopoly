@@ -76,6 +76,14 @@ public class PreGameFlowManager : MonoBehaviour
         {
             case 2:
                 playerNamesPanel2P.SetActive(true);
+                
+                if(MainManager.shortMatch)
+                {
+                    MainManager.raceThreshold = 9;
+                }
+
+                else
+                                
                 MainManager.raceThreshold = 13;
                 break;
 
