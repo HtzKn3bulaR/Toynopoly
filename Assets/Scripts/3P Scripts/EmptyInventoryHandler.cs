@@ -113,7 +113,7 @@ public class EmptyInventoryHandler : MonoBehaviour
                 }
             }
 
-            if (numberOfOwners == 1 || MainManager.fieldsLeftForCar[i] < 1 || MainManager.DefProcedureCompleted[i] || MainManager.carPrizes[i] > MainManager.playerCash[MainManager.buyer])
+            if (numberOfOwners == 1 && MainManager.protection[i] || MainManager.fieldsLeftForCar[i] < 1 || MainManager.DefProcedureCompleted[i] || MainManager.carPrizes[i] > MainManager.playerCash[MainManager.buyer])
 
             { buyingPossible[i] = false; }
 

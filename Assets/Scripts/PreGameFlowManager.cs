@@ -48,6 +48,8 @@ public class PreGameFlowManager : MonoBehaviour
     
     [SerializeField] TextMeshProUGUI p6NameInputField;
 
+    
+
 
     // Start is called before the first frame update
     void Start()
@@ -77,7 +79,7 @@ public class PreGameFlowManager : MonoBehaviour
             case 2:
                 playerNamesPanel2P.SetActive(true);
                 
-                if(MainManager.shortMatch)
+                if (MainManager.shortMatch)
                 {
                     MainManager.raceThreshold = 9;
                 }
@@ -215,6 +217,11 @@ public class PreGameFlowManager : MonoBehaviour
             MainManager.activePlayer = playerData.activePlayer;
             MainManager.levelCounter = playerData.level;
             MainManager.roundCounter = playerData.round;
+
+            MainManager.raceThreshold = playerData.matchlength;
+            MainManager.shieldAvailable = playerData.shields;
+            MainManager.protection = playerData.protection;
+            MainManager.tempdividends = playerData.tempdividends;
 
             for (int i = 0; i < playerData.playerInventory.Length; i++)
 

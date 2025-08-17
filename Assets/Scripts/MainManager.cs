@@ -21,6 +21,8 @@ public class MainManager : MonoBehaviour
     public static List<bool> playerOutofOptions = new List<bool> { false, false, false, false, false, false };
     public static bool[] spectator = { false, false, false, false, false, false };
     public static int playerWithBuyOption = 0;
+    public static bool[] protection = { false, false, false, false, false, false };
+    public static bool[] shieldAvailable = { true, true, true, true, true };
 
     public static string[] activeTracks = { "Track1", "Track2", "Track3", "Track4", "Track5", "Track6", "Track7", "Track8", "Track9" };
 
@@ -51,6 +53,8 @@ public class MainManager : MonoBehaviour
 
     public static bool activePlayerWins = false;
 
+    public static bool IsToynopolyBattle = false;
+
     
     //game Scores New
 
@@ -71,6 +75,8 @@ public class MainManager : MonoBehaviour
     public static bool gameOver = false;
 
     public static bool matchTimeDisplayed = true;
+
+    public static List<int> tempdividends = new List<int> { };
 
     
 

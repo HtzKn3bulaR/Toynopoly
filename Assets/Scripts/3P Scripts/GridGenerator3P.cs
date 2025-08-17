@@ -92,7 +92,7 @@ public class GridGenerator3P : MonoBehaviour
         "Museum 1","Toy World Aquatica: Redux","Ghost Town 1","Rooftops 1","Rooftops","Castle 1","HMS Invincible Redux","Aspenside",
         "Ranch","Airport","Fairground 1","Port Limano 2","StadVolt","Toytanic 2","Casino RV","Supermarket 1","Biohazard Factory","Toys In The Hood 2",
         "Toy World Mayhem","Smashride Circuit","RV Temple","Meltdown","Petro Volt","Botanical Garden ","Mysterious Toy-Volt Factory 1","Snowland 1","Home 2",
-        "Subway 2","School's Out 2","Moon Dawn","Radioactive Garden","Toy World 1","Holiday Camp California Edition","ToySoldierz",
+        "Subway 2","School's Out 2","Moon Dawn","Radioactive Garden","Toy World 1","Holiday Camp California Ed.","ToySoldierz",
         "Santorini","Kadish Sprint","The Great Silence","Spa-Volt 1","Lunar","Skating Toys Redux","Museum EX","Library","Sakura","Wildland","Hospital 2","Museum 3",
         "Home 1","Rooftop Chase Redux","Hospital 1","Game Room 2","Venice","Quake!","Mid-sea Island","Metro-Volt","urbanX","Toytanic 1","Industry","Snowy River","Toy World 3",
         "Game Room 1","Botanical Garden EX","Helios","Subway","Paper Town 1","Route-77","Castle 2","Urban Sprint 1","Wonderful Skylands 1","Hull Breach 3000","Fairground 2",
@@ -106,7 +106,7 @@ public class GridGenerator3P : MonoBehaviour
 
     { "Airport 2","Battered Mansion 1","Battered Mansion 2","Best-Milk Farm","Chilled to the Bone","Cumulonimbus Clouds","Donut Plains 3","Freestoyle 2","GBA Bowser Castle 3",
         "Hallow's Eve","High Rollers","Illusion","Junkyard 2","Market Mayhem","Miami Manic","Molten Caverns","Mid-sea Island","Palm Marsh","Paper Town 1","Penny Racers - Caves"
-        ,"Penny Racers - Harbour","POD: Roc","Port Limano EX","RC Stadium 1","Rigs Highway","Road in the Sky","Spooky-Volt","Subway","Temple of the Burning Darkness"
+        ,"Penny Racers - Harbour","POD: Roc","Port Limano EX","RC Stadium 1","Rigs Highway","Road in the Sky","Spooky-Volt","Subway","Temple of the Burning Darkn."
         ,"Tetris Festival","Terminus","The Felling Yard","Toy World EX","Toys in the Hood EX","Wonderful Skylands 2","Avalon","Belgium","Blood on the Rooftops","Broken Sunlight"
         ,"Cake","Chess Night","Christmas Snow Globe","Christmas Special Stage","Cliffside","Cliffside Court","Desolate District 1","Downhill Jam (THUG2)","Endgame","Floating World",
         "Fools Mate 2","Fukushima","Go Play Outside!","Ground N Smash 2","Harbor Lights","Appalachian RC","Forest Mansion 3 (Redux)","Hanging Gaps","Horror Doinky 2","Isola Verde: Redux","MineZcraft",

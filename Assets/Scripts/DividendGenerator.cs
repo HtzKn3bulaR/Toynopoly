@@ -12,7 +12,7 @@ public class DividendGenerator : MonoBehaviour
 
     List<int> dividendList = new List<int> {  };
 
-    List<int> actualDividendList = new List<int> {  };
+    public List<int> actualDividendList = new List<int> {  };
 
     int[] dividendsTenRounds = { 7, 7, 7, 7, 0, 1, 2, 3, 4, 5 };
     int[] dividendsTwelveRounds = { 7, 7, 7, 7, 7, 7, 0, 1, 2, 3, 4, 5 };
@@ -63,6 +63,8 @@ public class DividendGenerator : MonoBehaviour
 
     void Awake()
     {
+
+
         if (MainManager.playerNumber < 3)
         {
             gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -70,9 +72,11 @@ public class DividendGenerator : MonoBehaviour
         }
 
         else
+        {
 
-        playerManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
-        gridGeneratorScript = GameObject.Find("GridGenerator3P").GetComponent<GridGenerator3P>();
+            playerManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
+            gridGeneratorScript = GameObject.Find("GridGenerator3P").GetComponent<GridGenerator3P>();
+        }
        
 
         if (MainManager.playerNumber == 5)
@@ -85,6 +89,11 @@ public class DividendGenerator : MonoBehaviour
         {
             dividendList.AddRange(dividendsTwelveRounds);
             actualDividendList.AddRange(dividendsTwelveRounds);
+        }
+
+        if (MainManager.gameResumed)
+        {
+            actualDividendList.AddRange(MainManager.tempdividends);
         }
 
     }
