@@ -6,7 +6,13 @@ using TMPro;
 
 public class ProtectionHandler : MonoBehaviour
 {
+    public AudioClip shieldDeployed;
+    public AudioSource protectionAudio;
+
     public Sprite shieldIcon;
+
+    public ParticleSystem shieldEmitter;
+    [SerializeField] GameObject shieldObject;
 
     [SerializeField] List<GameObject> unusedShields = new List<GameObject>();
 
@@ -20,6 +26,19 @@ public class ProtectionHandler : MonoBehaviour
     [SerializeField] List<Button> p5Inventory = new List<Button>();
 
     private PlayerManager3P playerManagerScript;
+    private GameManager gameManagerScript;
+
+
+    [SerializeField] TextMeshProUGUI activeCar;
+    [SerializeField] TextMeshProUGUI activePlayer;
+
+    [SerializeField] GameObject P2protectionPanel;
+    [SerializeField] GameObject shieldDeployedPanel;
+
+    [SerializeField] Button shieldCarPicture;
+
+    private GridGenerator3P gridGeneratorScript;
+    private GridGenerator gridGenerate2PScript;
 
     // Start is called before the first frame update
     void Awake()
@@ -27,6 +46,19 @@ public class ProtectionHandler : MonoBehaviour
         if (MainManager.playerNumber > 2)
         {
             playerManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
+        }
+
+        if (MainManager.playerNumber < 3)
+        {
+            gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+            gridGenerate2PScript = GameObject.Find("GridGenerator").GetComponent<GridGenerator>();
+        }
+
+        else
+        {
+
+            playerManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
+            gridGeneratorScript = GameObject.Find("GridGenerator3P").GetComponent<GridGenerator3P>();
         }
 
     }
@@ -63,9 +95,15 @@ public class ProtectionHandler : MonoBehaviour
 
         }
 
-
+        shieldDeployedPanel.gameObject.SetActive(true);
+        DisplayShieldDeployedPanel();
 
     }
+
+
+
+
+
 
     public void CheckProtectionOptionAfterChallenge()
     {
@@ -90,7 +128,55 @@ public class ProtectionHandler : MonoBehaviour
 
     }
 
+    public void GetInformation()
+    {
+        activeCar.text = MainManager.cars[MainManager.TimeBattleCarIndex].ToString();
+        activePlayer.text = MainManager.playerNames[MainManager.activePlayer].ToString();
+    }
 
+    public void P2ProtectionPanelClose()
+    {
+        P2protectionPanel.gameObject.SetActive(false);
+    }
+
+    public void DisplayShieldDeployedPanel()
+    {
+        shieldObject.gameObject.SetActive(true);
+        shieldEmitter.Play();
+        protectionAudio.PlayOneShot(shieldDeployed);
+
+
+
+        if (MainManager.playerNumber > 2)
+        {
+            for (int i = 0; i < gridGeneratorScript.activeList.Count; i++)
+
+            {
+                if (gridGeneratorScript.activeList[i] == MainManager.cars[MainManager.currentCarIndex])
+
+                { shieldCarPicture.image.sprite = gridGeneratorScript.activeSpriteList[i]; }
+            }
+
+        }
+
+        else
+
+            for (int i = 0; i < gridGenerate2PScript.activeList.Count; i++)
+
+            {
+                if (gridGenerate2PScript.activeList[i] == MainManager.cars[MainManager.currentCarIndex])
+
+                { shieldCarPicture.image.sprite = gridGenerate2PScript.activeSpriteList[i]; }
+            }
+
+    }
+
+    public void ShieldInfoPanelClose()
+    {
+        shieldDeployedPanel.gameObject.SetActive(false);
+        shieldEmitter.Stop();
+        shieldObject.gameObject.SetActive(false);
+    }
 
 }
 

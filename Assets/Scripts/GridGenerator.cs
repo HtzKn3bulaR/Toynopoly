@@ -24,6 +24,8 @@ public class GridGenerator : MonoBehaviour
     public AudioClip newGame;
     public AudioSource gameSounds;
 
+    public ParticleSystem bliss;
+    
 
     public  TextMeshProUGUI track1;
     public  TextMeshProUGUI track2;
@@ -47,11 +49,7 @@ public class GridGenerator : MonoBehaviour
     [SerializeField] TextMeshProUGUI player1NameField;
     [SerializeField] TextMeshProUGUI player2NameField;
     [SerializeField] TextMeshProUGUI player3NameField;
-
-    //public TextMeshProUGUI p1NameInputField;
-    //public TextMeshProUGUI p2NameInputField;
-    //public TextMeshProUGUI p3NameInputField;
-
+    
 
     [SerializeField] Button carASprite;
     [SerializeField] Button carBSprite;
@@ -61,9 +59,7 @@ public class GridGenerator : MonoBehaviour
     [SerializeField] Button carFSprite;
 
     [SerializeField] Button carrouselSprite;
-
-    //[SerializeField] Button playerNamesSubmit;
-
+        
     [SerializeField] GameObject gameStartingPanel;
     [SerializeField] GameObject timerPanel;
 
@@ -195,8 +191,7 @@ public class GridGenerator : MonoBehaviour
 
     { };
 
-
-
+   
 
     List<T> GetUniqueRandomElements<T>(List<T> inputList, int count)
 
@@ -413,6 +408,7 @@ public class GridGenerator : MonoBehaviour
 
     {
         carCarrousel.SetActive(true);
+        bliss.Play();
         
 
 
@@ -630,7 +626,7 @@ public class GridGenerator : MonoBehaviour
 
         {
             case 2:
-                
+                               
                 player1NameField.text = MainManager.playerNames[0];
                 player2NameField.text = MainManager.playerNames[1];
                 break;
@@ -697,6 +693,7 @@ public class GridGenerator : MonoBehaviour
                 break;
             default:
                 gameStartingPanel.SetActive(true);
+                bliss.Stop();
                 PopulatePlayerPanel();
                 break;
         }

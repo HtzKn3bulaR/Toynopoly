@@ -124,7 +124,7 @@ public class CountUpHandler : MonoBehaviour
             }
         }
 
-        else if (MainManager.levelCounter == 2 && MainManager.IsToynopolyBattle == true)
+        else if (MainManager.levelCounter == 2)
         {
             for (int i = 0; i < rows.Length; i++)
             {

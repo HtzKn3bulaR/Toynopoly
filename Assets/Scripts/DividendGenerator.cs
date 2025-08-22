@@ -34,6 +34,8 @@ public class DividendGenerator : MonoBehaviour
 
     public Button dividendCarPicture;
 
+    public ParticleSystem diamond;
+
 
 
     List<T> GetUniqueRandomElements<T>(List<T> inputList, int count)
@@ -44,9 +46,7 @@ public class DividendGenerator : MonoBehaviour
         return inputListClone.GetRange(0, count);
 
     }
-
-    // Start is called before the first frame update
-
+        
 
     void Shuffle<T>(List<T> inputList)
 
@@ -166,6 +166,7 @@ public class DividendGenerator : MonoBehaviour
 
         dividendPayPanel.gameObject.SetActive(true);
         divGenAudio.PlayOneShot(dividend);
+        diamond.Play();
 
         dividendCarNamePanel.text = MainManager.cars[actualDividendList[MainManager.roundCounter - 1]];
         dividendCarPrizePanel.text = MainManager.carPrizes[actualDividendList[MainManager.roundCounter - 1]].ToString();
@@ -215,12 +216,14 @@ public class DividendGenerator : MonoBehaviour
         {
             gameManagerScript.AcceptDividend();
             dividendPayPanel.gameObject.SetActive(false);
+            diamond.Stop();
         }
 
         else
         {
             playerManagerScript.AcceptDividend();
             dividendPayPanel.gameObject.SetActive(false);
+            diamond.Stop();
         }
 
     }

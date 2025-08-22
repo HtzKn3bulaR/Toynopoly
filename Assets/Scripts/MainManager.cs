@@ -7,6 +7,11 @@ public class MainManager : MonoBehaviour
 {
     public static MainManager Instance;
 
+    public static string selectedFilePath;
+
+    public static bool autoResultsValid = false;
+    
+    
     public static bool gameResumed = false;
     
     public static int playerNumber = 0;

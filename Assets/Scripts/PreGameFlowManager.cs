@@ -48,8 +48,9 @@ public class PreGameFlowManager : MonoBehaviour
     
     [SerializeField] TextMeshProUGUI p6NameInputField;
 
-    
 
+    List<string> tempPlayersList = new List<string>
+    { };
 
     // Start is called before the first frame update
     void Start()
@@ -151,29 +152,44 @@ public class PreGameFlowManager : MonoBehaviour
 
             {
                 case 2:
-                    MainManager.playerNames[0] = p1NameInputFieldP2.text.ToUpper();
-                    MainManager.playerNames[1] = p2NameInputFieldP2.text.ToUpper();
+                if (tempPlayersList.Count > 1)
+                {
+                    SetRandomPlayerSequence();
+                }
+                else
+                    Debug.Log("Please enter player names");
                     break;
 
                 case 3:
-                    MainManager.playerNames[0] = p1NameInputFieldP3.text.ToUpper();
-                    MainManager.playerNames[1] = p2NameInputFieldP3.text.ToUpper();
-                    MainManager.playerNames[2] = p3NameInputFieldP3.text.ToUpper();
-                    break;
+
+                if (tempPlayersList.Count > 2)
+                {
+                    SetRandomPlayerSequence();
+                }
+                else
+                    Debug.Log("Please enter player names");
+                break;
 
             case 4:
-                MainManager.playerNames[0] = p1NameInputFieldP4.text.ToUpper();
-                MainManager.playerNames[1] = p2NameInputFieldP4.text.ToUpper();
-                MainManager.playerNames[2] = p3NameInputFieldP4.text.ToUpper();
-                MainManager.playerNames[3] = p4NameInputFieldP4.text.ToUpper();
+                if (tempPlayersList.Count > 3)
+                {
+                    SetRandomPlayerSequence();
+                }
+                else
+                    Debug.Log("Please enter player names");
+                
+                SetRandomPlayerSequence();
                 break;
 
             case 5:
-                MainManager.playerNames[0] = p1NameInputFieldP5.text.ToUpper();
-                MainManager.playerNames[1] = p2NameInputFieldP5.text.ToUpper();
-                MainManager.playerNames[2] = p3NameInputFieldP5.text.ToUpper();
-                MainManager.playerNames[3] = p4NameInputFieldP5.text.ToUpper();
-                MainManager.playerNames[4] = p5NameInputFieldP5.text.ToUpper();
+                if (tempPlayersList.Count > 4)
+                {
+                    SetRandomPlayerSequence();
+                }
+                else
+                    Debug.Log("Please enter player names");
+                
+                SetRandomPlayerSequence();
                 break;
         }
 
@@ -186,6 +202,24 @@ public class PreGameFlowManager : MonoBehaviour
         Load();
         MainManager.gameResumed = true;
         SceneManager.LoadScene(MainManager.playerNumber - 1);
+    }
+
+    public void PrepareNameString(string name)
+    {
+        string entry;
+
+        entry = name.TrimEnd(new char[] { '\r', ' ' });
+        entry = entry.TrimStart(new char[] { '\r', ' ' });
+        entry = entry.ToUpper();
+        tempPlayersList.Add(entry);
+        
+        Debug.Log(entry);
+
+        for (int i = 0; i < tempPlayersList.Count; i++)
+        {
+            Debug.Log(tempPlayersList[i]);
+        }
+
     }
 
     private void Load()
@@ -310,4 +344,41 @@ public class PreGameFlowManager : MonoBehaviour
     {
         
     }
+
+    void SetRandomPlayerSequence()
+    {
+                
+        var randomPlayersList = GetUniqueRandomElements(tempPlayersList, tempPlayersList.Count);
+
+       for (int i = 0; i < tempPlayersList.Count; i++)
+        {
+            MainManager.playerNames[i] = randomPlayersList[i];
+        }
+
+
+    }
+
+    List<T> GetUniqueRandomElements<T>(List<T> inputList, int count)
+
+    {
+        List<T> inputListClone = new List<T>(inputList);
+        Shuffle(inputListClone);
+        return inputListClone.GetRange(0, count);
+
+    }
+
+
+    void Shuffle<T>(List<T> inputList)
+
+    {
+        for (int i = 0; i < inputList.Count - 1; i++)
+
+        {
+            T temp = inputList[i];
+            int rand = Random.Range(i, inputList.Count);
+            inputList[i] = inputList[rand];
+            inputList[rand] = temp;
+        }
+    }
+
 }

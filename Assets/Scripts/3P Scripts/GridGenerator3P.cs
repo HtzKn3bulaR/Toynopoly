@@ -21,6 +21,8 @@ public class GridGenerator3P : MonoBehaviour
     public AudioClip stageReady;
     public AudioClip transition;
     public AudioSource gameSounds;
+
+    public ParticleSystem bliss;
     
 
     [SerializeField] GameObject carCarrousel;
@@ -345,6 +347,9 @@ public class GridGenerator3P : MonoBehaviour
     void StartCarrousel()
 
     {
+        bliss.Play();
+
+
         carCarrousel.SetActive(true);
 
 
@@ -728,6 +733,7 @@ public class GridGenerator3P : MonoBehaviour
                 break;
             default:
                 gameStartingPanel.SetActive(true);
+                bliss.Stop();
                 PopulatePlayerPanel();
                 break;
         }

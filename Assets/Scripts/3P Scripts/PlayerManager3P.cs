@@ -117,6 +117,8 @@ public class PlayerManager3P : MonoBehaviour
 
     [SerializeField] GameObject timerPanel;
 
+    [SerializeField] ParticleSystem[] finale;
+
     //[SerializeField] Button[] sellButtons = { };
 
     public TMP_Dropdown winnerDropdown;
@@ -215,9 +217,7 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] TextMeshProUGUI resultsP3cashTotal;
     [SerializeField] TextMeshProUGUI resultsP4cashTotal;
     [SerializeField] TextMeshProUGUI resultsP5cashTotal;
-
-
-
+          
 
     [SerializeField] Sprite carDefaultSprite;
 
@@ -1202,11 +1202,12 @@ public class PlayerManager3P : MonoBehaviour
     public void Level2ChallengeScoring()
 
     {
-
-        challengeOutcomePanel.SetActive(false);
+        challengeOutcomePanel.SetActive(false);      
         timeBattlePanel.SetActive(true);
         TimeBattleOutcome();
+        
     }
+             
 
 
     void Level1Scoring()
@@ -1381,13 +1382,15 @@ public class PlayerManager3P : MonoBehaviour
         if (MainManager.roundCounter % MainManager.playerNumber == 0)
 
         {
+            ReInstateRows();
             preSellingInfoPanel.SetActive(true);
             audioSource.PlayOneShot(panelOpen);
         }
 
         else
 
-            RoundChangeover();
+            StartCoroutine(WaitAfterCarFame());
+        //RoundChangeover();
     }
 
 
@@ -1777,8 +1780,34 @@ public class PlayerManager3P : MonoBehaviour
                             
 
         level2StartPanel.SetActive(false);
+
+        MainManager.activePlayer = GetIndexOfLowestValue(MainManager.playerCash);
+
+        for (int i = 0; i < MainManager.playerNumber; i++)
+
+        {
+            turnIndicator[i].SetActive(false);
+        }
+
+        turnIndicator[MainManager.activePlayer].SetActive(true);
+
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
+    }
+
+    public int GetIndexOfLowestValue(int[] arr)
+    {
+        float value = float.PositiveInfinity;
+        int index = -1;
+        for (int i = 0; i < arr.Length; i++)
+        {
+            if (arr[i] < value)
+            {
+                index = i;
+                value = arr[i];
+            }
+        }
+        return index;
     }
 
 
@@ -1926,6 +1955,11 @@ public class PlayerManager3P : MonoBehaviour
         {
             resultsP5Name.text = playerRanking[4];
             resultsP5cashTotal.text = cashRanking[4].ToString();
+        }
+
+        for (int i = 0; i < finale.Length; i++)
+        {
+            finale[i].Play();
         }
 
 

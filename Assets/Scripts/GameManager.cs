@@ -60,6 +60,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject buyOptionPanel;
     [SerializeField] GameObject pausePanel;
     [SerializeField] GameObject timerPanel;
+    [SerializeField] GameObject protectionEnablePanel;
+    
 
     [SerializeField] GameObject sliderDefeat;
     [SerializeField] GameObject sliderWin;
@@ -159,6 +161,7 @@ public class GameManager : MonoBehaviour
     private ToynopolyCalculator toynopolyCalculatorScript;
     private Timer timerScript;
     private CountUpHandler countUpScript;
+    private ProtectionHandler protectionHandlerScript;
 
     // Start is called before the first frame update
     void Awake()
@@ -168,6 +171,7 @@ public class GameManager : MonoBehaviour
         toynopolyCalculatorScript = GameObject.Find("ToynopolyCalculator").GetComponent<ToynopolyCalculator>();
         timerScript = GameObject.Find("Timer").GetComponent<Timer>();
         countUpScript = GameObject.Find("CountUpHandler").GetComponent<CountUpHandler>();
+        protectionHandlerScript = GameObject.Find("ProtectionHandler").GetComponent<ProtectionHandler>();
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
         //timerPanel.gameObject.SetActive(true);
@@ -661,22 +665,29 @@ public class GameManager : MonoBehaviour
     public void RegisterResults()
 
     {
-        Debug.Log(winnerDropdown.value);
-        if ((winnerDropdown.value) == 1)
-
+        if (!MainManager.autoResultsValid)
         {
-            MainManager.activePlayerWins = false;
+            Debug.Log(winnerDropdown.value);
+            if ((winnerDropdown.value) == 1)
+
+            {
+                MainManager.activePlayerWins = false;
+            }
+
+            else if ((defeatDropdown.value) == 1)
+
+            {
+                MainManager.activePlayerWins = true;
+            }
+
+            else Debug.Log("Please set the race results!");
+
         }
 
-        else if ((defeatDropdown.value) == 1)
-
+        else
         {
-            MainManager.activePlayerWins = true;
+            raceInProgressPanel.SetActive(false);
         }
-
-        else Debug.Log("Please set the race results!");
-
-
         fields[MainManager.pendingField].gameObject.SetActive(false);
         MainManager.fieldAvailable[MainManager.pendingField] = false;
 
@@ -1143,6 +1154,22 @@ public class GameManager : MonoBehaviour
         timeBattlePanel.SetActive(false);
         buffNerfPanel.SetActive(false);
 
+
+        if (MainManager.playerInventory[MainManager.activePlayer,MainManager.TimeBattleCarIndex] > 0 && MainManager.shieldAvailable[MainManager.activePlayer] == true)
+
+        {
+            int totalInventory = 0;
+            totalInventory = MainManager.playerInventory[0, MainManager.TimeBattleCarIndex] + MainManager.playerInventory[1, MainManager.TimeBattleCarIndex];
+
+            if (totalInventory == MainManager.playerInventory[MainManager.activePlayer,MainManager.TimeBattleCarIndex])
+            {
+                protectionEnablePanel.gameObject.SetActive(true);
+                protectionHandlerScript.GetInformation();
+
+            }
+        }
+
+
         if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
 
         {
@@ -1186,7 +1213,8 @@ public class GameManager : MonoBehaviour
 
         else
 
-            RoundChangeover();
+            StartCoroutine(WaitAfterCarFame());
+            //RoundChangeover();
     }
 
 
@@ -1333,6 +1361,18 @@ public class GameManager : MonoBehaviour
 
     {
         level2StartPanel.SetActive(false);
+
+        MainManager.activePlayer = GetIndexOfLowestValue(MainManager.playerCash);
+
+        for (int i = 0; i < MainManager.playerNumber; i++)
+
+        {
+            turnIndicator[i].SetActive(false);
+        }
+
+        turnIndicator[MainManager.activePlayer].SetActive(true);
+
+
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
     }
@@ -1578,6 +1618,21 @@ public class GameManager : MonoBehaviour
                 rows[i].gameObject.SetActive(true);
             }
         }
+    }
+
+    public int GetIndexOfLowestValue(int[] arr)
+    {
+        float value = float.PositiveInfinity;
+        int index = -1;
+        for (int i = 0; i < arr.Length; i++)
+        {
+            if (arr[i] < value)
+            {
+                index = i;
+                value = arr[i];
+            }
+        }
+        return index;
     }
 
 
