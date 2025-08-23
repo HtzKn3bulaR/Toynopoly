@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System;
+using UnityEngine.Events;
 
 
 public class GameManager : MonoBehaviour
@@ -162,6 +163,9 @@ public class GameManager : MonoBehaviour
     private Timer timerScript;
     private CountUpHandler countUpScript;
     private ProtectionHandler protectionHandlerScript;
+
+    public static event Action Onlevel2Start;
+    public static event Action Onlevel3Start;
 
     // Start is called before the first frame update
     void Awake()
@@ -964,7 +968,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void Level2Scoring()
+    public void Level2Scoring()
 
     {
         if (MainManager.activePlayerWins == true)
@@ -1097,21 +1101,25 @@ public class GameManager : MonoBehaviour
 
         timeBattleWinnerDisplay.text = MainManager.playerNames[timeBattleWinner];
 
-        if (timeBattleWinner == MainManager.activePlayer)
-
+        if (!MainManager.autoResultsValid)
         {
-            int gap;
-            gap = System.Convert.ToInt32(winGap.value);
-            MainManager.timeBattleSeconds = (gap);
-        }
 
-        else
+            if (timeBattleWinner == MainManager.activePlayer)
 
-        {
-            int gap;
-            gap = System.Convert.ToInt32(defeatGap.value);
-            MainManager.timeBattleSeconds = (gap);
+            {
+                int gap;
+                gap = System.Convert.ToInt32(winGap.value);
+                MainManager.timeBattleSeconds = (gap);
+            }
 
+            else
+
+            {
+                int gap;
+                gap = System.Convert.ToInt32(defeatGap.value);
+                MainManager.timeBattleSeconds = (gap);
+
+            }
         }
 
         timeBattleSecondsDisplay.text = MainManager.timeBattleSeconds.ToString();
@@ -1333,7 +1341,8 @@ public class GameManager : MonoBehaviour
 
                 {
                     level2StartPanel.gameObject.SetActive(true);
-                }
+                    Onlevel2Start?.Invoke();
+}
 
                 MainManager.levelCounter = 2;
                 MainManager.roundCounter = 1;
@@ -1410,6 +1419,7 @@ public class GameManager : MonoBehaviour
         }
 
         level3StartPanel.gameObject.SetActive(true);
+        Onlevel3Start?.Invoke();
         audioSource.PlayOneShot(transition);
 
     }
@@ -1421,7 +1431,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void Level3Scoring()
+    public void Level3Scoring()
 
     {
         if (MainManager.activePlayerWins == true)

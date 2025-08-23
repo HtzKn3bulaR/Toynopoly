@@ -60,6 +60,8 @@ public class MainManager : MonoBehaviour
 
     public static bool IsToynopolyBattle = false;
 
+    public static int changeValue = 0;
+
     
     //game Scores New
 

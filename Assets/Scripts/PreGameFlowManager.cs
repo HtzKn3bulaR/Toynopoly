@@ -28,7 +28,7 @@ public class PreGameFlowManager : MonoBehaviour
     [SerializeField] GameObject playerNamesPanel4P;
     [SerializeField] GameObject playerNamesPanel5P;
 
-    [SerializeField] TextMeshProUGUI p1NameInputFieldP2;
+    /*[SerializeField] TextMeshProUGUI p1NameInputFieldP2;
     [SerializeField] TextMeshProUGUI p2NameInputFieldP2;
 
     [SerializeField] TextMeshProUGUI p1NameInputFieldP3;
@@ -47,6 +47,13 @@ public class PreGameFlowManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI p5NameInputFieldP5;
     
     [SerializeField] TextMeshProUGUI p6NameInputField;
+    */
+    [SerializeField] Button[] StartGame;
+
+    [SerializeField] GameObject[] inputFieldsP2;
+    [SerializeField] GameObject[] inputFieldsP3;
+    [SerializeField] GameObject[] inputFieldsP4;
+    [SerializeField] GameObject[] inputFieldsP5;
 
 
     List<string> tempPlayersList = new List<string>
@@ -212,6 +219,14 @@ public class PreGameFlowManager : MonoBehaviour
         entry = entry.TrimStart(new char[] { '\r', ' ' });
         entry = entry.ToUpper();
         tempPlayersList.Add(entry);
+
+        if (tempPlayersList.Count == MainManager.playerNumber)
+        {
+            for (int i = 0; i < StartGame.Length; i++)
+            {
+                StartGame[i].gameObject.SetActive(true);
+            }
+        }
         
         Debug.Log(entry);
 
@@ -219,6 +234,71 @@ public class PreGameFlowManager : MonoBehaviour
         {
             Debug.Log(tempPlayersList[i]);
         }
+
+    }
+
+    public void DisableFieldAfterEntryP2(int index)
+    {
+        var selectedField = inputFieldsP2[index].GetComponentInChildren<Selectable>();
+        selectedField.enabled = false;
+    }
+
+    public void DisableFieldsAfterEntryP3(int index)
+    {
+        var selectedField = inputFieldsP3[index].GetComponentInChildren<Selectable>();
+        selectedField.enabled = false;
+    }
+
+    public void DisableFieldsAfterEntryP4(int index)
+    {
+        var selectedField = inputFieldsP4[index].GetComponentInChildren<Selectable>();
+        selectedField.enabled = false;
+    }
+
+    public void DisableFieldsAfterEntryP5(int index)
+    {
+        var selectedField = inputFieldsP5[index].GetComponentInChildren<Selectable>();
+        selectedField.enabled = false;
+    }
+
+    public void BackToMainMenu()
+    {
+        tempPlayersList.Clear();
+
+        var inputField = inputFieldsP2[0].GetComponentInChildren<Selectable>();
+
+        for (int i = 0; i < 2; i++)
+        {
+            inputField = inputFieldsP2[i].GetComponentInChildren<Selectable>();
+            inputField.enabled = true;
+
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            inputField = inputFieldsP3[i].GetComponentInChildren<Selectable>();
+            inputField.enabled = true;
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            inputField = inputFieldsP4[i].GetComponentInChildren<Selectable>();
+            inputField.enabled = true;
+
+            StartGame[i].gameObject.SetActive(false);
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            inputField = inputFieldsP5[i].GetComponentInChildren<Selectable>();
+            inputField.enabled = true;
+                        
+        }
+
+        playerNamesPanel2P.gameObject.SetActive(false);
+        playerNamesPanel3P.gameObject.SetActive(false);
+        playerNamesPanel4P.gameObject.SetActive(false);
+        playerNamesPanel5P.gameObject.SetActive(false);
 
     }
 

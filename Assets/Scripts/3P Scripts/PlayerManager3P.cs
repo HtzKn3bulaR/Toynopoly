@@ -34,10 +34,10 @@ public class PlayerManager3P : MonoBehaviour
     public bool activePlayerHasToynopoly = false;
 
     private bool[] wantsToBuy = { false, false, false, false, false };
-    private bool stolenWin = false;
+    public bool stolenWin = false;
 
-    private bool challengeWon = true;
-    private bool challengeLost = false;
+    public bool challengeWon = true;
+    public bool challengeLost = false;
 
     private int[] carValueChangeOptions = { -10, -7, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 7, 10 };
 
@@ -95,6 +95,7 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] GameObject challengePanel;
 
     [SerializeField] GameObject continueButtonToynopoly;
+    [SerializeField] GameObject continueButtonToynopolyAuto;
     [SerializeField] GameObject continueButtonNormal;
 
 
@@ -226,11 +227,11 @@ public class PlayerManager3P : MonoBehaviour
 
 
 
-    private int raceWinnerLevel1 = 0;
-    private int runnerUpLevel1 = 0;
-    private int thirdLevel1 = 0;
+    public int raceWinnerLevel1 = 0;
+    public int runnerUpLevel1 = 0;
+    public int thirdLevel1 = 0;
 
-    private int stealer;
+    public int stealer;
 
     private DividendGenerator dividendScript;
     private EmptyInventoryHandler emptyInventoryScript;
@@ -238,7 +239,7 @@ public class PlayerManager3P : MonoBehaviour
     private ProtectionHandler protectionScript;
     private CountUpHandler countUpScript;
 
-
+    public static event Action OnLevel2Start;
 
     // Start is called before the first frame update
     void Awake()
@@ -804,6 +805,7 @@ public class PlayerManager3P : MonoBehaviour
             raceInProgressPanel.SetActive(true);
             continueButtonNormal.SetActive(true);
             continueButtonToynopoly.SetActive(false);
+            continueButtonToynopolyAuto.SetActive(false);
             audioSource.PlayOneShot(stageReady);
 
             if (MainManager.playerNumber == 5)
@@ -829,6 +831,7 @@ public class PlayerManager3P : MonoBehaviour
                 raceInProgressPanel.SetActive(true);
                 continueButtonNormal.SetActive(false);
                 continueButtonToynopoly.SetActive(true);
+            continueButtonToynopolyAuto.SetActive(true);
                 audioSource.PlayOneShot(stageReady);
                 currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} in progress");
                 currentRaceInfoTrack.text = selectedTrack;
@@ -892,29 +895,39 @@ public class PlayerManager3P : MonoBehaviour
         {
             case 1:
 
-                Debug.Log(winnerDropdown.value);
-
-                if ((winnerDropdown.value) == (MainManager.activePlayer))
-
+                if (!MainManager.autoResultsValid)
                 {
-                    MainManager.activePlayerWins = true;
+                    Debug.Log(winnerDropdown.value);
+
+                    if ((winnerDropdown.value) == (MainManager.activePlayer))
+
+                    {
+                        MainManager.activePlayerWins = true;
+                    }
+
+                    else
+
+                    {
+                        MainManager.activePlayerWins = false;
+                    }
+
+                    raceWinnerLevel1 = winnerDropdown.value;
+                    runnerUpLevel1 = runnerUpDropdown.value;
+
+                    if (MainManager.playerNumber > 4)
+                    {
+                        thirdLevel1 = thirdPlaceDropdown.value;
+                    }
                 }
 
-                else
-
+                else if (MainManager.autoResultsValid)
                 {
-                    MainManager.activePlayerWins = false;
+                    raceInProgressPanel.SetActive(false);
+                    raceInProgressPanelChallenge.SetActive(false);
                 }
 
                 raceResultsPanelL1.SetActive(false);
-                raceWinnerLevel1 = winnerDropdown.value;
-                runnerUpLevel1 = runnerUpDropdown.value;
 
-                if (MainManager.playerNumber > 4)
-                {
-                    thirdLevel1 = thirdPlaceDropdown.value;
-                }
-                                
                 Level1Scoring();
                 PostRaceRandomMarketProcedure();
                 break;
@@ -930,24 +943,26 @@ public class PlayerManager3P : MonoBehaviour
                     PlayerWinsCar(MainManager.activePlayer);
                     PlayerLosesCar(MainManager.defendingPlayer);
 
-                    if (!stolenWin)
+                    if (!MainManager.autoResultsValid)
                     {
-                        MainManager.raceWinner = MainManager.activePlayer;
-                        int gap;
-                        gap = System.Convert.ToInt32(gapToDefender.value);
-                        MainManager.timeBattleSeconds = (gap);
+                        if (!stolenWin)
+                        {
+                            MainManager.raceWinner = MainManager.activePlayer;
+                            int gap;
+                            gap = System.Convert.ToInt32(gapToDefender.value);
+                            MainManager.timeBattleSeconds = (gap);
+                        }
+
+                        else
+
+                        {
+                            MainManager.raceWinner = stealer;
+                            int gap;
+                            gap = System.Convert.ToInt32(gapStolenWin.value);
+                            MainManager.timeBattleSeconds = (gap);
+                        }
+
                     }
-
-                    else
-
-                    {
-                        MainManager.raceWinner = stealer;
-                        int gap;
-                        gap = System.Convert.ToInt32(gapStolenWin.value);
-                        MainManager.timeBattleSeconds = (gap);
-                    }
-
-
                 }
 
                 else if (challengeLost == true)
@@ -957,25 +972,27 @@ public class PlayerManager3P : MonoBehaviour
                     PlayerWinsCar(MainManager.defendingPlayer);
                     PlayerLosesCar(MainManager.activePlayer);
 
-
-                    if (!stolenWin)
+                    if (!MainManager.autoResultsValid)
                     {
-                        MainManager.raceWinner = MainManager.defendingPlayer;
-                        int gap2;
-                        gap2 = System.Convert.ToInt32(gapToChallenger.value);
-                        MainManager.timeBattleSeconds = (gap2);
+
+                        if (!stolenWin)
+                        {
+                            MainManager.raceWinner = MainManager.defendingPlayer;
+                            int gap2;
+                            gap2 = System.Convert.ToInt32(gapToChallenger.value);
+                            MainManager.timeBattleSeconds = (gap2);
+                        }
+
+                        else
+
+                        {
+                            MainManager.raceWinner = stealer;
+                            int gap;
+                            gap = System.Convert.ToInt32(gapStolenWin.value);
+                            MainManager.timeBattleSeconds = (gap);
+
+                        }
                     }
-
-                    else
-
-                    {
-                        MainManager.raceWinner = stealer;
-                        int gap;
-                        gap = System.Convert.ToInt32(gapStolenWin.value);
-                        MainManager.timeBattleSeconds = (gap);
-
-                    }
-
                 }
 
                 raceResultsPanelL2.SetActive(false);
@@ -1047,13 +1064,22 @@ public class PlayerManager3P : MonoBehaviour
     {
         float oldCarValue = MainManager.carPrizes[MainManager.currentCarIndex];
 
-        int changeValue;
-        
+        int changeValue = 0;
 
-        changeValue = System.Convert.ToInt32(gapToLast.value) + System.Convert.ToInt32(-gapToFirst.value);
+        if (MainManager.autoResultsValid)
+        {
+            changeValue = MainManager.changeValue;
+        }
+
+        if (!MainManager.autoResultsValid)
+        {
+            changeValue = System.Convert.ToInt32(gapToLast.value) + System.Convert.ToInt32(-gapToFirst.value);
+        }
+
+
         int ToynopolyTimeBattleSeconds = Mathf.Abs(changeValue);
 
-        if (gapToLast.value < gapToFirst.value)
+        if (changeValue <= 0)
         {
             MainManager.carPrizes[MainManager.currentCarIndex] -= ToynopolyTimeBattleSeconds;
 
@@ -1068,21 +1094,7 @@ public class PlayerManager3P : MonoBehaviour
                 MainManager.carIsInDefault[MainManager.currentCarIndex] = true;
 
                 CheckForDefaultCars();
-
-
-
-                /*
-                carPic[MainManager.currentCarIndex].image.sprite = carDefaultSprite;
-                
-
-                for (int i = 0; i < MainManager.playerNumber; i++)
-                {
-                    MainManager.playerInventory[i, MainManager.currentCarIndex] = 0;
-                }
-
-                rows[MainManager.currentCarIndex].SetActive(false);
-                MainManager.DefProcedureCompleted[MainManager.currentCarIndex] = true;
-                */
+                                                                
              }
             
             
@@ -1780,6 +1792,7 @@ public class PlayerManager3P : MonoBehaviour
                             
 
         level2StartPanel.SetActive(false);
+        OnLevel2Start?.Invoke();
 
         MainManager.activePlayer = GetIndexOfLowestValue(MainManager.playerCash);
 
