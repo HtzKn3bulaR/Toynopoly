@@ -163,6 +163,7 @@ public class GameManager : MonoBehaviour
     private Timer timerScript;
     private CountUpHandler countUpScript;
     private ProtectionHandler protectionHandlerScript;
+    private LapDataReader lapCountScript;
 
     public static event Action Onlevel2Start;
     public static event Action Onlevel3Start;
@@ -176,6 +177,7 @@ public class GameManager : MonoBehaviour
         timerScript = GameObject.Find("Timer").GetComponent<Timer>();
         countUpScript = GameObject.Find("CountUpHandler").GetComponent<CountUpHandler>();
         protectionHandlerScript = GameObject.Find("ProtectionHandler").GetComponent<ProtectionHandler>();
+        lapCountScript = GameObject.Find("LapDataReader").GetComponent<LapDataReader>();
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
         //timerPanel.gameObject.SetActive(true);
@@ -625,6 +627,7 @@ public class GameManager : MonoBehaviour
 
         currentRaceOpponent2.text = MainManager.playerNames[nonActivePlayer];
 
+        lapCountScript.FindLapData(selectedTrack);
 
     }
 
@@ -669,6 +672,11 @@ public class GameManager : MonoBehaviour
     public void RegisterResults()
 
     {
+        fields[MainManager.pendingField].gameObject.SetActive(false);
+        MainManager.fieldAvailable[MainManager.pendingField] = false;
+
+        MainManager.fieldsLeftForCar[MainManager.currentCarIndex]--;
+
         if (!MainManager.autoResultsValid)
         {
             Debug.Log(winnerDropdown.value);
@@ -692,13 +700,7 @@ public class GameManager : MonoBehaviour
         {
             raceInProgressPanel.SetActive(false);
         }
-        fields[MainManager.pendingField].gameObject.SetActive(false);
-        MainManager.fieldAvailable[MainManager.pendingField] = false;
-
-        MainManager.fieldsLeftForCar[MainManager.currentCarIndex]--;
-
-
-
+        
         raceResultsPanel.SetActive(false);
 
         if (MainManager.levelCounter == 1)
@@ -1342,11 +1344,11 @@ public class GameManager : MonoBehaviour
                 {
                     level2StartPanel.gameObject.SetActive(true);
                     Onlevel2Start?.Invoke();
-}
 
-                MainManager.levelCounter = 2;
-                MainManager.roundCounter = 1;
 
+                    MainManager.levelCounter = 2;
+                    MainManager.roundCounter = 1;
+                }
 
             }
 

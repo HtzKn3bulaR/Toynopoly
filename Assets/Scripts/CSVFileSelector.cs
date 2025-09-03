@@ -16,6 +16,7 @@ public class CSVFileSelector : MonoBehaviour
     private string applicationDataPath;
     private string defaultFolderName = "D:/Re-Volt";
 
+    private CSVFileReader fileReaderScript;
    
     
     
@@ -29,7 +30,7 @@ public class CSVFileSelector : MonoBehaviour
 
     void Start()
     {
-        
+                
         applicationDataPath = defaultFolderName + "/profiles/";
 
         GetAllCSVFiles();
@@ -52,7 +53,7 @@ public class CSVFileSelector : MonoBehaviour
     {
         csvFiles.Clear();
 
-        selectedFilePath = "";
+        //selectedFilePath = "";
 
         try
 
@@ -108,14 +109,19 @@ public class CSVFileSelector : MonoBehaviour
 
         else
         {
-            fileName = "";
-            selectedFilePath = "";
+            //fileName = "";
+            //selectedFilePath = "";
         }
 
+        if (selectedFilePath != null)
+        {
+            MainManager.selectedFilePath = selectedFilePath;
 
-        MainManager.selectedFilePath = selectedFilePath;
+            Debug.Log("Load Session File:" + applicationDataPath + fileName);
 
-        Debug.Log("Load Session File:" + applicationDataPath + fileName);
+            
+            
+        }
 
        
 

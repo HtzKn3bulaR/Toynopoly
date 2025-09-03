@@ -23,9 +23,11 @@ public class EmptyInventoryHandler : MonoBehaviour
     [SerializeField] TextMeshProUGUI fourthinactivePlayerName;
     [SerializeField] TextMeshProUGUI activePlayerName;
 
-    [SerializeField] GameObject emptyInvDialoguePanel;
+    public GameObject emptyInvDialoguePanel;
     [SerializeField] GameObject emptyInvBuyerDisplay;
     [SerializeField] GameObject buyOptionPanelAfterForcedBuy;
+    [SerializeField] GameObject nextRacePanel;
+    public GameObject notEnoughCashPanel;
 
     private PlayerManager3P gameManagerScript;
 
@@ -139,32 +141,49 @@ public class EmptyInventoryHandler : MonoBehaviour
     public void BuyCar(int car)
 
     {
-        carBought = car;
-        MainManager.playerInventory[MainManager.buyer, car]++;
-        MainManager.playerCash[MainManager.buyer] -= MainManager.carPrizes[car];
-        gameManagerScript.UpdateInventoryDisplay();
-        gameManagerScript.cashDisplay[MainManager.buyer].text = MainManager.playerCash[MainManager.buyer].ToString();
-        emptyInvDialoguePanel.SetActive(false);
 
-        int numberOfOwners = 0;
+        if (MainManager.playerCash[MainManager.buyer] < MainManager.carPrizes[car])
+        {
+            notEnoughCashPanel.SetActive(true);
+            emptyInvDialoguePanel.SetActive(false);
+            nextRacePanel.SetActive(false);
+            return;
+        }
 
-        for (int j = 0; j < MainManager.playerNumber; j++)
+        else
 
         {
-            if (MainManager.playerInventory[j, car] > 0)
+
+            carBought = car;
+            MainManager.playerInventory[MainManager.buyer, car]++;
+            MainManager.playerCash[MainManager.buyer] -= MainManager.carPrizes[car];
+            gameManagerScript.UpdateInventoryDisplay();
+            gameManagerScript.cashDisplay[MainManager.buyer].text = MainManager.playerCash[MainManager.buyer].ToString();
+            emptyInvDialoguePanel.SetActive(false);
+            nextRacePanel.SetActive(false);
+
+
+            int numberOfOwners = 0;
+
+            for (int j = 0; j < MainManager.playerNumber; j++)
 
             {
-                numberOfOwners++;
+                if (MainManager.playerInventory[j, car] > 0)
+
+                {
+                    numberOfOwners++;
+                }
             }
+
+            if (numberOfOwners == 1)
+
+            {
+                OfferBuyOption();
+            }
+
+            gameManagerScript.PerformLevel2Check();
+
         }
-
-        if (numberOfOwners == 1)
-
-        {
-            OfferBuyOption();
-        }
-
-        gameManagerScript.PerformLevel2Check();
     }
 
     public void Spectate()
@@ -271,6 +290,13 @@ public class EmptyInventoryHandler : MonoBehaviour
         gameManagerScript.UpdateCashDisplay();
 
         buyOptionPanelAfterForcedBuy.SetActive(false);
+
+    }
+
+
+    public void NotEnoughCashPanelClose()
+    {
+        notEnoughCashPanel.gameObject.SetActive(false);
 
     }
 

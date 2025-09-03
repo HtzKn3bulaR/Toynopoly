@@ -10,15 +10,13 @@ using TMPro;
 public class DividendGenerator : MonoBehaviour
 {
 
-    List<int> dividendList = new List<int> {  };
+    List<int> dividendList = new List<int>();
 
-    public List<int> actualDividendList = new List<int> {  };
+    public List<int> actualDividendList = new List<int>();
 
-    int[] dividendsTenRounds = { 7, 7, 7, 7, 0, 1, 2, 3, 4, 5 };
-    int[] dividendsTwelveRounds = { 7, 7, 7, 7, 7, 7, 0, 1, 2, 3, 4, 5 };
-
-    int raceThreshold;
-       
+    int[] dividendsTenRounds = { 7, 7, 7, 0, 1, 2, 3, 4, 5 };
+    int[] dividendsTwelveRounds = { 7, 7, 7, 7, 7, 0, 1, 2, 3, 4, 5 };
+               
     private GameManager gameManagerScript;
     private PlayerManager3P playerManagerScript;
     private GridGenerator3P gridGeneratorScript;
@@ -82,13 +80,13 @@ public class DividendGenerator : MonoBehaviour
         if (MainManager.playerNumber == 5)
         {
             dividendList.AddRange(dividendsTenRounds);
-            actualDividendList.AddRange(dividendsTenRounds);
+            //actualDividendList.AddRange(dividendsTenRounds);
         }
 
         else
         {
             dividendList.AddRange(dividendsTwelveRounds);
-            actualDividendList.AddRange(dividendsTwelveRounds);
+            //actualDividendList.AddRange(dividendsTwelveRounds);
         }
 
         if (MainManager.gameResumed)
@@ -104,37 +102,40 @@ public class DividendGenerator : MonoBehaviour
 
         if (MainManager.playerNumber < 3)
         {
-            dividendList.AddRange(dividendsTwelveRounds);
-            actualDividendList.AddRange(dividendsTwelveRounds);
+            //dividendList.AddRange(dividendsTwelveRounds);
+            //actualDividendList.AddRange(dividendsTwelveRounds);
         }
 
 
         if (MainManager.playerNumber == 5)
 
         {
-            raceThreshold = 11;
+            //raceThreshold = 11;
             MainManager.raceThreshold = 11;
         }
 
         else
 
         {
-           raceThreshold = 13;
+           //raceThreshold = 13;
            MainManager.raceThreshold = 13;
         }
         
      
 
-        var uniqueRandomList = GetUniqueRandomElements(dividendList, raceThreshold-1);
+        var uniqueRandomList = GetUniqueRandomElements(dividendList, dividendList.Count);
 
         for (int i = 0; i < uniqueRandomList.Count; i++)
 
         {
-            actualDividendList[i] = uniqueRandomList[i];
-            Debug.Log(MainManager.raceThreshold - 1);
+            actualDividendList.Add(uniqueRandomList[i]);
+            Debug.Log(MainManager.raceThreshold - 2);
             Debug.Log(actualDividendList[i]);
 
         }
+
+        //To make sure all dividends paid before last race
+        actualDividendList.Add(7);
 
 
         if (MainManager.playerNumber < 3)

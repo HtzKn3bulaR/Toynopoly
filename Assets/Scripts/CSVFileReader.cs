@@ -15,6 +15,7 @@ public class CSVFileReader : MonoBehaviour
     [SerializeField] TextMeshProUGUI[] LBcars;
     [SerializeField] TextMeshProUGUI[] LBtimes;
     [SerializeField] TextMeshProUGUI[] LBgaps;
+    [SerializeField] TextMeshProUGUI trackPlayed;
 
     [SerializeField] GameObject ResultsPanelAuto;
 
@@ -42,13 +43,20 @@ public class CSVFileReader : MonoBehaviour
     private char[] trimchar;
 
     private int cursorPos = 4;
+    private int trackCursor = 2;
     public string selectedFilePath;
 
+    private int linesInCSV;
+    public bool CSVfileIsNew = false;
+
     private List<string> resultLines = new List<string>();
+    private string trackLine = "No Data";
 
     private List<string> playerNames = new List<string>();
     private List<string> carNames = new List<string>();
     private List<string> times = new List<string>();
+
+    private string trackInfo;
 
     private List<string> stringsecs = new List<string>();
     private List<string> stringmins = new List<string>();
@@ -69,16 +77,25 @@ public class CSVFileReader : MonoBehaviour
     [SerializeField] GameObject[] challengerButtonsLB;
     [SerializeField] GameObject[] defenderButtonsLB;
 
+    [SerializeField] GameObject legendPanel;
+    [SerializeField] TextMeshProUGUI challengeOutcomeInfo;
+
 
     void Start()
     {
-        selectedFilePath = MainManager.selectedFilePath;
+
+        if (selectedFilePath != null)
+        {
+            selectedFilePath = MainManager.selectedFilePath;
+        }
 
         fileSelectorScript = GameObject.Find("CSVFileSelector").GetComponent<CSVFileSelector>();
-        playerManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
+        if (MainManager.playerNumber > 2)
+        {
+            playerManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
+        }
 
         GameManager.Onlevel2Start += ValidateButtonsChange;
-        GameManager.Onlevel2Start += GetResultsButtonsChange;
         GameManager.Onlevel3Start += ValidateButtonsLevel3;
 
     }
@@ -90,64 +107,88 @@ public class CSVFileReader : MonoBehaviour
     }
 
     public void ReadCSVFileCurrentRound()
-    {
-               
-
-        string[] lines = File.ReadAllLines(selectedFilePath);
-
-        Debug.Log("Number of lines in file " + lines.Length);
-
-        resultLines.Clear();
-        Debug.Log("Cursor position before reading" + cursorPos);
-
-        if (cursorPos > lines.Length)
-        {
-            Debug.Log("No more session data found in file");
-            playerNames.Clear();
-            carNames.Clear();
-            times.Clear();
-            gaps.Clear();
-
-            LeaderboardClear();
-
-            cursorPos = 4;
-            SetNewLogFilePanel.gameObject.SetActive(true);
-            fileSelectorScript.GetAllCSVFiles();                 
-
-        }
-
-        else if ((cursorPos + MainManager.playerNumber) > lines.Length)
+    {       
+        if (MainManager.selectedFilePath != null)
         {
 
-            for (int i = cursorPos; i < (lines.Length - cursorPos); i++)
+            string[] lines = File.ReadAllLines(MainManager.selectedFilePath);
+
+            if (CSVfileIsNew)
             {
+                cursorPos = 4;
+                trackCursor = 2;
+                CSVfileIsNew = false;
+            }
 
-                resultLines.Add(lines[i]);
+            else
+            {
+                trackCursor = cursorPos - 2;
+                Debug.Log("Track cursor set to " + trackCursor);
+            }
+
+            Debug.Log("Number of lines in file " + lines.Length);
+            linesInCSV = lines.Length;
+
+            resultLines.Clear();
+            Debug.Log("Cursor position before reading" + cursorPos);
+            Debug.Log("Track Cursor before reading" + trackCursor);
+
+            if (cursorPos > lines.Length)
+            {
+                Debug.Log("No more session data found in file");
+                playerNames.Clear();
+                carNames.Clear();
+                times.Clear();
+                gaps.Clear();
+
+                LeaderboardClear();
+
+                SetNewLogFilePanel.gameObject.SetActive(true);
+                fileSelectorScript.GetAllCSVFiles();
+
+                CSVfileIsNew = true;
 
             }
 
-            cursorPos += (lines.Length - cursorPos);
-            cursorPos += 3;
+            else if ((cursorPos + MainManager.playerNumber) > lines.Length)
+            {
+
+                for (int i = cursorPos; i < (lines.Length - cursorPos); i++)
+                {
+                    resultLines.Add(lines[i]);
+                }
+
+                trackLine = lines[trackCursor];
+                Debug.Log(lines[trackCursor]);
+
+            }
+
+            else
+            {
+
+
+                for (int i = cursorPos; i < (cursorPos + MainManager.playerNumber); i++)
+                {
+
+                    resultLines.Add(lines[i]);
+
+                }
+
+                trackLine = lines[trackCursor];
+                Debug.Log(lines[trackCursor]);
+
+
+                ExtractResultsData();
+            }
 
         }
 
         else
         {
+            SetNewLogFilePanel.gameObject.SetActive(true);
 
-
-            for (int i = cursorPos; i < (cursorPos + MainManager.playerNumber); i++)
-            {
-
-                resultLines.Add(lines[i]);
-
-            }
-
-            cursorPos += (MainManager.playerNumber);
-            cursorPos += 3;
-            Debug.Log("Cursor position after reading " + cursorPos);
-
-            ExtractResultsData();
         }
+
     }
 
     void ExtractResultsData()
@@ -158,42 +199,89 @@ public class CSVFileReader : MonoBehaviour
         times.Clear();
 
         char[] chars = { '"', '#' };
+        bool checkOK = true;
+                      
+        string[] firstCheckLine = resultLines[0].Split(",");
 
-        for (int i = 0; i < MainManager.playerNumber; i++)
+        if (firstCheckLine[0].Trim(chars) == "01")
         {
+            Debug.Log("Valid race result set found!");
+            checkOK = true;
+        }             
+                         
+         else
+            {
+            Debug.Log("Line Invalid! Looking Up next line");
+            checkOK = false;
+            } 
+        
+      
+        switch (checkOK)
+        {
+            case true:
 
+                string[] trackData = trackLine.Split(",");
+                trackInfo = trackData[1].Trim(chars);
+
+                for (int i = 0; i < MainManager.playerNumber; i++)
+
+        {
             string[] lineData = resultLines[i].Split(",");
 
+            
 
+            Debug.Log(lineData[1].Trim(chars));
+            
+            if (validLineMarkers.Contains(lineData[0].Trim(chars)))
 
-            if (i == 0 && lineData[0].Trim(chars) != "01")
             {
-                Debug.Log("Error! No valid session data found");
-                cursorPos++;
-                ReadCSVFileCurrentRound();
+                playerNames.Add(lineData[1].Trim(chars));
+                carNames.Add(lineData[2].Trim(chars));
+                times.Add(lineData[3].Trim(chars));
+                Debug.Log("Line " + i + "was read");
+                                        
             }
-
             else
             {
-                Debug.Log(lineData[0].Trim(chars));
+                cursorPos--;
+                
+                Debug.Log("Not all players have log file entries");
+            }
 
-                if (validLineMarkers.Contains(lineData[0].Trim(chars)))
+        }
+                 CleanCSVNames();
+                ExtractSeconds();
+                break;
 
-                {
-                    playerNames.Add(lineData[1].Trim(chars));
-                    carNames.Add(lineData[2].Trim(chars));
-                    times.Add(lineData[3].Trim(chars));
-                }
-                else
-
-                    cursorPos--;
-            } 
+            case false:
+                cursorPos++;
+                ReadCSVFileCurrentRound();
+                break;
         }
 
-        CleanCSVNames();
-        ExtractSeconds();
-
     }
+
+    void MoveCursorPosAfterSuccessfulRead()
+    {
+
+        if ((cursorPos + MainManager.playerNumber) > linesInCSV)
+        {
+            cursorPos += (linesInCSV - cursorPos);
+            cursorPos += 2;
+            
+            Debug.Log("Cursor position after reading " + cursorPos);
+        }
+
+        else
+        {
+            cursorPos += (MainManager.playerNumber);
+            cursorPos += 2;
+            Debug.Log("Cursor position after reading " + cursorPos);
+        }
+
+        
+    }
+
 
     void CleanCSVNames()
     {
@@ -259,24 +347,56 @@ public class CSVFileReader : MonoBehaviour
 
     void PopulateLeaderboard()
     {
-
-        ResultsPanelAuto.gameObject.SetActive(true);
-
-        for (int i = 0; i < playerNames.Count; i++)
+        if (MainManager.selectedFilePath != null)
         {
-            
-            LBplayers[i].text = playerNames[i].ToString();
-            LBcars[i].text = carNames[i].ToString();
-            LBtimes[i].text = times[i].ToString();
-            
-        }
 
-        for (int i = 0; i < playerNames.Count -1; i++)
-        {
-            LBgaps[i].text = gaps[i].ToString();
-        }
+            ResultsPanelAuto.gameObject.SetActive(true);
+            
+            if(playerManagerScript.activePlayerHasToynopoly == false && MainManager.levelCounter > 1)
+            {
+                legendPanel.gameObject.SetActive(true);
 
-        SetLeaderboardIcons();
+                switch(playerManagerScript.challengeWon)
+                {
+                    case true:
+                        challengeOutcomeInfo.text = "The challenge was won.";
+                        break;
+
+                    case false:
+                        challengeOutcomeInfo.text = "The challenge was lost.";
+                        break;
+
+                }
+
+            }
+
+            else
+            {
+                legendPanel.gameObject.SetActive(false);
+            }
+
+            for (int i = 0; i < playerNames.Count; i++)
+            {
+
+                LBplayers[i].text = playerNames[i].ToString();
+                LBcars[i].text = carNames[i].ToString();
+                LBtimes[i].text = times[i].ToString();
+
+            }
+
+            for (int i = 0; i < gaps.Count; i++)
+            {
+                LBgaps[i].text = gaps[i].ToString();
+            }
+
+            trackPlayed.text = trackInfo.ToString();
+
+
+            if (MainManager.playerNumber > 2)
+            {
+                SetLeaderboardIcons();
+            }
+        }
     }
 
     public void ResultsValidate()
@@ -286,24 +406,35 @@ public class CSVFileReader : MonoBehaviour
 
         bool resultsValid = true;
            
-        for (int i = 0; i < playerNames.Count; i++)
-        {                      
+        for (int i = 0; i < MainManager.playerNumber; i++)
+        {
 
             switch (playerNames.IndexOf(MainManager.playerNames[i]))
 
             {
                 case 0:
-                    Debug.Log(MainManager.playerNames[i] + " is the winner");                                  
-                    
-                    if (MainManager.playerNumber > 2)
+                    Debug.Log(MainManager.playerNames[i] + " is the winner");
+
+                    switch (MainManager.playerNumber > 2)
                     {
+
+                        case false:
+
+                            MainManager.timeBattleSeconds = Math.Clamp(gaps[0], 0, 20);
+
+                            if (MainManager.activePlayer == i)
+                                MainManager.activePlayerWins = true;
+                            break;
+
+                        case true:                                  
+                                               
                         playerManagerScript.raceWinnerLevel1 = i;
-                        MainManager.raceWinner = i;                                              
-                    }
+                        MainManager.raceWinner = i;
+                    
                     if (MainManager.activePlayer == i)
                     {
                         MainManager.activePlayerWins = true;
-                        
+
 
                         if (MainManager.levelCounter > 1)
                         {
@@ -326,61 +457,72 @@ public class CSVFileReader : MonoBehaviour
                         }
                     }
                     break;
-
+            }
+            break;
                 case 1:
                     Debug.Log(MainManager.playerNames[i] + " has second place");
-                   
-                    if (MainManager.playerNumber > 2)
+
+                    switch (MainManager.playerNumber > 2)
                     {
-                        playerManagerScript.runnerUpLevel1 = i;
-                    }
-                    if (MainManager.activePlayer == i)
-                    {
-                        MainManager.activePlayerWins = false;
+                        case false:
+                            if (MainManager.activePlayer == i)
+                                MainManager.activePlayerWins = false;
+                            break;
 
-                        if (MainManager.levelCounter > 1)
-                        {
-                            playerIsChallenger[1] = true;
-                            MainManager.timeBattleSeconds = Math.Clamp(gaps[0], -20, 20);
-                         }
+                        case true:                                                       
+                                playerManagerScript.runnerUpLevel1 = i;
+                            
+                            if (MainManager.activePlayer == i)
+                            {
+                                MainManager.activePlayerWins = false;
 
-                        if (MainManager.levelCounter > 1 && MainManager.raceWinner == MainManager.defendingPlayer)
-                        {
-                            playerManagerScript.challengeLost = true;
-                            playerManagerScript.challengeWon = false;
+                                if (MainManager.levelCounter > 1)
+                                {
+                                    playerIsChallenger[1] = true;
+                                    MainManager.timeBattleSeconds = Math.Clamp(gaps[0], -20, 20);
+                                }
 
-                        }
+                                if (MainManager.levelCounter > 1 && MainManager.raceWinner == MainManager.defendingPlayer)
+                                {
+                                    playerManagerScript.challengeLost = true;
+                                    playerManagerScript.challengeWon = false;
 
-                        else if (MainManager.levelCounter > 1 && MainManager.defendingPlayer != MainManager.raceWinner)
-                        {
-                            playerManagerScript.challengeLost = false;
-                            playerManagerScript.challengeWon = true;
-                            playerManagerScript.stolenWin = true;
-                        }                                                             
-                        
-                    }
+                                }
 
-                    else if (MainManager.defendingPlayer == i && MainManager.levelCounter > 1)
-                    {
-                        playerIsDefender[1] = true;
+                                else if (MainManager.levelCounter > 1 && MainManager.defendingPlayer != MainManager.raceWinner)
+                                {
+                                    playerManagerScript.challengeLost = false;
+                                    playerManagerScript.challengeWon = true;
+                                    playerManagerScript.stolenWin = true;
+                                }
 
-                        if (MainManager.levelCounter > 1 && MainManager.activePlayer == MainManager.raceWinner)
-                        {
-                            playerManagerScript.challengeWon = true;
-                            playerManagerScript.challengeLost = false;
-                            MainManager.timeBattleSeconds = Math.Clamp(gaps[0], -20, 20);
-                        }
-                        else if (MainManager.levelCounter > 1 && MainManager.activePlayer != MainManager.raceWinner)
-                        {
-                            playerManagerScript.challengeWon = false;
-                            playerManagerScript.challengeLost = true;
-                            playerManagerScript.stolenWin = true;                                                     
-                        }
-                    }
+                            }
 
-                    if (MainManager.playerNumber < 3)
-                    {
-                        MainManager.timeBattleSeconds = Math.Clamp(gaps[0], -20, 20);
+                            else if (MainManager.defendingPlayer == i && MainManager.levelCounter > 1)
+                            {
+                                playerIsDefender[1] = true;
+
+                                if (MainManager.levelCounter > 1 && MainManager.activePlayer == MainManager.raceWinner)
+                                {
+                                    playerManagerScript.challengeWon = true;
+                                    playerManagerScript.challengeLost = false;
+                                    MainManager.timeBattleSeconds = Math.Clamp(gaps[0], -20, 20);
+                                }
+                                else if (MainManager.levelCounter > 1 && MainManager.activePlayer != MainManager.raceWinner)
+                                {
+                                    playerManagerScript.challengeWon = false;
+                                    playerManagerScript.challengeLost = true;
+                                    playerManagerScript.stolenWin = true;
+                                }
+                            }
+
+                            if (MainManager.playerNumber < 3)
+                            {
+                                MainManager.timeBattleSeconds = Math.Clamp(gaps[0], -20, 20);
+                            }
+
+                            
+                            break;
                     }
 
                     break;
@@ -541,6 +683,8 @@ public class CSVFileReader : MonoBehaviour
 
                 case -1:
 
+                    Debug.Log("Player name " + MainManager.playerNames[i] + " not found in CSV results list");
+
                     if (MainManager.activePlayer == i)
                     {
                         MainManager.activePlayerWins = false;
@@ -576,8 +720,7 @@ public class CSVFileReader : MonoBehaviour
                     playerNames.Add(MainManager.playerNames[i]);
                     carNames.Add("Unknown");
                     times.Add("DNF");
-                    gaps.Add(99);
-
+                    
                     if (MainManager.playerNumber < 3)
                     {
                         MainManager.timeBattleSeconds = 20;
@@ -593,19 +736,32 @@ public class CSVFileReader : MonoBehaviour
          
         }
 
+        MoveCursorPosAfterSuccessfulRead();
         PopulateLeaderboard();
     }
 
     private void GetAllFinisherPositions()
     {
+
+        if (gaps.Count < MainManager.playerNumber - 1)
+        {
+            gaps.Add(99);
+            Debug.Log("99 added to gap List");
+        }
+
+
         for (int i = 0; i < MainManager.playerNumber; i++)
         {
+            
             switch (playerNames.IndexOf(MainManager.playerNames[i]))
             {
                 case 0:
                     MainManager.raceWinner = i;
+                    Debug.Log(MainManager.playerNames[i] + "is the Toynopoly Round winner");
+
                     if (MainManager.activePlayer == i)
                     {
+                        
                         switch (MainManager.playerNumber)
                         {
                             case 3:
@@ -620,7 +776,7 @@ public class CSVFileReader : MonoBehaviour
                                 else
                                 {
                                     MainManager.changeValue = gaps[1];
-                                    Mathf.Clamp(changeValue, -20, 20);
+                                    
                                 }
                                 break;
                             case 4:
@@ -631,7 +787,7 @@ public class CSVFileReader : MonoBehaviour
                                 else
                                 {
                                     MainManager.changeValue = gaps[2];
-                                    Mathf.Clamp(changeValue, -20, 20);
+                                    
                                 }
                                 break;
                             case 5:
@@ -642,7 +798,7 @@ public class CSVFileReader : MonoBehaviour
                                 else
                                 {
                                     MainManager.changeValue = gaps[3];
-                                    Mathf.Clamp(changeValue, -20, 20);
+                                   
                                 }
                                 break;
                         }
@@ -656,20 +812,51 @@ public class CSVFileReader : MonoBehaviour
                         switch(MainManager.playerNumber)
                         {
                             case 3:
+
+                                Debug.Log("Gap Array contains " + gaps.Count + " values");
+                                Debug.Log("Gap values are " + gaps[0] + " and" + gaps[1]);
+                                                                
+                                if (gaps[0] > 20)
+                                    gaps[0] = 20;
+
+                                if (gaps[1] - gaps[0] > 20)
+                                    MainManager.changeValue = (20 - gaps[0]);
+
+                                else
                                 MainManager.changeValue = ((gaps[1] - gaps[0]) - gaps[0]);
-                                MainManager.changeValue = Mathf.Clamp(changeValue, -20, 20);
+
+                                Debug.Log("Change value calculation result " + ((gaps[1] - gaps[0]) - gaps[0]));
                                 break;
 
                             case 4:
-                                MainManager.changeValue = ((gaps[2] - gaps[0]) - gaps[0]);
-                                MainManager.changeValue = Mathf.Clamp(changeValue, -20, 20);
+                                                                
+                                if (gaps[0] > 20)
+                                    gaps[0] = 20;
+
+                                if (gaps[2] - gaps[0] > 20)
+                                {
+                                    MainManager.changeValue = (20 - gaps[0]);
+                                }
+                                else
+                                    MainManager.changeValue = ((gaps[2] - gaps[0]) - gaps[0]);
                                 break;
 
                             case 5:
-                                MainManager.changeValue = ((gaps[3] - gaps[0]) - gaps[0]);
-                                MainManager.changeValue = Mathf.Clamp(changeValue, -20, 20);
+
+                                if (gaps[0] > 20)
+                                    gaps[0] = 20;
+
+                                if (gaps[3] - gaps[0] > 20)
+                                {
+                                    MainManager.changeValue = (20 - gaps[0]);
+                                }
+                                else
+
+                                    MainManager.changeValue = ((gaps[3] - gaps[0]) - gaps[0]);
                                 break;
                         }
+
+                        Debug.Log("Active player is second and change value is " + MainManager.changeValue);
                         
                     }
                     break;
@@ -681,23 +868,54 @@ public class CSVFileReader : MonoBehaviour
                         switch(MainManager.playerNumber)
                         {
                             case 3:
-                                MainManager.changeValue = -gaps[1];
-                                MainManager.changeValue = Mathf.Clamp(changeValue, -20, 20);
+
+                                if(gaps[1]>20)
+
+                                        {
+                                    MainManager.changeValue = -20;
+
+        }
+
+        else
+            MainManager.changeValue = -gaps[1];
+                                                                                                       
+                               
                                 break;
 
                             case 4:
+
+                                if(gaps[1] > 20)
+                                {
+                                    gaps[1] = 20;
+                                }
+
+                                if(gaps[2] - gaps[1] > 20)
+                                    MainManager.changeValue = (20 - gaps[1]);
+                                else
                                 MainManager.changeValue = ((gaps[2] - gaps[1]) - gaps[1]);
-                                MainManager.changeValue = Mathf.Clamp(changeValue, -20, 20);
+                                
                                 break;
                             case 5:
-                                MainManager.changeValue = ((gaps[3] - gaps[1]) - gaps[1]);
-                                MainManager.changeValue = Mathf.Clamp(changeValue, -20, 20);
+
+                                if (gaps[1] > 20)
+                                {
+                                    gaps[1] = 20;
+                                }
+
+                                if (gaps[3] - gaps[1] > 20)
+                                    MainManager.changeValue = (20 - gaps[1]);
+                                else
+                                    MainManager.changeValue = ((gaps[3] - gaps[1]) - gaps[1]);
+                                
                                 break;
 
                         }
+
+                        Debug.Log("Active player is third and change value is" + MainManager.changeValue);
                                                 
                     }
                     break;
+
                 case 3:
                     finisherPos4 = i;
                     if (MainManager.activePlayer == i)
@@ -705,25 +923,44 @@ public class CSVFileReader : MonoBehaviour
                         switch (MainManager.playerNumber)
                         {
                             case 4:
+
+                                if(gaps[2] > 20)
+                                {
+                                    MainManager.changeValue = -20;
+                                }
+                                else
                                 MainManager.changeValue = -gaps[2];
-                                MainManager.changeValue = Mathf.Clamp(changeValue, -20, 20);
+                               
                                 break;
                             case 5:
+
+                                if (gaps[2] > 20)
+                                    gaps[2] = 20;
+
+                                if(gaps[3] - gaps[2] > 20)
+                                    MainManager.changeValue = (20 - gaps[2]);
+                                else
                                 MainManager.changeValue = ((gaps[3] - gaps[2]) - gaps[2]);
-                                MainManager.changeValue = Mathf.Clamp(changeValue, -20, 20);
+                                
                                 break;
                         }
                                            
                     
                     break;
+
                 case 4:
                     finisherPos5 = i;
                     if (MainManager.activePlayer == i)
                     {
+                        if (gaps[3] > 20)
+                            gaps[3] = 20;
+
+
                         MainManager.changeValue = -gaps[3];
-                        MainManager.changeValue = Mathf.Clamp(changeValue, -20, 20);
+                       
                     }
                     break;
+
                 case -1:
                     if (MainManager.activePlayer == i)
                     {
@@ -734,11 +971,16 @@ public class CSVFileReader : MonoBehaviour
             }
 
         }
+
+        Debug.Log("Toynopoly owner is " + MainManager.playerNames[MainManager.activePlayer]);
+        Debug.Log("Toynopoly Result is " + MainManager.changeValue + "seconds change");
+
     }
 
     public void SetAutoResultsValid()
     {
         MainManager.autoResultsValid = true;
+                
     }
 
     public void SetAutoResultsInvalid()
@@ -752,6 +994,7 @@ public class CSVFileReader : MonoBehaviour
     public void LeaderboardClose()
     {
         ResultsPanelAuto.gameObject.SetActive(false);
+        legendPanel.gameObject.SetActive(false);
 
         LeaderboardClear();
     }
@@ -786,18 +1029,25 @@ public class CSVFileReader : MonoBehaviour
         validateButtonLevel1.gameObject.SetActive(false);
         validateButtonLevel2.gameObject.SetActive(true);
 
+        GetResultsButtonsChange();
+
      }
 
     private void GetResultsButtonsChange()
-    {
-        getResultsLevel1Button.gameObject.SetActive(false);
-        manualLevel1Button.gameObject.SetActive(false);
+     {
+        if (MainManager.playerNumber > 2)
+        {
+            getResultsLevel1Button.gameObject.SetActive(false);
+            manualLevel1Button.gameObject.SetActive(false);
+        }
+
 
     }
 
     public void ActivateButtonToynopolyRound()
     {
         validateButtonLevel2.gameObject.SetActive(false);
+        validateButtonLevel1.gameObject.SetActive(false);
         validateButtonToynopoly.gameObject.SetActive(true);
     }
 

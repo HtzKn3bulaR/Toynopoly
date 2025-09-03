@@ -97,6 +97,7 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] GameObject continueButtonToynopoly;
     [SerializeField] GameObject continueButtonToynopolyAuto;
     [SerializeField] GameObject continueButtonNormal;
+    [SerializeField] GameObject getAutoResultsButtonNormal;
 
 
     [SerializeField] GameObject raceResultsPanelL2;
@@ -238,6 +239,7 @@ public class PlayerManager3P : MonoBehaviour
     private Timer timerScript;
     private ProtectionHandler protectionScript;
     private CountUpHandler countUpScript;
+    private LapDataReader lapCountScript;
 
     public static event Action OnLevel2Start;
 
@@ -255,6 +257,7 @@ public class PlayerManager3P : MonoBehaviour
         timerScript = GameObject.Find("Timer").GetComponent<Timer>();
         protectionScript = GameObject.Find("ProtectionHandler").GetComponent<ProtectionHandler>();
         countUpScript = GameObject.Find("CountUpHandler").GetComponent<CountUpHandler>();
+        lapCountScript = GameObject.Find("LapDataReader").GetComponent<LapDataReader>();
 
         if (MainManager.gameResumed)
         {
@@ -637,6 +640,9 @@ public class PlayerManager3P : MonoBehaviour
         MainManager.defendingPlayer = MainManager.inactivePlayers[defender];
 
         raceInProgressPanelChallenge.SetActive(true);
+
+        lapCountScript.FindLapData(selectedTrack);
+
         challengeRaceProgressCar.GetComponentInChildren<TMP_Text>().text = selectedCar;
         challengeRaceProgressTrack.GetComponentInChildren<TMP_Text>().text = selectedTrack;
         challengeProgressTextInfo.text = ("Level " + MainManager.levelCounter + ", Race " + MainManager.roundCounter + " / " + ((MainManager.raceThreshold)-1) + " in progress");
@@ -650,27 +656,41 @@ public class PlayerManager3P : MonoBehaviour
     public void BuyCar()
 
     {
-        MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
-        PlayerWinsCar(MainManager.activePlayer);
 
-        UpdateCashDisplay();
-        UpdateInventoryDisplay();
+        if (MainManager.playerCash[MainManager.buyer] < MainManager.carPrizes[MainManager.currentCarIndex])
+        {
+            emptyInventoryScript.notEnoughCashPanel.SetActive(true);
+            emptyInventoryScript.emptyInvDialoguePanel.SetActive(false);
+            nextRaceComingUpPanel.SetActive(false);
+            return;
+        }
 
-        nextRaceComingUpPanel.SetActive(false);
-        l2SelectionIsOkay = true;
-        buyingPossible = true;
-        playerHasBoughtCarThisRound = true;
-
-        FillInactivePlayersArray();
-        Debug.Log($"Inactive players are {MainManager.inactivePlayers[0]} + {MainManager.inactivePlayers[1]} + {MainManager.inactivePlayers[2]} + {MainManager.inactivePlayers[3]}");
-        PerformLevel2Check();
-
-
-        if (activePlayerHasToynopoly == true && MainManager.fieldsLeftForCar[MainManager.currentCarIndex] > 9)
+        else
 
         {
-            OfferBuyOption();
 
+            MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
+            PlayerWinsCar(MainManager.activePlayer);
+
+            UpdateCashDisplay();
+            UpdateInventoryDisplay();
+
+            nextRaceComingUpPanel.SetActive(false);
+            l2SelectionIsOkay = true;
+            buyingPossible = true;
+            playerHasBoughtCarThisRound = true;
+
+            FillInactivePlayersArray();
+            Debug.Log($"Inactive players are {MainManager.inactivePlayers[0]} + {MainManager.inactivePlayers[1]} + {MainManager.inactivePlayers[2]} + {MainManager.inactivePlayers[3]}");
+            PerformLevel2Check();
+
+
+            if (activePlayerHasToynopoly == true && MainManager.fieldsLeftForCar[MainManager.currentCarIndex] > 9)
+
+            {
+                OfferBuyOption();
+
+            }
         }
 
     }
@@ -803,6 +823,7 @@ public class PlayerManager3P : MonoBehaviour
 
         {
             raceInProgressPanel.SetActive(true);
+            lapCountScript.FindLapData(selectedTrack);
             continueButtonNormal.SetActive(true);
             continueButtonToynopoly.SetActive(false);
             continueButtonToynopolyAuto.SetActive(false);
@@ -829,9 +850,12 @@ public class PlayerManager3P : MonoBehaviour
             
             {
                 raceInProgressPanel.SetActive(true);
-                continueButtonNormal.SetActive(false);
+            lapCountScript.FindLapData(selectedTrack);
+            continueButtonNormal.SetActive(false);
+            getAutoResultsButtonNormal.SetActive(false);
+                
                 continueButtonToynopoly.SetActive(true);
-            continueButtonToynopolyAuto.SetActive(true);
+                continueButtonToynopolyAuto.SetActive(true);
                 audioSource.PlayOneShot(stageReady);
                 currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} in progress");
                 currentRaceInfoTrack.text = selectedTrack;
@@ -1063,23 +1087,18 @@ public class PlayerManager3P : MonoBehaviour
     public void ToynopolyTimeBattleResult()
     {
         float oldCarValue = MainManager.carPrizes[MainManager.currentCarIndex];
-
-        int changeValue = 0;
-
-        if (MainManager.autoResultsValid)
-        {
-            changeValue = MainManager.changeValue;
-        }
+                 
 
         if (!MainManager.autoResultsValid)
         {
-            changeValue = System.Convert.ToInt32(gapToLast.value) + System.Convert.ToInt32(-gapToFirst.value);
+            MainManager.changeValue = System.Convert.ToInt32(gapToLast.value) + System.Convert.ToInt32(-gapToFirst.value);
         }
 
 
-        int ToynopolyTimeBattleSeconds = Mathf.Abs(changeValue);
+        int ToynopolyTimeBattleSeconds = Mathf.Abs(Mathf.Clamp(MainManager.changeValue, -20, 20));
+        Debug.Log("Time Battle Seconds value is " + ToynopolyTimeBattleSeconds);
 
-        if (changeValue <= 0)
+        if (MainManager.changeValue <= 0)
         {
             MainManager.carPrizes[MainManager.currentCarIndex] -= ToynopolyTimeBattleSeconds;
 
@@ -1288,7 +1307,9 @@ public class PlayerManager3P : MonoBehaviour
                 timeBattleNameDisplay[i].text = MainManager.cars[i];
                 timeBattlePrizeDisplay[i].text = MainManager.carPrizes[i].ToString();
 
-                if(MainManager.carPrizes[i] < 1)
+                if (MainManager.carPrizes[i] < 1)
+
+                    if (MainManager.playerNumber == 3 && MainManager.roundCounter > 3 || MainManager.playerNumber == 4 && MainManager.roundCounter > 4 || MainManager.playerNumber == 5 && MainManager.roundCounter > 5)
                 {
                     timeBattleButtons[i].gameObject.SetActive(false);
                 }

@@ -87,6 +87,31 @@ public class GridGenerator3P : MonoBehaviour
 
     private int carCardsPopulated = 0;
 
+    public TextAsset standardTrackNames;
+    public TextAsset bonusTrackNames;
+
+    public TextAsset rookieNames;
+    public TextAsset amateurNames;
+    public TextAsset advancedNames;
+    public TextAsset semiProNames;
+    public TextAsset proNames;
+    public TextAsset superProNames;
+
+
+    List<string> trackList = new List<string>();
+
+    List<string> bonusTrackList = new List<string>();
+
+    public static event Action OnTrackPanelPopulate;
+    public static event Action OnCarAPopulate;
+    public static event Action OnCarBPopulate;
+    public static event Action OnCarCPopulate;
+    public static event Action OnCarDPopulate;
+    public static event Action OnCarEPopulate;
+    public static event Action OnCarFPopulate;
+
+    /*
+
     List<string> trackList = new List<string>
 
     {
@@ -114,26 +139,29 @@ public class GridGenerator3P : MonoBehaviour
         "Fools Mate 2","Fukushima","Go Play Outside!","Ground N Smash 2","Harbor Lights","Appalachian RC","Forest Mansion 3 (Redux)","Hanging Gaps","Horror Doinky 2","Isola Verde: Redux","MineZcraft",
         "Skatepark F20","Treehouse Camping","Toys in the Hood 1.5","Mansion","Mysterious Toy-Volt Factory 2","Supermarket 5: Redux","Toys In The Hood 4 (RVA)","Winter Air"
     };
-
+    */
 
     public List<string> activeList;
     public List<Sprite> activeSpriteList;
 
-    List<string> rookieNamesList = new List<string>
+    List<string> rookieNamesList = new List<string>();
 
+    /*
     {
         "Angus 400", "Albatross GT", "BigVolt","Blobster","Chubble","Ciagnik","Col. Moss","Condor GRV","Crazy Pat","Dust Mite","El Gekko","El Rapido","E-Razr","Funk Flea","Funziona","Get Air",
         "Genghis Kar", "Harvester","High-Rod","Hot Spot","HSF-1","Hurricane","Junky","Lancer","LR 64","Micro","Mr. Bedtime","Myrmech","Naranja Turbo","Nesbitt","Nimbus","Panorama","Phat Slug",
         "Phat Trucker","Pipsqueak","Quaqa Turbo","RC Phink","Rebound 4x4","Road Star","Rouge","Show-Off","Splat","Starfire GT","Sunset Light","Super Wheat","Tesla","Toukka 4x4","Updraft","Vaanbus",
         "Volken Turbo"
     };
+    */
 
     public List<Sprite> rookieSpriteList = new List<Sprite>
 
     { };
 
-    List<string> amateurNamesList = new List<string>
+    List<string> amateurNamesList = new List<string>();
 
+    /*
     {
         "AMCO TC","Bad Bison","Badd RC","Baja Dash","Breadfast","Bumblebee","Candy Pebbles","Chapman","Dr. Grudge","Eatum","Emilia","Evil Weasel","Exceed","Flatter 4V","Frograph","Fun Zone","Groovster","Harmor","Honeybee",
         "Hotknife","Ignit-9","Koin Karp","Kyarus","LA 54","LMW","Locker","Madness","Manfred","Moby Trick","Mongoose","Mouse","Muller GT","Nevermore","Nitro Crusher","NY 54","Off Gear","Phantum","Power Cap",
@@ -141,39 +169,45 @@ public class GridGenerator3P : MonoBehaviour
         "Vixen","Wild Ride"
 
     };
+    */
 
     public List<Sprite> amateurSpriteList = new List<Sprite>
 
     { };
 
-    List<string> advancedNamesList = new List<string>
+    List<string> advancedNamesList = new List<string>();
 
+    /*
     {
         "75C","Aerozad","Akagi Attacker","Alice","APC L-13","Aquamarina","Aquasonic","Bajaette","Bendor","Bertha Ballistics","BossVolt","Breaker","Camelia","Cerveth","Donnie TC","Drawall","DRJ-61","Duck Sky",
         "Ember","Emperor","Flower Power","Frostbite","Frosted Delight","Fulon X","Grimlock","Hammerhead","Hyper XL","Junker","Le Pastel","Lithmus","Llag Sat","Marauder","Matra XL","Micro Tache","Panga TC","Panther",
         "Pest Control","Phenom","Pole Poz","Prizmer","R6 Turbo","Raudy","RC 1999","RC San","Recon MK1","Rice Ball","Road Rage","Romeo","Sarge","Shocker","Spearhead","Springtrap","ST 1","Sturm","Sunnyboy","Swizz Cheezer",
         "Thunder","Twilight GT","Twyster","Unicorn","Urban Jungle","Vibe Box","Wave Dancer","Weaver","Whiplash","YNZ"
     };
+    */
 
     public List<Sprite> advancedSpriteList = new List<Sprite>
 
     { };
 
-    List<string> semiProNamesList = new List<string>
+    List<string> semiProNamesList = new List<string>();
 
+    /*
     {
         "5TP","Acclaim GT","Adeon","Aeromaster","AMW","Ancile","Arnoux","Artifact","Ballista","BHV 1","Big Load","Big Match Jim","Blazar","Blaze V8","Bushido RS","CHC 305","Chubba","Cobra Max","Cossie","Current","Danger","Dragoon",
         "Dual Signal","Ducktail","Fat Agnus","Gravel Basher","Heritage","Hydrox","Iron-Z","Jackal","Jet Astro","JG-7","Jungle Beast","Karlington","KC-3","Locust","LV 54","Mambra","Maxam RS","Max Attack","Middle5",
         "Nitromare","Norwood","Ontogen","Pemto","Predator","Quazar","RC-Erra","RC Vector","RG1","Riptor","Rothams Racing","Runner 2000","Rustique","Sasquatch","Serrate","Sizzler","Sokudo","Speed Balancer","Styn",
         "Swede","Toy-World GT","Tri-Enter","Tribute","Trundle Buster","Victoria","Voltz XL","Winger","Yuurei V8","Zipper"
      };
+    */
 
     public List<Sprite> semiProSpriteList = new List<Sprite>
 
     { };
 
-    List<string> proNamesList = new List<string>
+    List<string> proNamesList = new List<string>();
 
+    /*
     {
         "After Image","Artair","Ayrton SP","BajaVolt","BanKing","Black Widow","Cerberus","Cherencov","Chimera TC","Cintach","Cougar","Drome Champ","Duflame","Eaglet","Electric Sheep","EXE TC","G3X","Gust","Humma"
         ,"Hydro Flame","Indy B","Jet Spike","Karen","Keyakizaka","Maverick","Mean Streak","Mid-Musc","N-Sharp","Outlaw","Panga","Patriot","Power Loader","Prime Target","Proto Combo","Puma","Purp XL",
@@ -181,19 +215,23 @@ public class GridGenerator3P : MonoBehaviour
         "Sucker Punch","Sunrise","The Knight","Tier 15","Tizzoni","Toro GT84","Toyeca","TT Raider","Ultra Drive","Velter Ultron","Visconti R","Vitesse","Wattage","Wildstar"
 
     };
+    */
 
     public List<Sprite> proSpriteList = new List<Sprite>
 
     { };
 
-    List<string> superProNamesList = new List<string>
 
+    List<string> superProNamesList = new List<string>();
+
+    /*
     {
         "Anaconda GT","Armand","AU-8","Calcure","Cambold R","Commandine","Daemmon","Dragheat","Elyta","Endo","Exclaim GT Mk.2","FD-400","FLIR","Golden Eye","Gungnir","Hanabira","Hemera","Hetgarde GT1","Horizenna","Hoshino",
         "Identity X","King Kaiju","King Moloko","Komet","La Rossa","Madax GT","Maxxas XLR8","Megalodon XL","Mudman","Nakajima","Napalm","Nyx","Orbitron","Orion","P4 Super","Prototype FX77","Quicksilver","Raven",
         "Reiser","Revel","Rinne","RVRC","Saeger","Selsia Turbo","Sentaro XL","Sideswipe","Skarlet","Skull Crusher","Slingshot","Spectron","Spedion","Starmac","Sterling F77","Stinger","Sylea","Tesseract","Ultra-RV","U.V.G.S.",
         "Voltrex","Wind Slicer","Wyvern","XM250","Yinisa"
     };
+    */
 
     public List<Sprite> superProSpriteList = new List<Sprite>
 
@@ -213,6 +251,10 @@ public class GridGenerator3P : MonoBehaviour
 
     void Awake()
     {
+
+        ReadTrackLists();
+        ReadCarLists();
+
 
         if (MainManager.gameResumed)
         {
@@ -264,6 +306,153 @@ public class GridGenerator3P : MonoBehaviour
             carFPresentation = carPicF.GetComponent<Animator>();
 
             CarSelect();
+
+        }
+    }
+
+
+    void ReadTrackLists()
+    {
+
+        string[] standardData = standardTrackNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
+
+        string[] bonusData = bonusTrackNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
+
+        int tableSize = standardData.Length;
+
+        for (int i = 0; i < tableSize; i++)
+        {
+            string nameTrimmed;
+
+            nameTrimmed = standardData[i].TrimEnd(new char[] { '\r', ' ' });
+            nameTrimmed = nameTrimmed.TrimStart(new char[] { '\r', ' ' });
+
+            trackList.Add(nameTrimmed);
+                        
+        }
+
+        for (int i = 0; i < tableSize; i++)
+        {
+
+            string nameTrimmed;
+
+            nameTrimmed = bonusData[i].TrimEnd(new char[] { '\r', ' ' });
+            nameTrimmed = nameTrimmed.TrimStart(new char[] { '\r', ' ' });
+
+            bonusTrackList.Add(nameTrimmed);
+        }
+
+
+    }
+
+
+    void ReadCarLists()
+    {
+
+        switch (MainManager.classSelected)
+        {
+            case 0:
+
+                string[] rookieData = rookieNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
+
+                int rookieCount = rookieData.Length;
+
+                string nameTrimmed;
+
+                foreach (string s in rookieData)
+                {
+                    nameTrimmed = s.TrimEnd(new char[] { '\r', ' ' });
+                    nameTrimmed = nameTrimmed.TrimStart(new char[] { '\r', ' ' });
+                    rookieNamesList.Add(nameTrimmed);
+                }
+                break;
+
+            case 1:
+
+                string[] amateurData = amateurNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
+
+                int amateurCount = amateurData.Length;
+
+                string nameTrimmedAm;
+
+                foreach (string s in amateurData)
+                {
+                    nameTrimmedAm = s.TrimEnd(new char[] { '\r', ' ' });
+                    nameTrimmedAm = nameTrimmedAm.TrimStart(new char[] { '\r', ' ' });
+                    amateurNamesList.Add(nameTrimmedAm);
+                }
+
+                break;
+
+            case 2:
+
+                string[] advancedData = advancedNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
+
+                int advancedCount = advancedData.Length;
+
+                string nameTrimmedAd;
+
+                foreach (string s in advancedData)
+                {
+                    nameTrimmedAd = s.TrimEnd(new char[] { '\r', ' ' });
+                    nameTrimmedAd = nameTrimmedAd.TrimStart(new char[] { '\r', ' ' });
+                    advancedNamesList.Add(nameTrimmedAd);
+                }
+
+                break;
+
+
+            case 3:
+
+                string[] semiProData = semiProNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
+
+                int semiProCount = semiProData.Length;
+
+                string nameTrimmedSe;
+
+                foreach (string s in semiProData)
+                {
+                    nameTrimmedSe = s.TrimEnd(new char[] { '\r', ' ' });
+                    nameTrimmedSe = nameTrimmedSe.TrimStart(new char[] { '\r', ' ' });
+                    semiProNamesList.Add(nameTrimmedSe);
+                }
+
+                break;
+
+            case 4:
+
+                string[] proData = proNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
+
+                int ProCount = proData.Length;
+
+                string nameTrimmedP;
+
+                foreach (string s in proData)
+                {
+                    nameTrimmedP = s.TrimEnd(new char[] { '\r', ' ' });
+                    nameTrimmedP = nameTrimmedP.TrimStart(new char[] { '\r', ' ' });
+                    proNamesList.Add(nameTrimmedP);
+                }
+
+                break;
+
+
+            case 5:
+
+                string[] superProData = superProNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
+
+                int superProCount = superProData.Length;
+
+                string nameTrimmedS;
+
+                foreach (string s in superProData)
+                {
+                    nameTrimmedS = s.TrimEnd(new char[] { '\r', ' ' });
+                    nameTrimmedS = nameTrimmedS.TrimStart(new char[] { '\r', ' ' });
+                    superProNamesList.Add(nameTrimmedS);
+                }
+
+                break;
 
         }
     }
@@ -469,6 +658,8 @@ public class GridGenerator3P : MonoBehaviour
 
     void PopulateCarCardA()
     {
+        
+        OnCarAPopulate?.Invoke();
         carAText.text = MainManager.cars[0];
         gameSounds.PlayOneShot(carPopulateSound);
         carAPresentation.SetTrigger("PresentCarA");
@@ -489,6 +680,7 @@ public class GridGenerator3P : MonoBehaviour
     void PopulateCarCardB()
 
     {
+        OnCarBPopulate?.Invoke();
         carBText.text = MainManager.cars[1];
         gameSounds.PlayOneShot(carPopulateSound);
         carBPresentation.SetTrigger("PresentCarB");
@@ -508,6 +700,7 @@ public class GridGenerator3P : MonoBehaviour
 
     void PopulateCarCardC()
     {
+        OnCarCPopulate?.Invoke();
         carCText.text = MainManager.cars[2];
         gameSounds.PlayOneShot(carPopulateSound);
         carCPresentation.SetTrigger("PresentCarC");
@@ -527,6 +720,7 @@ public class GridGenerator3P : MonoBehaviour
 
     void PopulateCarCardD()
     {
+        OnCarDPopulate?.Invoke();
         carDText.text = MainManager.cars[3];
         gameSounds.PlayOneShot(carPopulateSound);
         carDPresentation.SetTrigger("PresentCarD");
@@ -548,6 +742,7 @@ public class GridGenerator3P : MonoBehaviour
     void PopulateCarCardE()
 
     {
+        OnCarEPopulate?.Invoke();
         carEText.text = MainManager.cars[4];
         gameSounds.PlayOneShot(carPopulateSound);
         carEPresentation.SetTrigger("PresentCarE");
@@ -569,6 +764,7 @@ public class GridGenerator3P : MonoBehaviour
     void PopulateCarCardF()
 
     {
+        OnCarFPopulate?.Invoke();
         carFText.text = MainManager.cars[5];
         gameSounds.PlayOneShot(carPopulateSound);
         
@@ -604,6 +800,7 @@ public class GridGenerator3P : MonoBehaviour
 
         {
             MainManager.activeTracks[i] = uniqueRandomList[i];
+
         }
 
 
@@ -612,12 +809,14 @@ public class GridGenerator3P : MonoBehaviour
 
 
 
-        PopulateTrackPanel();
+        //PopulateTrackPanel();
     }
 
     void PopulateTrackPanel()
 
     {
+        OnTrackPanelPopulate?.Invoke();
+
         track1.text = MainManager.activeTracks[0];
         track2.text = MainManager.activeTracks[1];
         track3.text = MainManager.activeTracks[2];
@@ -733,6 +932,7 @@ public class GridGenerator3P : MonoBehaviour
                 break;
             default:
                 gameStartingPanel.SetActive(true);
+                PopulateTrackPanel();
                 bliss.Stop();
                 PopulatePlayerPanel();
                 break;

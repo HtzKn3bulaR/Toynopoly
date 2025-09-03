@@ -77,6 +77,7 @@ public class ReplaceTrackHandler : MonoBehaviour
 
     private void UpdateTrackPanel()
     {
+        
         gridGeneratorScript.track1.text = MainManager.activeTracks[0];
         gridGeneratorScript.track2.text = MainManager.activeTracks[1];
         gridGeneratorScript.track3.text = MainManager.activeTracks[2];

@@ -184,8 +184,7 @@ public class PreGameFlowManager : MonoBehaviour
                 }
                 else
                     Debug.Log("Please enter player names");
-                
-                SetRandomPlayerSequence();
+                                
                 break;
 
             case 5:
@@ -195,8 +194,7 @@ public class PreGameFlowManager : MonoBehaviour
                 }
                 else
                     Debug.Log("Please enter player names");
-                
-                SetRandomPlayerSequence();
+                                
                 break;
         }
 
