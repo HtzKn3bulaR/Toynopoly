@@ -351,28 +351,32 @@ public class CSVFileReader : MonoBehaviour
         {
 
             ResultsPanelAuto.gameObject.SetActive(true);
-            
-            if(playerManagerScript.activePlayerHasToynopoly == false && MainManager.levelCounter > 1)
+
+            if (MainManager.playerNumber > 2)
             {
-                legendPanel.gameObject.SetActive(true);
 
-                switch(playerManagerScript.challengeWon)
+                if (playerManagerScript.activePlayerHasToynopoly == false && MainManager.levelCounter > 1)
                 {
-                    case true:
-                        challengeOutcomeInfo.text = "The challenge was won.";
-                        break;
+                    legendPanel.gameObject.SetActive(true);
 
-                    case false:
-                        challengeOutcomeInfo.text = "The challenge was lost.";
-                        break;
+                    switch (playerManagerScript.challengeWon)
+                    {
+                        case true:
+                            challengeOutcomeInfo.text = "The challenge was won.";
+                            break;
+
+                        case false:
+                            challengeOutcomeInfo.text = "The challenge was lost.";
+                            break;
+
+                    }
 
                 }
 
-            }
-
-            else
-            {
-                legendPanel.gameObject.SetActive(false);
+                else
+                {
+                    legendPanel.gameObject.SetActive(false);
+                }
             }
 
             for (int i = 0; i < playerNames.Count; i++)
@@ -994,7 +998,11 @@ public class CSVFileReader : MonoBehaviour
     public void LeaderboardClose()
     {
         ResultsPanelAuto.gameObject.SetActive(false);
-        legendPanel.gameObject.SetActive(false);
+
+        if (MainManager.playerNumber > 2)
+        {
+            legendPanel.gameObject.SetActive(false);
+        }
 
         LeaderboardClear();
     }

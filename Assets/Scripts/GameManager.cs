@@ -167,6 +167,7 @@ public class GameManager : MonoBehaviour
 
     public static event Action Onlevel2Start;
     public static event Action Onlevel3Start;
+    public static event Action OnGameResumed;
 
     // Start is called before the first frame update
     void Awake()
@@ -195,6 +196,7 @@ public class GameManager : MonoBehaviour
                         
             UpdateInventoryDisplay();
             UpdateCarPrizesDisplay();
+            OnGameResumed?.Invoke();
             RoundChangeover();
             UpdateCashDisplay();
         }

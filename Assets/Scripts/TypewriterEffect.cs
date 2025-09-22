@@ -19,7 +19,7 @@ using Object = UnityEngine.Object;
         private int _currentVisibleCharactersIndex;
 
         private Coroutine _typewriterCoroutine;
-    private bool _readyForNewText = true;
+        private bool _readyForNewText = true;
 
         private WaitForSeconds _simpleDelay;
         private WaitForSeconds _interpunctuationDelay;

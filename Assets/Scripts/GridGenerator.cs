@@ -96,14 +96,16 @@ public class GridGenerator : MonoBehaviour
     public TextAsset superProNames;
 
     public static event Action OnTrackPanelPopulate;
-    public static event Action OnCarAPopulate;
-    public static event Action OnCarBPopulate;
-    public static event Action OnCarCPopulate;
-    public static event Action OnCarDPopulate;
+        
     public static event Action OnCarEPopulate;
-    public static event Action OnCarFPopulate;
+   
 
+    public event EventHandler<OnCarCardPopulateEventArgs> OnCarCardPopulate;
 
+    public class OnCarCardPopulateEventArgs : EventArgs
+    {
+        public TextMeshProUGUI carCard;
+    }
 
 
     List<string> trackList = new List<string>();
@@ -577,9 +579,9 @@ public class GridGenerator : MonoBehaviour
     void PopulateCarCardA()
 
     {
-
-        OnCarAPopulate?.Invoke();
+               
         carAText.text = MainManager.cars[0];
+        OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carAText });
         gameSounds.PlayOneShot(carPopulateSound);
         carAPresentation.SetTrigger("PresentCarA");
 
@@ -602,8 +604,8 @@ public class GridGenerator : MonoBehaviour
     void PopulateCarCardB()
 
     {
-        OnCarBPopulate?.Invoke();
         carBText.text = MainManager.cars[1];
+        OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carBText });
         gameSounds.PlayOneShot(carPopulateSound);
         carBPresentation.SetTrigger("PresentCarB");
 
@@ -625,8 +627,8 @@ public class GridGenerator : MonoBehaviour
 
     void PopulateCarCardC()
     {
-        OnCarCPopulate?.Invoke();
         carCText.text = MainManager.cars[2];
+        OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carCText });
         gameSounds.PlayOneShot(carPopulateSound);
         carCPresentation.SetTrigger("PresentCarC");
 
@@ -647,9 +649,9 @@ public class GridGenerator : MonoBehaviour
     }
 
     void PopulateCarCardD()
-    {
-        OnCarDPopulate?.Invoke();
+    {        
         carDText.text = MainManager.cars[3];
+        OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carDText });
         gameSounds.PlayOneShot(carPopulateSound);
 
         for (int i = 0; i < activeList.Count; i++)
@@ -670,8 +672,8 @@ public class GridGenerator : MonoBehaviour
     void PopulateCarCardE()
 
     {
-        OnCarEPopulate?.Invoke();
         carEText.text = MainManager.cars[4];
+        //OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carEText });
         gameSounds.PlayOneShot(carPopulateSound);
 
         for (int i = 0; i < activeList.Count; i++)
@@ -692,8 +694,8 @@ public class GridGenerator : MonoBehaviour
     void PopulateCarCardF()
 
     {
-        OnCarFPopulate?.Invoke();
         carFText.text = MainManager.cars[5];
+        OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carFText });
         gameSounds.PlayOneShot(carPopulateSound);
 
         for (int i = 0; i < activeList.Count; i++)
@@ -752,23 +754,7 @@ public class GridGenerator : MonoBehaviour
         }
                                
         trackDisplays[9].text = MainManager.bonusTrack;
-        //StartCoroutine(TrackTextReveal(9));
-
-
-
-        /*
-        track1.text = MainManager.activeTracks[0];
-        track2.text = MainManager.activeTracks[1];
-        track3.text = MainManager.activeTracks[2];
-        track4.text = MainManager.activeTracks[3];
-        track5.text = MainManager.activeTracks[4];
-        track6.text = MainManager.activeTracks[5];
-        track7.text = MainManager.activeTracks[6];
-        track8.text = MainManager.activeTracks[7];
-        track9.text = MainManager.activeTracks[8];
-
-        bonusTrack.text = MainManager.bonusTrack;
-        */
+        
 
     }
 

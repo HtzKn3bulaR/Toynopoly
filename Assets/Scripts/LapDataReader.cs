@@ -80,9 +80,7 @@ public class LapDataReader : MonoBehaviour
         for (int i = 0; i < tableSize; i++)
         {
 
-            Debug.Log(lapsList.laps[i].track);
-
-
+            
             if(lapsList.laps[i].track.Equals(trackSelected, StringComparison.InvariantCultureIgnoreCase))
                 
             {
@@ -127,9 +125,7 @@ public class LapDataReader : MonoBehaviour
 
         }
 
-        Debug.Log("Lap Count is " + currentLapCount);
-        Debug.Log("Index is " + index);
-
+        
         ShowLapData();
 
     }
