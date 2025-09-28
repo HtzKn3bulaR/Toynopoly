@@ -98,6 +98,7 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] GameObject continueButtonToynopolyAuto;
     [SerializeField] GameObject continueButtonNormal;
     [SerializeField] GameObject getAutoResultsButtonNormal;
+    [SerializeField] GameObject getAutoResultsButtonNormalL1;
 
 
     [SerializeField] GameObject raceResultsPanelL2;
@@ -640,6 +641,7 @@ public class PlayerManager3P : MonoBehaviour
         MainManager.defendingPlayer = MainManager.inactivePlayers[defender];
 
         raceInProgressPanelChallenge.SetActive(true);
+        getAutoResultsButtonNormal.SetActive(true);
 
         lapCountScript.FindLapData(selectedTrack);
 
@@ -853,6 +855,7 @@ public class PlayerManager3P : MonoBehaviour
             lapCountScript.FindLapData(selectedTrack);
             continueButtonNormal.SetActive(false);
             getAutoResultsButtonNormal.SetActive(false);
+            getAutoResultsButtonNormalL1.SetActive(false);
                 
                 continueButtonToynopoly.SetActive(true);
                 continueButtonToynopolyAuto.SetActive(true);
@@ -861,7 +864,6 @@ public class PlayerManager3P : MonoBehaviour
                 currentRaceInfoTrack.text = selectedTrack;
                 currentRaceInfoCar.text = selectedCar;
                 currentRaceOpponent1.text = MainManager.playerNames[MainManager.activePlayer];
-
 
             }
                    

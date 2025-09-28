@@ -191030,7 +191030,8 @@ MonoBehaviour:
   continueButtonToynopoly: {fileID: 445332174}
   continueButtonToynopolyAuto: {fileID: 565706396}
   continueButtonNormal: {fileID: 1877171688}
-  getAutoResultsButtonNormal: {fileID: 785316924}
+  getAutoResultsButtonNormal: {fileID: 1380534324}
+  getAutoResultsButtonNormalL1: {fileID: 785316924}
   raceResultsPanelL2: {fileID: 719014371}
   challengeOutcomePanel: {fileID: 833911657}
   timeBattlePanel: {fileID: 1449831683}
@@ -196487,9 +196488,9 @@ RectTransform:
   - {fileID: 1533421536}
   - {fileID: 913151584}
   - {fileID: 378290814}
+  - {fileID: 2113904204}
   - {fileID: 1906740086}
   - {fileID: 1510956769}
-  - {fileID: 2113904204}
   - {fileID: 1223748536}
   - {fileID: 616157215}
   m_Father: {fileID: 2069182145}

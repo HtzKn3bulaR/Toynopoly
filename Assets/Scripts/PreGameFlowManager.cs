@@ -27,33 +27,16 @@ public class PreGameFlowManager : MonoBehaviour
     [SerializeField] GameObject playerNamesPanel3P;
     [SerializeField] GameObject playerNamesPanel4P;
     [SerializeField] GameObject playerNamesPanel5P;
-
-    /*[SerializeField] TextMeshProUGUI p1NameInputFieldP2;
-    [SerializeField] TextMeshProUGUI p2NameInputFieldP2;
-
-    [SerializeField] TextMeshProUGUI p1NameInputFieldP3;
-    [SerializeField] TextMeshProUGUI p2NameInputFieldP3;   
-    [SerializeField] TextMeshProUGUI p3NameInputFieldP3;
-
-    [SerializeField] TextMeshProUGUI p1NameInputFieldP4;
-    [SerializeField] TextMeshProUGUI p2NameInputFieldP4;
-    [SerializeField] TextMeshProUGUI p3NameInputFieldP4;
-    [SerializeField] TextMeshProUGUI p4NameInputFieldP4;
-
-    [SerializeField] TextMeshProUGUI p1NameInputFieldP5;
-    [SerializeField] TextMeshProUGUI p2NameInputFieldP5;
-    [SerializeField] TextMeshProUGUI p3NameInputFieldP5;
-    [SerializeField] TextMeshProUGUI p4NameInputFieldP5;
-    [SerializeField] TextMeshProUGUI p5NameInputFieldP5;
-    
-    [SerializeField] TextMeshProUGUI p6NameInputField;
-    */
+        
     [SerializeField] Button[] StartGame;
 
     [SerializeField] GameObject[] inputFieldsP2;
     [SerializeField] GameObject[] inputFieldsP3;
     [SerializeField] GameObject[] inputFieldsP4;
     [SerializeField] GameObject[] inputFieldsP5;
+
+    [SerializeField] GameObject continueButton;
+    [SerializeField] GameObject startModButton;
 
 
     List<string> tempPlayersList = new List<string>
@@ -131,11 +114,24 @@ public class PreGameFlowManager : MonoBehaviour
                 else
                     MainManager.raceThreshold = 11;
                 break;
-        }
-        
-              
+
+            case 6:
+                continueButton.gameObject.SetActive(false);
+                startModButton.gameObject.SetActive(true);
+                MainManager.playerNumber = 2;
+                MainManager.raceThreshold = 24;
+                break;
+            
+        }                   
                              
     }
+
+    public void StartMod()
+    {
+        SceneManager.LoadScene(5);
+    }
+
+
 
     public void SetMatchLength()
     {

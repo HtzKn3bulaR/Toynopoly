@@ -20,9 +20,9 @@ Broken Sunlight;2;2;2;2;2;3
 Buoy Town;3;3;3;4;4;4
 Cake;3;4;4;4;4;4
 Cardboard Castle;4;5;5;5;6;6
-Casino RV;3;3;3;3;3;4
+Casino RV;3;3;3;3;4;4
 Castle 1;3;3;3;3;3;4
-Castle 2;3;3;3;3;3;4
+Castle 2;3;3;3;3;4;4
 Chess Night;3;3;3;3;3;3
 Chilled to the Bone;2;2;2;2;3;3
 Christmas Snow Globe;5;5;5;5;6;6
@@ -48,7 +48,7 @@ Frostpeak;3;3;3;3;4;4
 Fukushima;3;3;3;3;3;3
 Galaxy World 1;3;3;3;3;3;3
 Galaxy World 2;3;3;3;3;4;4
-Game Room 1;4;4;5;5;5;5
+Game Room 1;4;5;5;5;5;5
 Game Room 2;3;3;3;4;4;4
 GBA Bowser Castle 3;4;4;4;4;4;5
 Ghengis Kastle;3;3;3;4;4;4
@@ -75,7 +75,7 @@ Hull Breach 2;2;2;2;2;2;3
 Hull Breach 3000;3;3;3;4;4;4
 Hyperborean Harmony;4;4;5;5;5;5
 Illusion;2;2;3;3;3;3
-Images of Giza: Redux;4;5;5;5;5;5
+Images of Giza: Redux;4;5;5;5;6;6
 Industry;3;3;3;3;3;3
 Isola Verde: Redux;3;3;3;3;3;3
 Jailhouse Rock;3;3;3;3;3;3
@@ -86,9 +86,9 @@ Lunar;3;3;3;4;4;4
 Mansion;3;3;3;3;3;3
 Market Mayhem;4;4;5;5;5;5
 Medieval Mayhem;3;3;3;3;3;3
-Medieval: Redux;4;4;4;5;5;5
+Medieval: Redux;4;4;5;5;5;5
 Meltdown;4;4;4;4;4;5
-Metro-Volt;3;3;3;3;3;3
+Metro-Volt;3;3;3;3;3;4
 Mexico 1;3;3;3;3;3;3
 Miami Manic;5;5;6;6;6;6
 Mid-Sea Island;3;4;4;4;4;4
@@ -113,7 +113,7 @@ PetroVolt;2;2;2;3;3;3
 POD: Roc;6;6;6;7;7;8
 POD: Skyrace;2;2;2;3;3;3
 Port Limano 1;5;5;6;6;6;6
-Port Limano 2;3;3;3;3;4;4
+Port Limano 2;3;3;3;4;4;4
 Port Limano EX;2;3;3;3;3;3
 Quake!;2;2;3;3;3;3
 Radioactive Garden;4;5;5;5;6;6
@@ -124,7 +124,7 @@ Re-Ville;3;3;3;3;3;3
 Rigs Highway;3;3;3;3;4;4
 Road in the Sky;5;5;6;6;6;7
 Roofbottom;4;4;4;4;5;5
-Rooftop Chase: Redux;3;3;3;3;3;4
+Rooftop Chase: Redux;3;3;3;3;4;4
 Rooftop Chase: Redux R;2;2;3;3;3;3
 Rooftops;3;3;3;4;4;4
 Rooftops 1;3;3;3;3;3;3
@@ -132,8 +132,8 @@ Room 12x16;5;5;5;5;6;6
 Route-77;3;3;3;4;4;4
 RV Temple;2;2;2;2;2;3
 Sakura;3;3;3;3;3;3
-Santorini;4;4;4;4;4;5
-SBX Alpine;3;3;3;4;4;4
+Santorini;4;4;4;4;5;5
+SBX Alpine;3;3;4;4;4;4
 School's Out! 1;4;4;4;4;5;5
 School's Out! 2;2;2;2;2;2;2
 Shakespeare Library;3;3;3;3;3;4
@@ -143,7 +143,7 @@ Skating Toys: Redux;2;2;2;2;2;3
 Smashride Circuit;3;3;3;3;3;4
 Snowland 1;3;3;3;3;4;4
 Snowy River;3;3;4;4;4;4
-Spaceship;3;4;4;4;4;4
+Spaceship;3;4;4;4;4;5
 Spa-Volt 1;3;3;3;3;3;3
 Spa-Volt 2;3;3;3;3;4;4
 Spa-Volt 2 R;3;3;3;3;4;4
@@ -151,19 +151,19 @@ Splat!;5;5;5;6;6;6
 Spoinky Doinky 1;2;2;2;2;2;2
 Spooky-Volt;5;6;6;6;6;7
 Spring Visit;3;4;4;4;4;4
-StadVolt;3;4;4;4;4;4
+StadVolt;4;4;4;4;4;4
 Subway;2;2;2;2;3;3
 Subway 2;2;2;2;3;3;3
 Subway 2 R;2;2;2;2;2;3
 Supermarket 1;4;4;4;4;4;4
 Supermarket 2;7;7;8;8;8;9
 Supermarket 5: Redux;5;5;5;6;6;7
-Swan Street;3;3;3;3;3;3
+Swan Street;3;3;3;4;4;4
 Synthwave;4;4;4;4;4;5
-Temple of the Burning Darkn.;4;5;5;5;5;6
+Temple of the Burning Darkness;4;5;5;5;5;6
 Terminus;3;3;3;3;3;3
 Tetris Festival;4;4;4;5;5;5
-The Bunker;3;4;4;4;4;4
+The Bunker;4;4;4;4;4;5
 The Catacombs;2;2;2;2;2;2
 The Felling Yard;3;3;3;3;3;3
 The Great Silence;3;3;3;3;3;3
@@ -185,9 +185,9 @@ Toytanic 1;3;3;3;3;3;4
 Toytanic 2;3;3;3;3;3;4
 Treehouse Camping;3;3;3;3;3;3
 Tuscany;3;3;4;4;4;4
-Urban Sprint 1;3;3;3;3;3;4
+Urban Sprint 1;3;3;3;3;4;4
 urbanX;3;3;3;3;4;4
-Venice;3;3;3;3;3;4
+Venice;3;3;3;3;4;4
 Waterfall;6;6;6;6;7;7
 White Rose Chapel;3;3;3;3;3;3
 Wildland;3;3;3;3;3;4

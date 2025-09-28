@@ -8,10 +8,7 @@ using UnityEngine.Events;
 
 
 public class GameManager : MonoBehaviour
-{
-
-    
-
+{   
     public AudioClip panelOpen;
     public AudioClip stageReady;
     public AudioClip coinFalling;

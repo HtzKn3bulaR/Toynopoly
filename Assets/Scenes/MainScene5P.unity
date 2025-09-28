@@ -25640,9 +25640,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1535367126}
-        m_TargetAssemblyTypeName: CarReplaceHandler, Assembly-CSharp
-        m_MethodName: InitiateReplaceProcedure
+      - m_Target: {fileID: 310700326}
+        m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
+        m_MethodName: OpenMatchScoreEditor
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -44807,7 +44807,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &399597746
 RectTransform:
   m_ObjectHideFlags: 0
@@ -97963,19 +97963,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: WinnerDropdown, Assembly-CSharp
-        m_MethodName: LoadPlayerOptions
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1896969731}
         m_TargetAssemblyTypeName: PlayerManager3P, Assembly-CSharp
         m_MethodName: ShowResultsPanel
         m_Mode: 1
@@ -97987,7 +97975,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 567314005}
+        m_TargetAssemblyTypeName: WinnerDropdown, Assembly-CSharp
+        m_MethodName: LoadPlayerOptions
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1239888297}
         m_TargetAssemblyTypeName: RunnerUpDropdown, Assembly-CSharp
         m_MethodName: LoadPlayerOptions
         m_Mode: 1
@@ -172484,11 +172484,11 @@ RectTransform:
   - {fileID: 2102294120}
   - {fileID: 2007559355}
   - {fileID: 1571996325}
+  - {fileID: 1994808168}
   - {fileID: 2100230225}
   - {fileID: 253513460}
   - {fileID: 1036419202}
   - {fileID: 1858821778}
-  - {fileID: 1994808168}
   m_Father: {fileID: 2069182145}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -212331,6 +212331,7 @@ MonoBehaviour:
   continueButtonToynopolyAuto: {fileID: 2030934368}
   continueButtonNormal: {fileID: 765720939}
   getAutoResultsButtonNormal: {fileID: 505147557}
+  getAutoResultsButtonNormalL1: {fileID: 1384514254}
   raceResultsPanelL2: {fileID: 719014371}
   challengeOutcomePanel: {fileID: 833911657}
   timeBattlePanel: {fileID: 1449831683}

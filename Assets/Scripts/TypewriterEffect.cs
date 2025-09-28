@@ -34,9 +34,7 @@ using Object = UnityEngine.Object;
     public static event Action CompleteTextRevealed;
     public static event Action<char> CharacterRevealed;
 
-
-
-
+    
 
 
         private void Awake()
@@ -53,7 +51,17 @@ using Object = UnityEngine.Object;
         GridGenerator.OnTrackPanelPopulate += OnCallTypewriter;
 
        
+
+       
         }
+
+    private void Start()
+    {
+        
+         
+    }
+
+    
 
     private void OnCallTypewriter()
     {
@@ -64,11 +72,7 @@ using Object = UnityEngine.Object;
     {
         TMPro_EventManager.TEXT_CHANGED_EVENT.Remove(PrepareForNewText);
     }
-
-    private void Start()
-        {
-        
-    }
+      
 
 
         public void PrepareForNewText(Object obj)

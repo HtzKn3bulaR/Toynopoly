@@ -128337,7 +128337,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -169.8125, y: -163.12065}
+  m_AnchoredPosition: {x: -243, y: -163.12065}
   m_SizeDelta: {x: 195.1039, y: 50.4773}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1262738138
@@ -192233,7 +192233,8 @@ MonoBehaviour:
   continueButtonToynopoly: {fileID: 445332174}
   continueButtonToynopolyAuto: {fileID: 317196031}
   continueButtonNormal: {fileID: 1877171688}
-  getAutoResultsButtonNormal: {fileID: 421096726}
+  getAutoResultsButtonNormal: {fileID: 1262738136}
+  getAutoResultsButtonNormalL1: {fileID: 421096726}
   raceResultsPanelL2: {fileID: 719014371}
   challengeOutcomePanel: {fileID: 833911657}
   timeBattlePanel: {fileID: 1449831683}
