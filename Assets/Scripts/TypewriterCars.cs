@@ -54,12 +54,12 @@ public class TypewriterCars : MonoBehaviour
 
     private void Start()
     {
-        if (MainManager.playerNumber < 3)
+        if (MainManager.playerNumber < 3 || MainManager.playerNumber > 15)
         {
             gridGenerator.OnCarCardPopulate += GridGenerator_OnCarCardPopulate;
         }
 
-        else
+        else 
         {
             gridGenerator3P.OnCarCardPopulate += GridGenerator3P_OnCarCardPopulate;
         }

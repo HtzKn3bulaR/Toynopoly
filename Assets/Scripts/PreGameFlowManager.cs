@@ -118,7 +118,7 @@ public class PreGameFlowManager : MonoBehaviour
             case 6:
                 continueButton.gameObject.SetActive(false);
                 startModButton.gameObject.SetActive(true);
-                MainManager.playerNumber = 2;
+                MainManager.playerNumber = 16;
                 MainManager.raceThreshold = 24;
                 break;
             

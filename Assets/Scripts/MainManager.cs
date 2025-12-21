@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,7 +20,8 @@ public class MainManager : MonoBehaviour
     public static bool shortMatch = false;
 
     public static int classSelected = 0;
-
+    
+    
     public static string[] cars = { "CarA", "CarB", "CarC", "CarD", "CarE", "CarF" };
     public static bool[] carIsInDefault = { false, false, false, false, false, false };
     public static bool[] DefProcedureCompleted = { false, false, false, false, false, false };

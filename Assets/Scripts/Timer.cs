@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using System;
 
+
 public class Timer : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI timerText;
@@ -21,6 +22,12 @@ public class Timer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.T))
+        {
+            ResetTimer();
+        }
+
+
             elapsedTime += Time.deltaTime;
             int hours = Mathf.FloorToInt(elapsedTime / 3600);
             int minutes = Mathf.FloorToInt(elapsedTime % 3600) / 60;
@@ -78,6 +85,11 @@ public class Timer : MonoBehaviour
             }
         }
 
+    }
+
+    void ResetTimer()
+    {
+        elapsedTime = 0;
     }
 
 }

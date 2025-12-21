@@ -13,10 +13,7 @@ public class SessionManager : MonoBehaviour
     public List<string> playerRoster;
 
     [SerializeField] private Transform[] fields;
-    [SerializeField] private Transform[] rows;
-
-    
-
+            
     [SerializeField] GameObject nextRaceComingUpPanel;
     [SerializeField] GameObject raceInProgressPanel;
 
@@ -68,7 +65,7 @@ public class SessionManager : MonoBehaviour
 
         MainManager.fieldsLeftForCar[MainManager.currentCarIndex]--;
 
-        playerPanelManager.StartRandomizerVisual();
+        //playerPanelManager.StartRandomizerVisual();
 
         statusInfoTextBar.text = ($"Races completed: {MainManager.roundCounter - 1} / Players connected: {playerRoster.Count}");
 

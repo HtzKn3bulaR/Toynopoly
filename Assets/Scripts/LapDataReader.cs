@@ -135,7 +135,7 @@ public class LapDataReader : MonoBehaviour
     {
         lapDisplay.text = currentLapCount.ToString();
 
-        if (MainManager.playerNumber > 2)
+        if (MainManager.playerNumber > 2 && MainManager.playerNumber <16)
         {
             lapDisplayChallenge.text = currentLapCount.ToString();
         }

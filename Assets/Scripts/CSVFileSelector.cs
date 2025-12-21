@@ -5,6 +5,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 public class CSVFileSelector : MonoBehaviour
 {
@@ -43,18 +44,19 @@ public class CSVFileSelector : MonoBehaviour
         
     }
 
-    public void SetNewMainFolder()
+    public void SetNewMainFolder(string folder)
     {
-        defaultFolderName = rvglFolder.text;
+        string newFolder = folder;
+        defaultFolderName = newFolder;
+        applicationDataPath = defaultFolderName + "/profiles/";
+        GetAllCSVFiles();
     }
 
 
     public void GetAllCSVFiles()
     {
         csvFiles.Clear();
-
-        //selectedFilePath = "";
-
+                
         try
 
         {
@@ -76,11 +78,17 @@ public class CSVFileSelector : MonoBehaviour
         catch (UnassignedReferenceException)
         {
             Debug.LogError("Access denied to some directories");
+            return;
+            
         }
 
         catch (Exception e)
         {
-            Debug.LogError($"An error occured while accessing files: {e.Message}");
+            fileDropdown.ClearOptions();
+            return;
+            //Debug.LogError($"An error occured while accessing files: {e.Message}");
+            
+            
         }
 
         SetDropdownOptions();

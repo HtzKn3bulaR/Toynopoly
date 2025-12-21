@@ -90,7 +90,8 @@ public class CSVFileReader : MonoBehaviour
         }
 
         fileSelectorScript = GameObject.Find("CSVFileSelector").GetComponent<CSVFileSelector>();
-        if (MainManager.playerNumber > 2)
+
+        if (MainManager.playerNumber > 2 && MainManager.playerNumber < 16)
         {
             playerManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
         }

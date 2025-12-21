@@ -16,6 +16,8 @@ public class PlayerPanelManager : MonoBehaviour
 
     [SerializeField] private Transform shuffleButton;
 
+    [SerializeField] private Transform[] rows;
+
     private List<Transform> playerNametagTransformList;
 
     private float timer = 0.0f;
@@ -41,6 +43,11 @@ public class PlayerPanelManager : MonoBehaviour
         playerPanel.gameObject.SetActive(true);
         shuffleButton.gameObject.SetActive(true);
         reversePanel.gameObject.SetActive(true);
+
+        foreach(Transform row in rows)
+        {
+            row.gameObject.SetActive(true);
+        }
 
     }
 

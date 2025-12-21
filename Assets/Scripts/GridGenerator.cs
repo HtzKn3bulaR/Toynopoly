@@ -762,30 +762,26 @@ public class GridGenerator : MonoBehaviour
     public void PopulatePlayerPanel()
 
     {
-        gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+       
 
         switch (MainManager.playerNumber)
 
         {
             case 2:
-                               
+
+                gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
                 player1NameField.text = MainManager.playerNames[0];
                 player2NameField.text = MainManager.playerNames[1];
+                gameManagerScript.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
                 break;
 
-            case 3:
-                
-                player1NameField.text = MainManager.playerNames[0];
-                player2NameField.text = MainManager.playerNames[1];
-                player3NameField.text = MainManager.playerNames[2];
+            case >2:
                 break;
 
         }
 
         StartCoroutine(WaitAfterLineupSelected());
-               
-
-        gameManagerScript.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+                       
     }
 
     void ShowNextRow()
@@ -793,7 +789,11 @@ public class GridGenerator : MonoBehaviour
         if (rowShown < 6)
 
         {
-            gameManagerScript.rows[rowShown].SetActive(true);
+            if (MainManager.playerNumber < 16)
+            {
+
+                gameManagerScript.rows[rowShown].SetActive(true);
+            }
 
             StartCoroutine(FieldsAppearingDelay());
         }
@@ -858,7 +858,11 @@ public class GridGenerator : MonoBehaviour
         PopulateTrackPanel();
 
         gameSounds.PlayOneShot(transition);
-        gameManagerScript.helpText.gameObject.SetActive(true);
+
+        if (MainManager.playerNumber < 16)
+        {
+            gameManagerScript.helpText.gameObject.SetActive(true);
+        }
         
         timerPanel.gameObject.SetActive(true);
         
