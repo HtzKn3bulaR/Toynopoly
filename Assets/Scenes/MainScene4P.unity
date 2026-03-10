@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -9200,7 +9199,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
         m_MethodName: GetPlayerIndex
         m_Mode: 1
@@ -31630,7 +31629,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
         m_MethodName: GetCarIndex
         m_Mode: 1
@@ -35417,9 +35416,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: CSVFileReader, Assembly-CSharp
-        m_MethodName: SetAutoResultsInvalid
+      - m_Target: {fileID: 1896969731}
+        m_TargetAssemblyTypeName: PlayerManager3P, Assembly-CSharp
+        m_MethodName: ShowResultsPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -35429,9 +35428,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: CSVFileReader, Assembly-CSharp
-        m_MethodName: LeaderboardClose
+      - m_Target: {fileID: 567314005}
+        m_TargetAssemblyTypeName: WinnerDropdown, Assembly-CSharp
+        m_MethodName: LoadPlayerOptions
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1239888297}
+        m_TargetAssemblyTypeName: RunnerUpDropdown, Assembly-CSharp
+        m_MethodName: LoadPlayerOptions
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -50030,6 +50041,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 227fd10552398694990371411f67f56d, type: 3}
   - {fileID: 21300000, guid: 93b6829c3436b34429e6d1e2cd8919fd, type: 3}
   - {fileID: 21300000, guid: 83f8ce30423d38a4bbba5df01db99c84, type: 3}
+  - {fileID: 21300000, guid: ebced6077cdc3f54e98dbb4cbe09080d, type: 3}
   - {fileID: 21300000, guid: 472d520702134fc4bb7441fd5957284a, type: 3}
   - {fileID: 21300000, guid: 1538dfd5302a2e646b35be9d4e27303e, type: 3}
   - {fileID: 21300000, guid: 66ef2e649c347e24dacdb79110cd6741, type: 3}
@@ -50078,6 +50090,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 288c27e15a1be40408857b86a3b4f6f7, type: 3}
   - {fileID: 21300000, guid: 0c70abcf39b4ac3479ae8ad0f6c6f1c0, type: 3}
   - {fileID: 21300000, guid: 3542d5f6c3c952440a07cf0c7c14902a, type: 3}
+  - {fileID: 21300000, guid: f77ac389debd44a45a5d31cef93bd848, type: 3}
   - {fileID: 21300000, guid: c9e9a0386157c2d49ba4cef577c2854b, type: 3}
   - {fileID: 21300000, guid: 1b53b185ac11ad443a790d13c731ab9c, type: 3}
   - {fileID: 21300000, guid: e2eb256884e7a7c42822ba1991999ca7, type: 3}
@@ -50177,7 +50190,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 6c6454c4081ebd14f8c64617278fff5f, type: 3}
   - {fileID: 21300000, guid: 9c02b1d96d1001846bc83aa2b3848933, type: 3}
   - {fileID: 21300000, guid: 8a440941eca86da4fb2db6d3c50cef5b, type: 3}
-  - {fileID: 21300000, guid: 40b93697dc7199249b88b56154c531fd, type: 3}
   - {fileID: 21300000, guid: 0f3ff242dd2aeb6418a693ecb23af848, type: 3}
   - {fileID: 21300000, guid: 8d20317158c33a24292e9661b7f4a956, type: 3}
   - {fileID: 21300000, guid: 66e7ddfaad6537a44b683ebb9718f274, type: 3}
@@ -50237,6 +50249,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 07fecc89daa20ce449b1533650c36a4a, type: 3}
   - {fileID: 21300000, guid: 95a454e7178b6554ab0c9636efa8eced, type: 3}
   - {fileID: 21300000, guid: 4299575ce397b964e8449819b4822247, type: 3}
+  - {fileID: 21300000, guid: c0d52e72c8527f7458687325a39712cb, type: 3}
   - {fileID: 21300000, guid: 903f12b770cd6b64695b35035aff4ff2, type: 3}
   - {fileID: 21300000, guid: ba7777df7b4152349a3330262b2ae73f, type: 3}
   - {fileID: 21300000, guid: 719981319f9a8984e83a702b1cec3568, type: 3}
@@ -50252,11 +50265,13 @@ MonoBehaviour:
   - {fileID: 21300000, guid: d8718203a26921f4695470f4310425be, type: 3}
   - {fileID: 21300000, guid: edbc5f5dc7adf664db5f98656405fe8f, type: 3}
   - {fileID: 21300000, guid: fff5e3898b7d56d45a7baebb5359329a, type: 3}
-  - {fileID: 21300000, guid: 64c77de7ee4f03146b53f6412fbe4655, type: 3}
   - {fileID: 21300000, guid: 59ea298181e4a9d4daa6a0e31ee676e9, type: 3}
   - {fileID: 21300000, guid: 9e7afe33a06d3714c848e2227613008b, type: 3}
+  - {fileID: 21300000, guid: 01cf9c2664de8e5429f93fe86c714c6a, type: 3}
   superProSpriteList:
+  - {fileID: 21300000, guid: 682bc5b4d287bfb4c89af93edfdb6a53, type: 3}
   - {fileID: 21300000, guid: 61504a066603ad1499dd9e8e7214fbdf, type: 3}
+  - {fileID: 21300000, guid: 1a1e6857715876e469c397ec13053d79, type: 3}
   - {fileID: 21300000, guid: 38254460121e08c4dadd664f890be4f7, type: 3}
   - {fileID: 21300000, guid: f2ec6b3362c6ff64080a7dcc38c5277e, type: 3}
   - {fileID: 21300000, guid: 6c66cff1f66fff1409416710d05497a9, type: 3}

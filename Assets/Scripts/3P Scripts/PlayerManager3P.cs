@@ -924,6 +924,8 @@ public class PlayerManager3P : MonoBehaviour
                 if (!MainManager.autoResultsValid)
                 {
                     Debug.Log(winnerDropdown.value);
+                    Debug.Log(runnerUpDropdown.value);
+                    
 
                     if ((winnerDropdown.value) == (MainManager.activePlayer))
 
@@ -943,6 +945,8 @@ public class PlayerManager3P : MonoBehaviour
                     if (MainManager.playerNumber > 4)
                     {
                         thirdLevel1 = thirdPlaceDropdown.value;
+                        Debug.Log(thirdPlaceDropdown.value);
+
                     }
                 }
 
