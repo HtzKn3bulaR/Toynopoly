@@ -15,11 +15,13 @@ public class MainManager : MonoBehaviour
     
     public static bool gameResumed = false;
     
-    public static int playerNumber = 0;
+    public static int playerNumber = 1;
 
     public static bool shortMatch = false;
 
-    public static int classSelected = 0;
+    public static int classSelected = 0;        
+    public static string roomCode;
+    public static string matchTitle = "Friendly Match";
     
     
     public static string[] cars = { "CarA", "CarB", "CarC", "CarD", "CarE", "CarF" };

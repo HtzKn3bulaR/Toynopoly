@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class PreGameFlowManager : MonoBehaviour
 {
+    public static PreGameFlowManager Instance;
 
     [SerializeField] Button newGame;
     [SerializeField] Button help;
@@ -23,10 +24,12 @@ public class PreGameFlowManager : MonoBehaviour
     [SerializeField] TMP_Dropdown matchLengthMenu;
 
 
-    [SerializeField] GameObject playerNamesPanel2P;
-    [SerializeField] GameObject playerNamesPanel3P;
+    [SerializeField] GameObject clientSignUpWindow;
+    [SerializeField] GameObject playerNameHost;
     [SerializeField] GameObject playerNamesPanel4P;
-    [SerializeField] GameObject playerNamesPanel5P;
+    [SerializeField] GameObject lobbyWindow;
+
+    [SerializeField] TextMeshProUGUI roomCodeInfo;
         
     [SerializeField] Button[] StartGame;
 
@@ -39,13 +42,12 @@ public class PreGameFlowManager : MonoBehaviour
     [SerializeField] GameObject startModButton;
 
 
-    List<string> tempPlayersList = new List<string>
-    { };
+    public string tempPlayerName;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+       Instance = this; 
     }
 
 
@@ -57,73 +59,34 @@ public class PreGameFlowManager : MonoBehaviour
 
     }
 
-
-    public void EnterPlayerNames()
-
+    public void ShowClientSignUpPanel()
     {
+        clientSignUpWindow.gameObject.SetActive(true);
+    }
+
+    public void ShowLobbyWindow()
+    {
+        lobbyWindow.SetActive(true);
+        playerNameHost.SetActive(false);
+        
+    }
+
+
+    public void ShowHostSignUpPanel()
+    {
+        newGamePanel.SetActive(false);
+        playerNameHost.SetActive(true);
+
         MainManager.classSelected = (carClassMenu.value);
-        MainManager.playerNumber = (playerNumberMenu.value) + 2;
+        
 
-        switch (MainManager.playerNumber)
-
-        {
-            case 2:
-                playerNamesPanel2P.SetActive(true);
-                
-                if (MainManager.shortMatch)
-                {
-                    MainManager.raceThreshold = 9;
-                }
-
-                else
-                                
-                MainManager.raceThreshold = 13;
-                break;
-
-            case 3:
-                playerNamesPanel3P.SetActive(true);
-
-                if (MainManager.shortMatch)
-                {
-                    MainManager.raceThreshold = 7;
-                }
-
-                else
-
-                MainManager.raceThreshold = 13;
-                break;
-
-            case 4:
-                playerNamesPanel4P.SetActive(true);
-                if (MainManager.shortMatch)
-                {
-                    MainManager.raceThreshold = 9;
-                }
-
-                else
-                    MainManager.raceThreshold = 13;
-                break;
-
-            case 5:
-                playerNamesPanel5P.SetActive(true);
-                if (MainManager.shortMatch)
-                {
-                    MainManager.raceThreshold = 6;
-                }
-
-                else
-                    MainManager.raceThreshold = 11;
-                break;
-
-            case 6:
-                continueButton.gameObject.SetActive(false);
-                startModButton.gameObject.SetActive(true);
-                MainManager.playerNumber = 16;
-                MainManager.raceThreshold = 24;
-                break;
-            
-        }                   
+        
                              
+    }
+
+    public void SetLobbyTitle(string name)
+    {
+        MainManager.matchTitle = name;
     }
 
     public void StartMod()
@@ -149,61 +112,11 @@ public class PreGameFlowManager : MonoBehaviour
 
     public void ContinueToMain()
 
-    {
-
-        switch (MainManager.playerNumber)
-
-            {
-                case 2:
-                if (tempPlayersList.Count > 1)
-                {
-                    SetRandomPlayerSequence();
-                }
-                else
-                    Debug.Log("Please enter player names");
-                    break;
-
-                case 3:
-
-                if (tempPlayersList.Count > 2)
-                {
-                    SetRandomPlayerSequence();
-                }
-                else
-                    Debug.Log("Please enter player names");
-                break;
-
-            case 4:
-                if (tempPlayersList.Count > 3)
-                {
-                    SetRandomPlayerSequence();
-                }
-                else
-                    Debug.Log("Please enter player names");
-                                
-                break;
-
-            case 5:
-                if (tempPlayersList.Count > 4)
-                {
-                    SetRandomPlayerSequence();
-                }
-                else
-                    Debug.Log("Please enter player names");
-                                
-                break;
-        }
-
-
-            SceneManager.LoadScene(MainManager.playerNumber - 1);
+    {               
+      
+     SceneManager.LoadScene(LobbyHandler.Instance.ReturnJoinedLobby().Players.Count - 1);
     }
-
-    public void ResumePreviousGame()
-    {
-        Load();
-        MainManager.gameResumed = true;
-        SceneManager.LoadScene(MainManager.playerNumber - 1);
-    }
+        
 
     public void PrepareNameString(string name)
     {
@@ -212,171 +125,18 @@ public class PreGameFlowManager : MonoBehaviour
         entry = name.TrimEnd(new char[] { '\r', ' ' });
         entry = entry.TrimStart(new char[] { '\r', ' ' });
         entry = entry.ToUpper();
-        tempPlayersList.Add(entry);
-
-        if (tempPlayersList.Count == MainManager.playerNumber)
-        {
-            for (int i = 0; i < StartGame.Length; i++)
-            {
-                StartGame[i].gameObject.SetActive(true);
-            }
-        }
-        
-        Debug.Log(entry);
-
-        for (int i = 0; i < tempPlayersList.Count; i++)
-        {
-            Debug.Log(tempPlayersList[i]);
-        }
-
+        tempPlayerName = entry;
+        LobbyHandler.Instance.SetLobbyPlayerName(tempPlayerName); 
     }
 
-    public void DisableFieldAfterEntryP2(int index)
-    {
-        var selectedField = inputFieldsP2[index].GetComponentInChildren<Selectable>();
-        selectedField.enabled = false;
-    }
-
-    public void DisableFieldsAfterEntryP3(int index)
-    {
-        var selectedField = inputFieldsP3[index].GetComponentInChildren<Selectable>();
-        selectedField.enabled = false;
-    }
-
-    public void DisableFieldsAfterEntryP4(int index)
-    {
-        var selectedField = inputFieldsP4[index].GetComponentInChildren<Selectable>();
-        selectedField.enabled = false;
-    }
-
-    public void DisableFieldsAfterEntryP5(int index)
-    {
-        var selectedField = inputFieldsP5[index].GetComponentInChildren<Selectable>();
-        selectedField.enabled = false;
-    }
+    
 
     public void BackToMainMenu()
     {
-        tempPlayersList.Clear();
+        tempPlayerName = null;
 
-        var inputField = inputFieldsP2[0].GetComponentInChildren<Selectable>();
+        
 
-        for (int i = 0; i < 2; i++)
-        {
-            inputField = inputFieldsP2[i].GetComponentInChildren<Selectable>();
-            inputField.enabled = true;
-
-        }
-
-        for (int i = 0; i < 3; i++)
-        {
-            inputField = inputFieldsP3[i].GetComponentInChildren<Selectable>();
-            inputField.enabled = true;
-        }
-
-        for (int i = 0; i < 4; i++)
-        {
-            inputField = inputFieldsP4[i].GetComponentInChildren<Selectable>();
-            inputField.enabled = true;
-
-            StartGame[i].gameObject.SetActive(false);
-        }
-
-        for (int i = 0; i < 5; i++)
-        {
-            inputField = inputFieldsP5[i].GetComponentInChildren<Selectable>();
-            inputField.enabled = true;
-                        
-        }
-
-        playerNamesPanel2P.gameObject.SetActive(false);
-        playerNamesPanel3P.gameObject.SetActive(false);
-        playerNamesPanel4P.gameObject.SetActive(false);
-        playerNamesPanel5P.gameObject.SetActive(false);
-
-    }
-
-    private void Load()
-    {
-        int x = 0;
-        int y = 0;
-        int z = 0;
-        int a = 0;
-        int b = 0;
-
-        string saveString = SaveSystem.Load();
-
-        if (saveString != null)
-        {
-
-            GameManager.SaveGameData playerData = JsonUtility.FromJson<GameManager.SaveGameData>(saveString);
-
-            MainManager.playerNumber = playerData.playerNumber;
-            MainManager.playerNames = playerData.playerNames;
-            MainManager.playerCash = playerData.playerCash;
-                        
-            MainManager.classSelected = playerData.classSelected;
-            MainManager.cars = playerData.cars;
-            MainManager.carPrizes = playerData.carPrizes;
-            MainManager.fieldsLeftForCar = playerData.fieldsLeftForCar;
-            MainManager.fieldAvailable = playerData.fieldAvailable;
-            MainManager.activeTracks = playerData.activeTracks;
-            MainManager.bonusTrack = playerData.bonusTrack;
-            MainManager.activePlayer = playerData.activePlayer;
-            MainManager.levelCounter = playerData.level;
-            MainManager.roundCounter = playerData.round;
-
-            MainManager.raceThreshold = playerData.matchlength;
-            MainManager.shieldAvailable = playerData.shields;
-            MainManager.protection = playerData.protection;
-            MainManager.tempdividends = playerData.tempdividends;
-
-            for (int i = 0; i < playerData.playerInventory.Length; i++)
-
-            {
-                if (i < 6)
-                { MainManager.playerInventory[0, i] = playerData.playerInventory[i]; }
-
-                else if (i < 12)
-                {
-                    MainManager.playerInventory[1, x] = playerData.playerInventory[i];
-                    x++;
-                }
-
-                else if (i < 18)
-                {
-                    MainManager.playerInventory[2, y] = playerData.playerInventory[i];
-                    y++;
-                }
-
-                else if (i < 24)
-                {
-                    MainManager.playerInventory[3, z] = playerData.playerInventory[i];
-                    z++;
-                }
-
-                else if (i < 30)
-
-                {
-                    MainManager.playerInventory[4, a] = playerData.playerInventory[i];
-                    a++;
-                }
-
-                else
-                {
-                    MainManager.playerInventory[5, b] = playerData.playerInventory[i];
-                    a++;
-                }
-
-
-            }
-
-
-        }
-
-        else
-
-            ContinueToMain();
     }
 
 
@@ -418,41 +178,13 @@ public class PreGameFlowManager : MonoBehaviour
     {
         
     }
+        
 
-    void SetRandomPlayerSequence()
+      
+
+    internal void CloseLobbyWindow()
     {
-                
-        var randomPlayersList = GetUniqueRandomElements(tempPlayersList, tempPlayersList.Count);
-
-       for (int i = 0; i < tempPlayersList.Count; i++)
-        {
-            MainManager.playerNames[i] = randomPlayersList[i];
-        }
-
-
+        lobbyWindow.SetActive(false);
+        clientSignUpWindow.SetActive(false);
     }
-
-    List<T> GetUniqueRandomElements<T>(List<T> inputList, int count)
-
-    {
-        List<T> inputListClone = new List<T>(inputList);
-        Shuffle(inputListClone);
-        return inputListClone.GetRange(0, count);
-
-    }
-
-
-    void Shuffle<T>(List<T> inputList)
-
-    {
-        for (int i = 0; i < inputList.Count - 1; i++)
-
-        {
-            T temp = inputList[i];
-            int rand = Random.Range(i, inputList.Count);
-            inputList[i] = inputList[rand];
-            inputList[rand] = temp;
-        }
-    }
-
 }

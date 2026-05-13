@@ -62372,6 +62372,7 @@ GameObject:
   m_Component:
   - component: {fileID: 542717427}
   - component: {fileID: 542717425}
+  - component: {fileID: 542717429}
   - component: {fileID: 542717428}
   m_Layer: 0
   m_Name: GridGenerator3P
@@ -62940,6 +62941,27 @@ MonoBehaviour:
   - {fileID: 21300000, guid: dc59d026dcdb2d541bb83291f7b66bb3, type: 3}
   - {fileID: 21300000, guid: f43d25ab01b3c3b49a67159a4fff5679, type: 3}
   - {fileID: 21300000, guid: 7f31e83a026d0ef4a8b825c89eddac59, type: 3}
+--- !u!114 &542717429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 542717424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3132276037
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &545886310
 GameObject:
   m_ObjectHideFlags: 0

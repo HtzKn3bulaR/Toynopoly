@@ -115,7 +115,7 @@ public class CarReplaceHandler : MonoBehaviour
     public void ExecuteCarReplace()
     {
 
-        MainManager.cars[newCarPosition] = gridGeneratorScript.activeList[newCarIndex];
+        MainManager.cars[newCarPosition] = gridGeneratorScript.activeList[newCarIndex].Value;
 
         switch (newCarPosition)
         {

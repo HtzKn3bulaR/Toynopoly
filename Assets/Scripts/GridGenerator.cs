@@ -96,10 +96,8 @@ public class GridGenerator : MonoBehaviour
     public TextAsset proNames;
     public TextAsset superProNames;
         
-    public static event Action OnTrackPanelPopulate;
-        
-    public static event Action OnCarEPopulate;
-   
+    public static event Action OnTrackPanelPopulate;      
+      
 
     public event EventHandler<OnCarCardPopulateEventArgs> OnCarCardPopulate;
 

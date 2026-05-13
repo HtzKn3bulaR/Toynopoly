@@ -85,8 +85,9 @@ public class CSVFileSelector : MonoBehaviour
         catch (Exception e)
         {
             fileDropdown.ClearOptions();
+            Debug.LogError($"An error occured while accessing files: {e.Message}");
             return;
-            //Debug.LogError($"An error occured while accessing files: {e.Message}");
+            
             
             
         }
