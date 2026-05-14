@@ -16,6 +16,9 @@ public class ToynopolyRelay : MonoBehaviour
     private void Start()
     {
         Instance = this;
+
+        DontDestroyOnLoad(this.gameObject);
+
     }
 
     public async Task<string> CreateRelay()
@@ -31,6 +34,10 @@ public class ToynopolyRelay : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
             NetworkManager.Singleton.StartHost();
+
+            Debug.Log("Host started");
+
+            Debug.Log("Local Client ID " + NetworkManager.Singleton.LocalClientId);
 
             return joinCode;
             

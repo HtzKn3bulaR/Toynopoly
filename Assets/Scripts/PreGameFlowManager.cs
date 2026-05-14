@@ -112,8 +112,7 @@ public class PreGameFlowManager : MonoBehaviour
 
     public void ContinueToMain()
 
-    {               
-      
+    {      
      SceneManager.LoadScene(LobbyHandler.Instance.ReturnJoinedLobby().Players.Count - 1);
     }
         
@@ -179,8 +178,6 @@ public class PreGameFlowManager : MonoBehaviour
         
     }
         
-
-      
 
     internal void CloseLobbyWindow()
     {

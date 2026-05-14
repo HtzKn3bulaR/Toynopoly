@@ -1,12 +1,23 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class OnlineManager : NetworkBehaviour
 {
     public static OnlineManager Instance;
+
+    private NetworkList<FixedString32Bytes> trackNetworkList;
+
+    private NetworkList<FixedString32Bytes> carNetworkList;
+
+    public NetworkVariable<FixedString32Bytes> networkBonusTrack;
+
+    private NetworkList<FixedString32Bytes> playerNetworkList;
 
     public enum PlayerStatus
     {
@@ -33,34 +44,78 @@ public class OnlineManager : NetworkBehaviour
     {
         Instance = this;
         DontDestroyOnLoad(this.gameObject);
+
+        trackNetworkList = new NetworkList<FixedString32Bytes>();
+        carNetworkList = new NetworkList<FixedString32Bytes>();
+        networkBonusTrack = new NetworkVariable<FixedString32Bytes>();
+        playerNetworkList = new NetworkList<FixedString32Bytes>();
+    }
+
+    private void Start()
+    {
+        localPlayerStatus = PlayerStatus.None;
     }
 
     public override void OnNetworkSpawn()
     {
-        Debug.Log("Local ID is " + NetworkManager.Singleton.LocalClientId);
-        if (NetworkManager.Singleton.LocalClientId == 0)
-        {           
+        SceneManager.LoadScene(LobbyHandler.Instance.ReturnJoinedLobby().Players.Count - 1);
 
-            localPlayerStatus = PlayerStatus.None;                   
+        Debug.Log("Network Spawn Event fired");
 
-            NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
-
-            GridGenerator3P.Instance.TrackSelect();
-            
-        }
-        else
-        {
-            localPlayerStatus = PlayerStatus.None;
-                       
-
-        }
-
-        GridGenerator3P.Instance.CarSelect();
 
     }
 
-    private void NetworkManager_OnClientConnectedCallback(ulong obj)
+    public void SendDataToTrackNetworkList(List<FixedString32Bytes> tracksCurrentMatch, FixedString32Bytes bonusTrack)
     {
-        throw new NotImplementedException();
+        trackNetworkList.Clear();
+        for (int i = 0; i < tracksCurrentMatch.Count; i++)
+        {
+            trackNetworkList.Add(tracksCurrentMatch[i]);
+            Debug.Log("Track Added to Network List " + trackNetworkList[i].Value);
+        }
+
+        networkBonusTrack.Value = bonusTrack;
     }
+
+    public void SendDataToCarNetworkList(List<FixedString32Bytes> carsCurrentMatch)
+    {
+        carNetworkList.Clear();
+        for (int i = 0; i < carsCurrentMatch.Count; i++)
+        {
+            carNetworkList.Add(carsCurrentMatch[i]);
+            Debug.Log("Track Added to Network List " + carNetworkList[i].Value);
+        }
+    }
+
+    public void SendDataToPlayerNetworkList(List<FixedString32Bytes> playersCurrentMatch)
+    {
+        playerNetworkList.Clear();
+        for (int i = 0; i < playersCurrentMatch.Count; i++)
+        {
+            playerNetworkList.Add(playersCurrentMatch[i]);
+            Debug.Log("Track Added to Network List " + playerNetworkList[i].Value);
+        }
+    }
+
+    public NetworkList<FixedString32Bytes> ReturnTrackNetworkList()
+    {
+        return trackNetworkList;
+    }
+
+    public NetworkList<FixedString32Bytes> ReturnCarNetworkList()
+    {
+        return carNetworkList;
+    }
+
+    public NetworkList<FixedString32Bytes> ReturnPlayerNetworkList()
+    {
+        return playerNetworkList;
+    }
+
+    public NetworkVariable<FixedString32Bytes> ReturnNetworkBonusTrack()
+    {
+        return networkBonusTrack;
+    }
+
+
 }

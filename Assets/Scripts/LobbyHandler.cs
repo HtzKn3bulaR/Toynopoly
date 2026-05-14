@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using TMPro;
+using Unity.Collections;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
@@ -28,13 +29,14 @@ public class LobbyHandler : MonoBehaviour
 
     public static event Action OnLobbyJoined;
 
-    
+    private string originalHostId;
 
 
     private async void Start()
     {
         Instance = this;
 
+        DontDestroyOnLoad(this);
         DontDestroyOnLoad(this.gameObject);
 
         await UnityServices.InitializeAsync();
@@ -132,10 +134,10 @@ public class LobbyHandler : MonoBehaviour
         AdjustRoundsThresholdToPlayerNumber(joinedLobby.Players.Count);
         MainManager.playerNumber = joinedLobby.Players.Count;
 
-        LobbyUIHandler.Instance.UpdatePlayerNumber(joinedLobby.Players.Count);          
-                
+        LobbyUIHandler.Instance.UpdatePlayerNumber(joinedLobby.Players.Count);
 
-        if(CheckIfLobbyHost())
+
+        if (joinedLobby.HostId == originalHostId)
         {
             if (joinedLobby.Players.Count > 1)
             {
@@ -143,7 +145,7 @@ public class LobbyHandler : MonoBehaviour
             }
         }
 
-        else
+        else 
         {
             if (joinedLobby.Data["RelayJoinCode"].Value != "0")
                 //Game was started by Host
@@ -158,7 +160,10 @@ public class LobbyHandler : MonoBehaviour
 
     private bool CheckIfLobbyHost()
     {
-        return AuthenticationService.Instance.PlayerId == joinedLobby.Players[0].Id;
+        Debug.Log("Local Player ID " + AuthenticationService.Instance.PlayerId);
+        Debug.Log("Is Host " + AuthenticationService.Instance.PlayerId == joinedLobby.HostId);
+        return AuthenticationService.Instance.PlayerId == joinedLobby.HostId;
+                
     }
 
 
@@ -252,8 +257,11 @@ public class LobbyHandler : MonoBehaviour
 
         MainManager.roomCode = hostLobby.LobbyCode;
         Debug.Log("Room Code sent to Main Manager " + MainManager.roomCode);
-        PrintPlayers();
-               
+
+        originalHostId = hostLobby.HostId;
+        Debug.Log("Host ID " +  originalHostId);
+
+        PrintPlayers();              
 
         SetLobbyParameters();
 
@@ -343,6 +351,10 @@ public class LobbyHandler : MonoBehaviour
 
             PrintPlayers();
 
+            SetCarClassOnClients();
+
+            SetMatchLengthOnClients();
+
             var callbacks = new LobbyEventCallbacks();
             callbacks.LobbyChanged += Callbacks_LobbyChanged;
             try
@@ -362,6 +374,53 @@ public class LobbyHandler : MonoBehaviour
 
         }
         catch (LobbyServiceException e) { Debug.Log(e.ToString()); }
+    }
+
+    private void SetCarClassOnClients()
+    {
+        switch (LobbyHandler.Instance.ReturnJoinedLobby().Data["CarClass"].Value)
+
+        {
+            case "Rookie":
+                MainManager.classSelected = 0;
+                break;
+
+            case "Amateur":
+                MainManager.classSelected = 1;
+                break;
+
+            case "Advanced":
+                MainManager.classSelected = 2;
+                break;
+
+            case "Semi-Pro":
+                MainManager.classSelected = 3;
+                break;
+
+            case "Pro":
+                MainManager.classSelected = 4;
+                break;
+
+            case "Super-Pro":
+                MainManager.classSelected = 5;
+                break;
+        }
+    }
+
+    private void SetMatchLengthOnClients()
+    {
+        switch (joinedLobby.Data["MatchLength"].Value)
+        {
+            case "Short":
+                MainManager.shortMatch = true;
+                break;
+
+            case "Regular":
+                MainManager.shortMatch = false;
+                break;
+        }
+
+        AdjustRoundsThresholdToPlayerNumber(joinedLobby.Players.Count);
     }
 
     public Lobby ReturnJoinedLobby()
@@ -469,14 +528,15 @@ public class LobbyHandler : MonoBehaviour
             catch
                 (LobbyServiceException e)
             { Debug.Log(e); 
-                }            
+                }
 
+            
         }
 
-        PreGameFlowManager.Instance.CloseLobbyWindow();
+        //PreGameFlowManager.Instance.CloseLobbyWindow();
         Debug.Log("Game Started");
 
-        PreGameFlowManager.Instance.ContinueToMain();
+        //PreGameFlowManager.Instance.ContinueToMain();
 
     }
 

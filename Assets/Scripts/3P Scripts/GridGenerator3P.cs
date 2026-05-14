@@ -1,12 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
-using System;
-using Unity.Netcode;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Netcode;
 using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.UI;
 
 
 public class GridGenerator3P : NetworkBehaviour
@@ -95,19 +96,19 @@ public class GridGenerator3P : NetworkBehaviour
     public TextAsset superProNames;
 
 
-    List<string> trackList = new List<string>();
+    private List<FixedString32Bytes> trackList = new List<FixedString32Bytes>();
 
-    //ACTIVE TRACKS NETWORK LIST
-    public NetworkList<FixedString64Bytes> activeTracks = new NetworkList<FixedString64Bytes>();
+    //ACTIVE TRACKS LIST
+    public List<FixedString32Bytes> activeTracks = new List<FixedString32Bytes>();
     
     //BONUS TRACK NETWORK VARIABLE
-    public NetworkVariable<FixedString64Bytes> activeBonusTrack = new NetworkVariable<FixedString64Bytes>();
+    public FixedString64Bytes activeBonusTrack;
 
-    //ACTIVE CARS NETWORK LIST
-    public NetworkList<FixedString32Bytes> cars = new NetworkList<FixedString32Bytes>();
+    //ACTIVE CARS LIST
+    public List<FixedString32Bytes> cars = new List<FixedString32Bytes>();
 
     //PLAYER SEQUENCED LIST
-    public NetworkList<FixedString64Bytes> players = new NetworkList<FixedString64Bytes>();
+    public List<FixedString32Bytes> players = new List<FixedString32Bytes>();
 
     public List<string> bonusTrackList = new List<string>();
 
@@ -183,17 +184,19 @@ public class GridGenerator3P : NetworkBehaviour
         List<T> inputListClone = new List<T>(inputList);
         Shuffle(inputListClone);
         return inputListClone.GetRange(0, count);
-
     }
 
-    void Awake()
+    public void Awake()
     {
+        
+    }
+
+    public void Start()
+    {
+        Instance = this;
 
         ReadTrackLists();
-        ReadCarLists();
-              
-
-            //TrackSelect(); -> Managed by OnlineManager, only runs on Server
+        ReadCarLists();           
 
             gameSounds = GetComponent<AudioSource>();
 
@@ -204,15 +207,68 @@ public class GridGenerator3P : NetworkBehaviour
             carEPresentation = carPicE.GetComponent<Animator>();
             carFPresentation = carPicF.GetComponent<Animator>();
 
-            //CarSelect(); ->Managed by OnlineManager, only runs on Server        
+        PrepareCarClassLists();
+
+        if (NetworkManager.Singleton.LocalClientId == 0)
+        {            
+            TrackSelect();
+            CarSelect();
+
+            SetRandomPlayerSequence();
+        }
+
+        PropagateGridToClients();
+
     }
 
-    public void Start()
+    private void PropagateGridToClients()
     {
-        Instance = this;
-
-       
+        if (NetworkManager.Singleton.LocalClientId != 0)
+        {
+            GetTrackLineup();
+            GetCarLineup();
+            GetPlayerLineup();
+        }
     }
+
+    private void GetTrackLineup()
+    {
+        var temporaryTrackList = OnlineManager.Instance.ReturnTrackNetworkList();
+
+        for (int i = 0; i < temporaryTrackList.Count; i++)
+        {
+            MainManager.activeTracks[i] = temporaryTrackList[i].Value;            
+        }
+
+        MainManager.bonusTrack = OnlineManager.Instance.networkBonusTrack.Value.ToSafeString();
+    }
+
+    private void GetCarLineup()
+    {
+        var temporaryCarList = OnlineManager.Instance.ReturnCarNetworkList();
+
+        for (int i = 0; i < temporaryCarList.Count; i++)
+        {
+            MainManager.cars[i] = temporaryCarList[i].Value;
+        }
+    }
+
+    private void GetPlayerLineup()
+    {
+        var temporaryPlayerList = OnlineManager.Instance.ReturnPlayerNetworkList();
+
+        for (int i = 0; i < temporaryPlayerList.Count; i++)
+        {
+            MainManager.playerNames[i] = temporaryPlayerList[i].Value;
+        }
+
+
+        StartCarrousel();
+
+        StartCoroutine(FirstCarPresentationDelay());
+
+    }
+
 
 
     void ReadTrackLists()
@@ -377,44 +433,50 @@ public class GridGenerator3P : NetworkBehaviour
         }
     }
 
-    public void CarSelect()
-
+    private void PrepareCarClassLists()
     {
-        switch (LobbyHandler.Instance.ReturnJoinedLobby().Data["CarClass"].Value)
+        switch (MainManager.classSelected)
 
         {
-            case "Rookie":
+            case 0:
                 activeList = rookieNamesList;
                 activeSpriteList = rookieSpriteList;
                 break;
 
-            case "Amateur":
+            case 1:
                 activeList = amateurNamesList;
                 activeSpriteList = amateurSpriteList;
                 break;
 
-            case "Advanced":
+            case 2:
                 activeList = advancedNamesList;
                 activeSpriteList = advancedSpriteList;
                 break;
 
-            case "Semi-Pro":
+            case 3:
                 activeList = semiProNamesList;
                 activeSpriteList = semiProSpriteList;
                 break;
 
-            case "Pro":
+            case 4:
                 activeList = proNamesList;
                 activeSpriteList = proSpriteList;
                 break;
 
-            case "Super-Pro":
+            case 5:
                 activeList = superProNamesList;
                 activeSpriteList = superProSpriteList;
                 break;
-
         }
 
+        Debug.Log("Active List first entry " + activeList[0]);
+    }
+
+
+    public void CarSelect()
+
+    {
+       
         if (NetworkManager.Singleton.LocalClientId == 0)
         {
             var uniqueRandomList = GetUniqueRandomElements(activeList, 6);
@@ -423,19 +485,19 @@ public class GridGenerator3P : NetworkBehaviour
             Debug.Log("Cars in Network List " + cars.Count);
                         
             for (int i = 0; i < uniqueRandomList.Count; i++)
-
             {                   
                 Debug.Log(uniqueRandomList[i]);
+                cars.Add(uniqueRandomList[i].Value);
 
-                cars.Add(uniqueRandomList[i].Value);                               
+                MainManager.cars[i] = cars[i].Value;
             }
-        }
-                
+
+            OnlineManager.Instance.SendDataToCarNetworkList(cars);
+        }         
 
         Debug.Log("First Car" + cars[0].Value);
 
         StartCarrousel();
-
 
         StartCoroutine(FirstCarPresentationDelay());
 
@@ -568,7 +630,7 @@ public class GridGenerator3P : NetworkBehaviour
     void PopulateCarCardA()
     {
         
-        carAText.text = cars[0].Value;
+        carAText.text = MainManager.cars[0];
         OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carAText });
         gameSounds.PlayOneShot(carPopulateSound);
         carAPresentation.SetTrigger("PresentCarA");
@@ -576,7 +638,7 @@ public class GridGenerator3P : NetworkBehaviour
         for (int i = 0; i < activeList.Count; i++)
 
         {
-            if (activeList[i] == cars[0].Value)
+            if (activeList[i] == MainManager.cars[0])
 
             { carPicA.image.sprite = activeSpriteList[i]; }
 
@@ -589,7 +651,7 @@ public class GridGenerator3P : NetworkBehaviour
     void PopulateCarCardB()
 
     {
-        carBText.text = cars[1].Value;
+        carBText.text = MainManager.cars[1];
         OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carBText });
         gameSounds.PlayOneShot(carPopulateSound);
         carBPresentation.SetTrigger("PresentCarB");
@@ -597,7 +659,7 @@ public class GridGenerator3P : NetworkBehaviour
         for (int i = 0; i < activeList.Count; i++)
 
         {
-            if (activeList[i] == cars[1].Value)
+            if (activeList[i] == MainManager.cars[1])
 
             { carPicB.image.sprite = activeSpriteList[i]; }
 
@@ -609,7 +671,7 @@ public class GridGenerator3P : NetworkBehaviour
 
     void PopulateCarCardC()
     {
-        carCText.text = cars[2].Value;
+        carCText.text = MainManager.cars[2];
         OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carCText });
         gameSounds.PlayOneShot(carPopulateSound);
         carCPresentation.SetTrigger("PresentCarC");
@@ -617,7 +679,7 @@ public class GridGenerator3P : NetworkBehaviour
         for (int i = 0; i < activeList.Count; i++)
 
         {
-            if (activeList[i] == cars[2].Value)
+            if (activeList[i] == MainManager.cars[2])
 
             { carPicC.image.sprite = activeSpriteList[i]; }
 
@@ -629,7 +691,7 @@ public class GridGenerator3P : NetworkBehaviour
 
     void PopulateCarCardD()
     {
-        carDText.text = cars[3].Value;
+        carDText.text = MainManager.cars[3];
         OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carDText });
         gameSounds.PlayOneShot(carPopulateSound);
         carDPresentation.SetTrigger("PresentCarD");
@@ -637,7 +699,7 @@ public class GridGenerator3P : NetworkBehaviour
         for (int i = 0; i < activeList.Count; i++)
 
         {
-            if (activeList[i] == cars[3].Value)
+            if (activeList[i] == MainManager.cars[3])
 
             { carPicD.image.sprite = activeSpriteList[i]; }
 
@@ -651,7 +713,7 @@ public class GridGenerator3P : NetworkBehaviour
     void PopulateCarCardE()
 
     {
-        carEText.text = cars[4].Value;
+        carEText.text = MainManager.cars[4];
         //OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carEText });
         gameSounds.PlayOneShot(carPopulateSound);
         carEPresentation.SetTrigger("PresentCarE");
@@ -659,7 +721,7 @@ public class GridGenerator3P : NetworkBehaviour
         for (int i = 0; i < activeList.Count; i++)
 
         {
-            if (activeList[i] == cars[4].Value)
+            if (activeList[i] == MainManager.cars[4])
 
             { carPicE.image.sprite = activeSpriteList[i]; }
 
@@ -673,7 +735,7 @@ public class GridGenerator3P : NetworkBehaviour
     void PopulateCarCardF()
 
     {
-        carFText.text = cars[5].Value;
+        carFText.text = MainManager.cars[5];
         OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carFText });
         gameSounds.PlayOneShot(carPopulateSound);
         
@@ -681,7 +743,7 @@ public class GridGenerator3P : NetworkBehaviour
         for (int i = 0; i < activeList.Count; i++)
 
         {
-            if (activeList[i] == cars[5].Value)
+            if (activeList[i] == MainManager.cars[5])
 
             { carPicF.image.sprite = activeSpriteList[i]; }
 
@@ -698,17 +760,27 @@ public class GridGenerator3P : NetworkBehaviour
     public void TrackSelect()
 
     {
-        var uniqueRandomList = GetUniqueRandomElements(trackList, 9);
-
-        for (int i = 0; i < uniqueRandomList.Count; i++)
-
+        if (NetworkManager.Singleton.LocalClientId == 0)
         {
-            activeTracks.Add(uniqueRandomList[i]);
+            var uniqueRandomList = GetUniqueRandomElements(trackList, 9);
 
+            for (int i = 0; i < uniqueRandomList.Count; i++)
+
+            {
+                activeTracks.Add(uniqueRandomList[i].Value);
+
+                MainManager.activeTracks[i] = activeTracks[i].Value;
+            }
+
+            int rand = UnityEngine.Random.Range(0, bonusTrackList.Count);
+            activeBonusTrack = bonusTrackList[rand];
+
+            MainManager.bonusTrack = activeBonusTrack.Value;
+
+            OnlineManager.Instance.SendDataToTrackNetworkList(activeTracks, activeBonusTrack.Value);
         }
 
-        int rand = UnityEngine.Random.Range(0, bonusTrackList.Count);
-        activeBonusTrack.Value = bonusTrackList[rand];
+                       
 
         //PopulateTrackPanel();
     }
@@ -718,17 +790,17 @@ public class GridGenerator3P : NetworkBehaviour
     {
         OnTrackPanelPopulate?.Invoke();
 
-        track1.text = activeTracks[0].Value;
-        track2.text = activeTracks[1].Value;
-        track3.text = activeTracks[2].Value;
-        track4.text = activeTracks[3].Value;
-        track5.text = activeTracks[4].Value;
-        track6.text = activeTracks[5].Value;
-        track7.text = activeTracks[6].Value;
-        track8.text = activeTracks[7].Value;
-        track9.text = activeTracks[8].Value;
+        track1.text = MainManager.activeTracks[0];
+        track2.text = MainManager.activeTracks[1];
+        track3.text = MainManager.activeTracks[2];
+        track4.text = MainManager.activeTracks[3];
+        track5.text = MainManager.activeTracks[4];
+        track6.text = MainManager.activeTracks[5];
+        track7.text = MainManager.activeTracks[6];
+        track8.text = MainManager.activeTracks[7];
+        track9.text = MainManager.activeTracks[8];
 
-        bonusTrack.text = activeBonusTrack.Value.ToSafeString();
+        bonusTrack.text = MainManager.bonusTrack;
      }
 
 
@@ -736,15 +808,26 @@ public class GridGenerator3P : NetworkBehaviour
 
     void SetRandomPlayerSequence()
     {
+        List<FixedString32Bytes> temporaryPlayerList = new List<FixedString32Bytes>();
 
-        var randomPlayersList = GetUniqueRandomElements(LobbyHandler.Instance.ReturnJoinedLobby().Players, LobbyHandler.Instance.ReturnJoinedLobby().Players.Count);
+        for (int i = 0; i < LobbyHandler.Instance.ReturnJoinedLobby().Players.Count; i++)
+        {
+            temporaryPlayerList.Add(LobbyHandler.Instance.ReturnJoinedLobby().Players[i].Data["PlayerName"].Value);
+            Debug.Log("Player name added " + LobbyHandler.Instance.ReturnJoinedLobby().Players[i].Data["PlayerName"].Value);
+        }
+
+        var randomPlayersList = GetUniqueRandomElements(temporaryPlayerList, temporaryPlayerList.Count);
 
         for (int i = 0; i < LobbyHandler.Instance.ReturnJoinedLobby().Players.Count; i++)
         {
             players.Add(randomPlayersList[i].ToSafeString());
+
+            MainManager.playerNames[i] = players[i].Value;
         }
 
-    } 
+        OnlineManager.Instance.SendDataToPlayerNetworkList(players);
+
+    }
 
 
 
@@ -758,23 +841,23 @@ public class GridGenerator3P : NetworkBehaviour
         {
             case 2:
                 
-                player1NameField.text = players[0].Value;
-                player2NameField.text = players[1].Value;
+                player1NameField.text = MainManager.playerNames[0];
+                player2NameField.text = MainManager.playerNames[1];
                 break;
 
             case 3:
-                
-                player1NameField.text = players[0].Value;
-                player2NameField.text = players[1].Value;
-                player3NameField.text = players[2].Value;
+
+                player1NameField.text = MainManager.playerNames[0];
+                player2NameField.text = MainManager.playerNames[1];
+                player3NameField.text = MainManager.playerNames[2];
                 break;
 
             case 4:
 
-                player1NameField.text = players[0].Value;
-                player2NameField.text = players[1].Value;
-                player3NameField.text = players[2].Value;
-                player4NameField.text = players[3].Value;
+                player1NameField.text = MainManager.playerNames[0];
+                player2NameField.text = MainManager.playerNames[1];
+                player3NameField.text = MainManager.playerNames[2];
+                player4NameField.text = MainManager.playerNames[3];
                 break;
 
             case 5:
