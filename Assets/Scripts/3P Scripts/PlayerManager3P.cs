@@ -473,7 +473,11 @@ public class PlayerManager3P : MonoBehaviour
 
     void ShowNextRacePanel()
     {
-        nextRaceComingUpPanel.SetActive(true);
+        if (nextRaceComingUpPanel == null)
+            Debug.Log("Next Race Panel Is Null!");
+        else
+            nextRaceComingUpPanel.SetActive(true);
+
         audioSource.PlayOneShot(panelOpen);
 
         nextTrackDisplay.text = selectedTrack;
@@ -873,6 +877,9 @@ public class PlayerManager3P : MonoBehaviour
 
     private void OnRaceLevel1InProgress(bool previousValue, bool newValue)
     {
+        if (LocalIsActivePlayer())
+            return;
+
         if (newValue == true)
         {
             StartRace();

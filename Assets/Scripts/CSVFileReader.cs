@@ -5,11 +5,13 @@ using System;
 using System.IO;
 using TMPro;
 using UnityEngine.Events;
+using Unity.Netcode;
+using Unity.Collections;
 
 
 public class CSVFileReader : MonoBehaviour
 {
-
+    public static CSVFileReader Instance;
 
     [SerializeField] TextMeshProUGUI[] LBplayers;
     [SerializeField] TextMeshProUGUI[] LBcars;
@@ -83,6 +85,7 @@ public class CSVFileReader : MonoBehaviour
 
     void Start()
     {
+        Instance = this;
 
         if (selectedFilePath != null)
         {
@@ -99,7 +102,11 @@ public class CSVFileReader : MonoBehaviour
         GameManager.Onlevel2Start += ValidateButtonsChange;
         GameManager.Onlevel3Start += ValidateButtonsLevel3;
 
+        OnlineManager.Instance.trackInfoNetworkVariable.OnValueChanged += ShowResultsOnLocalMachine;
+
     }
+
+   
 
     // Update is called once per frame
     void Update()
@@ -250,7 +257,7 @@ public class CSVFileReader : MonoBehaviour
             }
 
         }
-                 CleanCSVNames();
+                CleanCSVNames();
                 ExtractSeconds();
                 break;
 
@@ -322,7 +329,6 @@ public class CSVFileReader : MonoBehaviour
         }
 
         GapCalculate();
-
     }
 
     void GapCalculate()
@@ -344,11 +350,17 @@ public class CSVFileReader : MonoBehaviour
                 }
             }
         }
+
+        //NETWORK RESULTS
+
+        OnlineManager.Instance.SendResultListToServerRpc();
+
     }
+        
 
     void PopulateLeaderboard()
     {
-        if (MainManager.selectedFilePath != null)
+        if (MainManager.selectedFilePath != null || !NetworkManager.Singleton.IsHost)
         {
             ResultsPanelAuto.gameObject.SetActive(true);
 
@@ -398,8 +410,59 @@ public class CSVFileReader : MonoBehaviour
             {
                 SetLeaderboardIcons();
             }
+
+            if(!NetworkManager.Singleton.IsHost)
+            {
+                validateButtonLevel1.SetActive(false);
+                manualLevel1Button.SetActive(false);
+            }
+
         }
     }
+
+    //NETWORK RESULTS
+
+    private void ShowResultsOnLocalMachine(FixedString32Bytes previousValue, FixedString32Bytes newValue)
+    {
+        if (NetworkManager.Singleton.IsClient)
+        {
+            Debug.Log("Processing Race Results On Local Machine " + NetworkManager.Singleton.LocalClientId);
+
+            RaceInProgessPanelClose();
+
+            trackInfo = newValue.Value;
+
+            playerNames.Clear();
+            times.Clear();
+            gaps.Clear();
+            carNames.Clear();
+
+            foreach (FixedString32Bytes player in OnlineManager.Instance.playerNamesRankingNetworkList)
+            {
+                playerNames.Add(player.Value.ToString());
+            }
+
+            foreach (FixedString32Bytes car in OnlineManager.Instance.carNamesRankingNetworkList)
+            {
+                carNames.Add(car.Value.ToString());
+            }
+
+            foreach (FixedString32Bytes time in OnlineManager.Instance.timesRankingNetworkList)
+            {
+                times.Add(time.Value.ToString());
+            }
+
+            foreach (int gap in OnlineManager.Instance.gapsRankingNetworkList)
+            {
+                gaps.Add(gap);
+            }
+
+            ResultsValidate();
+        }
+
+    }
+
+    //NETWORK RESULTS END
 
     public void ResultsValidate()
     {
@@ -1111,6 +1174,61 @@ public class CSVFileReader : MonoBehaviour
             playerIsDefender[i] = false;
         }
     }
+
+    //NETWORK RESULTS-----------------------------------------------------------------------
+
+    public List<string> GetPlayerRankingResultsList()
+    {
+        return playerNames;
+    }
+
+    public List<string> GetCarRankingResultsList()
+    {
+        return carNames;
+    }
+
+    public List<string> GetTimeRankingResultsList()
+    {
+        return times;
+    }
+
+    public List<int> GetGapsList()
+    {
+        return gaps;
+    }
+
+    public string GetTrackInfo()
+    {
+        return trackInfo;
+    }
+
+
+
+
+    /*
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SendResultListToClientsRpc(List<string> namesRanking, List<string> timesRanking, List<string> carsRanking, List<int> gapsRanking, string trackInfo)
+    {
+        if (NetworkManager.Singleton.IsClient)
+        {
+
+            playerNames.Clear();
+            playerNames = namesRanking;
+
+            carNames.Clear();
+            carNames = carsRanking;
+
+            times.Clear();
+            times = timesRanking;
+
+            gaps.Clear();
+            gaps = gapsRanking;
+
+            ResultsValidate();
+        }
+
+    }
+    */
 
 
 }

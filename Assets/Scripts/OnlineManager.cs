@@ -23,13 +23,25 @@ public class OnlineManager : NetworkBehaviour
 
     private NetworkList<FixedString32Bytes> playerNetworkList;
 
-    public NetworkVariable<int> pendingFieldNetwork; 
-        
+    public NetworkVariable<int> pendingFieldNetwork;
+
     public NetworkVariable<FixedString32Bytes> selectedTrackNetwork = new NetworkVariable<FixedString32Bytes>();
 
     public NetworkVariable<bool> level1RaceIsInProgress = new NetworkVariable<bool>(false);
-        
-    
+
+    //RANKING NETWORK LISTS
+
+    public NetworkList<FixedString32Bytes> playerNamesRankingNetworkList;
+
+    public NetworkList<FixedString32Bytes> carNamesRankingNetworkList;
+
+    public NetworkList<FixedString32Bytes> timesRankingNetworkList;
+
+    public NetworkList<int> gapsRankingNetworkList;
+
+    public NetworkVariable<FixedString32Bytes> trackInfoNetworkVariable;
+
+
     private bool trackListReady = false;
     private bool carListReady = false;
     private bool playerListReady = false;
@@ -39,7 +51,7 @@ public class OnlineManager : NetworkBehaviour
 
     public void Awake()
     {
-        
+
     }
 
     private void Start()
@@ -49,6 +61,12 @@ public class OnlineManager : NetworkBehaviour
         networkBonusTrack = new NetworkVariable<FixedString32Bytes>();
         playerNetworkList = new NetworkList<FixedString32Bytes>();
         pendingFieldNetwork = new NetworkVariable<int>(99);
+
+        playerNamesRankingNetworkList = new NetworkList<FixedString32Bytes>();
+        carNamesRankingNetworkList = new NetworkList<FixedString32Bytes>();
+        timesRankingNetworkList = new NetworkList<FixedString32Bytes>();
+        gapsRankingNetworkList = new NetworkList<int>();
+
 
     }
 
@@ -65,8 +83,7 @@ public class OnlineManager : NetworkBehaviour
                 ReportPlayerDataToNetworkRpc(item.Key, item.Value);
             }
         }
-
-        LobbyUIHandler.Instance.ShowLoadingPanel();
+        
 
         if (NetworkManager.Singleton.LocalClientId == 0)
         {
@@ -75,11 +92,11 @@ public class OnlineManager : NetworkBehaviour
                 Debug.Log("All Clients Connected!");
                 GetPlayerCountConnectedToRelayRpc();
                 Debug.Log("Players Registered in Main Manager " + MainManager.playerNumber);
-                LoadMainScene();                           
+                LoadMainScene();
             }
         }
-    }             
-        
+    }
+
     public void LoadMainScene()
     {
         SceneManager.LoadScene(MainManager.playerNumber - 1);
@@ -97,9 +114,9 @@ public class OnlineManager : NetworkBehaviour
     {
         Instance = this;
         DontDestroyOnLoad(this.gameObject);
-                
+
         NetworkManager.Singleton.OnClientConnectedCallback += Singleton_OnClientConnectedCallback;
-                
+
         ReportPlayerDataToNetworkRpc(MainManager.localMultiplayerName, NetworkManager.Singleton.LocalClientId);
 
         Debug.Log("Network Spawn Event fired");
@@ -116,10 +133,10 @@ public class OnlineManager : NetworkBehaviour
         {
             if (newValue == true)
             {
-                Debug.Log("All Network Lists Ready - Loading Main Scene");                              
+                Debug.Log("All Network Lists Ready - Loading Main Scene");
 
                 Debug.Log("Player Number " + MainManager.playerNumber);
-               
+
                 LoadMainScene();
             }
         }
@@ -143,7 +160,7 @@ public class OnlineManager : NetworkBehaviour
         {
             trackNetworkList.Add(tracksCurrentMatch[i]);
             Debug.Log("Track Added to Network List " + trackNetworkList[i].Value);
-            if(trackNetworkList.Count == 9)
+            if (trackNetworkList.Count == 9)
             {
                 trackListReady = true;
                 Debug.Log("Track List Ready");
@@ -193,7 +210,7 @@ public class OnlineManager : NetworkBehaviour
 
     private void CheckReadiness()
     {
-        if(playerListReady && carListReady && trackListReady)
+        if (playerListReady && carListReady && trackListReady)
         {
             networkListsReady.Value = true;
         }
@@ -221,7 +238,7 @@ public class OnlineManager : NetworkBehaviour
 
     //PLAYER ID MANAGEMENT
 
-    
+
     internal void ReadPlayerIDs()
     {
         if (NetworkManager.LocalClientId == 0)
@@ -230,10 +247,10 @@ public class OnlineManager : NetworkBehaviour
             {
                 Debug.Log("Player " + playerName.Value + "has ID " + playerID[playerName.Value]);
             }
-        }                
+        }
     }
 
-    
+
 
     internal ulong GetLocalClientID()
     {
@@ -285,4 +302,53 @@ public class OnlineManager : NetworkBehaviour
     }
 
 
+    //RESULTS
+
+    [Rpc(SendTo.Server)]
+    public void SendResultListToServerRpc()
+    {
+        playerNamesRankingNetworkList.Clear();
+
+        foreach (string name in CSVFileReader.Instance.GetPlayerRankingResultsList())
+        {
+            playerNamesRankingNetworkList.Add(name.ToSafeString());
+        }
+
+        foreach (FixedString32Bytes name in playerNamesRankingNetworkList)
+        { Debug.Log("Name added to network List : " + name.Value); }
+
+        carNamesRankingNetworkList.Clear();
+
+        foreach (string car in CSVFileReader.Instance.GetCarRankingResultsList())
+        {
+            carNamesRankingNetworkList.Add(car.ToSafeString());
+        }
+
+        timesRankingNetworkList.Clear();
+
+        foreach (string time in CSVFileReader.Instance.GetTimeRankingResultsList())
+        {
+            timesRankingNetworkList.Add(time.ToSafeString());
+        }
+
+        gapsRankingNetworkList.Clear();
+
+        foreach (int gap in CSVFileReader.Instance.GetGapsList())
+        {
+            gapsRankingNetworkList.Add(gap);
+        }
+
+        StartCoroutine(WaitAfterResultsSentToNetwork());
+
+        trackInfoNetworkVariable.Value = CSVFileReader.Instance.GetTrackInfo();
+
+    }
+
+    private IEnumerator WaitAfterResultsSentToNetwork()
+    {
+        yield return new WaitForSeconds(2f);
+
+        trackInfoNetworkVariable.Value = CSVFileReader.Instance.GetTrackInfo();
+
+    }
 }

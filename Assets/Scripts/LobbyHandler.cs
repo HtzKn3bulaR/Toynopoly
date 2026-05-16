@@ -581,6 +581,8 @@ public class LobbyHandler : MonoBehaviour
         gameHasStarted = true;
         deviceHasJoinedRelay = true;
 
+        LobbyUIHandler.Instance.ShowLoadingPanel();
+
         //PreGameFlowManager.Instance.CloseLobbyWindow();
         Debug.Log("Game Started");
 
