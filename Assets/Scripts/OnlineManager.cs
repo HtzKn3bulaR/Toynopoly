@@ -1,14 +1,18 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.Services.Lobbies;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class OnlineManager : NetworkBehaviour
 {
+    private Dictionary<string, ulong> playerID = new Dictionary<string, ulong>();
+
     public static OnlineManager Instance;
 
     private NetworkList<FixedString32Bytes> trackNetworkList;
@@ -19,50 +23,117 @@ public class OnlineManager : NetworkBehaviour
 
     private NetworkList<FixedString32Bytes> playerNetworkList;
 
-    public enum PlayerStatus
+    public NetworkVariable<int> pendingFieldNetwork; 
+        
+    public NetworkVariable<FixedString32Bytes> selectedTrackNetwork = new NetworkVariable<FixedString32Bytes>();
+
+    public NetworkVariable<bool> level1RaceIsInProgress = new NetworkVariable<bool>(false);
+        
+    
+    private bool trackListReady = false;
+    private bool carListReady = false;
+    private bool playerListReady = false;
+
+    public NetworkVariable<bool> networkListsReady = new NetworkVariable<bool>(false);
+
+
+    public void Awake()
     {
-        None,
-        Active,
-        Inactive
-    }
-
-    public enum PlayerNumber
-    {
-        Player1,
-        Player2,
-        Player3,
-        Player4,
-        Player5,
-    }
-
-    public PlayerNumber localPlayerNumber;
-
-    public PlayerStatus localPlayerStatus;
-
-
-    private void Awake()
-    {
-        Instance = this;
-        DontDestroyOnLoad(this.gameObject);
-
-        trackNetworkList = new NetworkList<FixedString32Bytes>();
-        carNetworkList = new NetworkList<FixedString32Bytes>();
-        networkBonusTrack = new NetworkVariable<FixedString32Bytes>();
-        playerNetworkList = new NetworkList<FixedString32Bytes>();
+        
     }
 
     private void Start()
     {
-        localPlayerStatus = PlayerStatus.None;
+        trackNetworkList = new NetworkList<FixedString32Bytes>();
+        carNetworkList = new NetworkList<FixedString32Bytes>();
+        networkBonusTrack = new NetworkVariable<FixedString32Bytes>();
+        playerNetworkList = new NetworkList<FixedString32Bytes>();
+        pendingFieldNetwork = new NetworkVariable<int>(99);
+
+    }
+
+    private void Singleton_OnClientConnectedCallback(ulong obj)
+    {
+        Debug.Log("Client Connected! - Reporting Credentials");
+
+        ReportPlayerDataToNetworkRpc(MainManager.localMultiplayerName, NetworkManager.Singleton.LocalClientId);
+
+        if (NetworkManager.Singleton.LocalClientId == 0)
+        {
+            foreach (var item in playerID)
+            {
+                ReportPlayerDataToNetworkRpc(item.Key, item.Value);
+            }
+        }
+
+        LobbyUIHandler.Instance.ShowLoadingPanel();
+
+        if (NetworkManager.Singleton.LocalClientId == 0)
+        {
+            if (CheckAllClientsConnected())
+            {
+                Debug.Log("All Clients Connected!");
+                GetPlayerCountConnectedToRelayRpc();
+                Debug.Log("Players Registered in Main Manager " + MainManager.playerNumber);
+                LoadMainScene();                           
+            }
+        }
+    }             
+        
+    public void LoadMainScene()
+    {
+        SceneManager.LoadScene(MainManager.playerNumber - 1);
+    }
+
+    private bool CheckAllClientsConnected()
+    {
+        Debug.Log("Number of Clients Connected " + NetworkManager.Singleton.ConnectedClientsList.Count);
+        Debug.Log("Number of Players Signed Up For Match " + MainManager.playerNumber);
+
+        return NetworkManager.Singleton.ConnectedClientsList.Count == MainManager.playerNumber;
     }
 
     public override void OnNetworkSpawn()
     {
-        SceneManager.LoadScene(LobbyHandler.Instance.ReturnJoinedLobby().Players.Count - 1);
+        Instance = this;
+        DontDestroyOnLoad(this.gameObject);
+                
+        NetworkManager.Singleton.OnClientConnectedCallback += Singleton_OnClientConnectedCallback;
+                
+        ReportPlayerDataToNetworkRpc(MainManager.localMultiplayerName, NetworkManager.Singleton.LocalClientId);
 
         Debug.Log("Network Spawn Event fired");
 
+        LobbyUIHandler.Instance.ShowLoadingPanel();
 
+        networkListsReady.OnValueChanged += OnNetworkListsReady;
+
+    }
+
+    private void OnNetworkListsReady(bool previousValue, bool newValue)
+    {
+        if (NetworkManager.Singleton.LocalClientId != 0)
+        {
+            if (newValue == true)
+            {
+                Debug.Log("All Network Lists Ready - Loading Main Scene");                              
+
+                Debug.Log("Player Number " + MainManager.playerNumber);
+               
+                LoadMainScene();
+            }
+        }
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void ReportPlayerDataToNetworkRpc(string localName, ulong localID)
+    {
+        if (!playerID.ContainsKey(localName))
+        {
+            playerID.Add(localName, localID);
+
+            Debug.Log("Player Data Added To Network Dictionary " + localName + " " + localID);
+        }
     }
 
     public void SendDataToTrackNetworkList(List<FixedString32Bytes> tracksCurrentMatch, FixedString32Bytes bonusTrack)
@@ -72,9 +143,16 @@ public class OnlineManager : NetworkBehaviour
         {
             trackNetworkList.Add(tracksCurrentMatch[i]);
             Debug.Log("Track Added to Network List " + trackNetworkList[i].Value);
+            if(trackNetworkList.Count == 9)
+            {
+                trackListReady = true;
+                Debug.Log("Track List Ready");
+            }
         }
 
         networkBonusTrack.Value = bonusTrack;
+
+        CheckReadiness();
     }
 
     public void SendDataToCarNetworkList(List<FixedString32Bytes> carsCurrentMatch)
@@ -83,8 +161,16 @@ public class OnlineManager : NetworkBehaviour
         for (int i = 0; i < carsCurrentMatch.Count; i++)
         {
             carNetworkList.Add(carsCurrentMatch[i]);
-            Debug.Log("Track Added to Network List " + carNetworkList[i].Value);
+            Debug.Log("Car Added to Network List " + carNetworkList[i].Value);
+
+            if (carNetworkList.Count == 6)
+            {
+                carListReady = true;
+                Debug.Log("Car List Ready");
+            }
         }
+
+        CheckReadiness();
     }
 
     public void SendDataToPlayerNetworkList(List<FixedString32Bytes> playersCurrentMatch)
@@ -93,7 +179,23 @@ public class OnlineManager : NetworkBehaviour
         for (int i = 0; i < playersCurrentMatch.Count; i++)
         {
             playerNetworkList.Add(playersCurrentMatch[i]);
-            Debug.Log("Track Added to Network List " + playerNetworkList[i].Value);
+            Debug.Log("Player Added to Network List " + playerNetworkList[i].Value);
+
+            if (playerNetworkList.Count == MainManager.playerNumber)
+            {
+                playerListReady = true;
+                Debug.Log("Player List Ready");
+            }
+        }
+
+        CheckReadiness();
+    }
+
+    private void CheckReadiness()
+    {
+        if(playerListReady && carListReady && trackListReady)
+        {
+            networkListsReady.Value = true;
         }
     }
 
@@ -115,6 +217,71 @@ public class OnlineManager : NetworkBehaviour
     public NetworkVariable<FixedString32Bytes> ReturnNetworkBonusTrack()
     {
         return networkBonusTrack;
+    }
+
+    //PLAYER ID MANAGEMENT
+
+    
+    internal void ReadPlayerIDs()
+    {
+        if (NetworkManager.LocalClientId == 0)
+        {
+            foreach (FixedString32Bytes playerName in playerNetworkList)
+            {
+                Debug.Log("Player " + playerName.Value + "has ID " + playerID[playerName.Value]);
+            }
+        }                
+    }
+
+    
+
+    internal ulong GetLocalClientID()
+    {
+        return NetworkManager.Singleton.LocalClientId;
+    }
+
+    internal ulong GetPlayerID(string playerName)
+    {
+        return playerID[playerName];
+    }
+
+    internal List<FixedString32Bytes> ReturnPlayerNamesList()
+    {
+        List<FixedString32Bytes> playerNamesList = new List<FixedString32Bytes>();
+
+        foreach (var item in playerID)
+        {
+            playerNamesList.Add(item.Key);
+        }
+
+        return playerNamesList;
+    }
+
+    [Rpc(SendTo.Server)]
+    public void GetPlayerCountConnectedToRelayRpc()
+    {
+        AckRelayConnectedPlayersCountToClientsRpc(NetworkManager.Singleton.ConnectedClients.Count);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void AckRelayConnectedPlayersCountToClientsRpc(int count)
+    {
+        MainManager.playerNumber = count;
+    }
+
+    //GAME RUNNING EVENTS
+
+
+    [Rpc(SendTo.Server)]
+    internal void ReportPendingFieldRpc(int field)
+    {
+        pendingFieldNetwork.Value = field;
+    }
+
+    [Rpc(SendTo.Server)]
+    internal void ReportRaceLevel1InProgressRpc()
+    {
+        level1RaceIsInProgress.Value = true;
     }
 
 

@@ -21,12 +21,16 @@ public class LobbyUIHandler : MonoBehaviour
     [SerializeField] private GameObject[] playerPanels;
     [SerializeField] private TextMeshProUGUI[] playerNameTags;
 
+    [SerializeField] private GameObject loadingPanel;
+
     [SerializeField] private Button startGameButton;
 
     // Start is called before the first frame update
     void Start()
     {
         Instance = this;
+               
+
         LobbyHandler.OnLobbyJoined += LobbyHandler_OnLobbyJoined;                
     }
 
@@ -60,8 +64,16 @@ public class LobbyUIHandler : MonoBehaviour
         roomCode.text = MainManager.roomCode;
     }
 
-    public void SetPlayerBox(int playerIndex, string playerName)
+    public void ResetPlayerBoxes()
     {
+        foreach (GameObject panel in playerPanels)
+        {
+            panel.SetActive(false);
+        }
+    }
+
+    public void SetPlayerBox(int playerIndex, string playerName)
+    {    
         playerPanels[playerIndex].gameObject.SetActive(true);
         playerNameTags[playerIndex].text = playerName;
     }
@@ -80,5 +92,9 @@ public class LobbyUIHandler : MonoBehaviour
     {
         playersInLobby.text = playerNumber.ToString();
     }
-        
+
+    internal void ShowLoadingPanel()
+    {
+        loadingPanel.gameObject.SetActive(true);
+    }
 }

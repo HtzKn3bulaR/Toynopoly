@@ -44,9 +44,11 @@ public class MainManager : MonoBehaviour
 
     public static int pendingField = 0;
     public static int currentCarIndex = 0;
+    public static string selectedTrack;
 
     public static int TimeBattleCarIndex = 0;
 
+    public static string localMultiplayerName;
     public static int activePlayer = 0;
 
     public static int[] inactivePlayers = { 0, 1, 2, 3, 4};

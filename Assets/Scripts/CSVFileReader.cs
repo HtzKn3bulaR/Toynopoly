@@ -350,12 +350,10 @@ public class CSVFileReader : MonoBehaviour
     {
         if (MainManager.selectedFilePath != null)
         {
-
             ResultsPanelAuto.gameObject.SetActive(true);
 
             if (MainManager.playerNumber > 2)
             {
-
                 if (playerManagerScript.activePlayerHasToynopoly == false && MainManager.levelCounter > 1)
                 {
                     legendPanel.gameObject.SetActive(true);
@@ -369,7 +367,6 @@ public class CSVFileReader : MonoBehaviour
                         case false:
                             challengeOutcomeInfo.text = "The challenge was lost.";
                             break;
-
                     }
 
                 }

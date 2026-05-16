@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,14 +13,16 @@ using UnityEngine;
 public class ToynopolyRelay : MonoBehaviour
 {
     public static ToynopolyRelay Instance;
+        
 
     private void Start()
     {
         Instance = this;
 
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(this.gameObject);        
 
     }
+        
 
     public async Task<string> CreateRelay()
     {
@@ -39,14 +42,14 @@ public class ToynopolyRelay : MonoBehaviour
 
             Debug.Log("Local Client ID " + NetworkManager.Singleton.LocalClientId);
 
-            return joinCode;
+            return joinCode;                       
             
         }
         catch (RelayServiceException e)
         {
             Debug.LogError(e.Message);
             return null;
-        }
+        }              
 
     }
 
@@ -58,12 +61,13 @@ public class ToynopolyRelay : MonoBehaviour
 
             JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
 
-
             RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
 
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
             NetworkManager.Singleton.StartClient();
+
+            //LobbyHandler.Instance.LeaveLobby();
         }
         catch (RelayServiceException e)
         {

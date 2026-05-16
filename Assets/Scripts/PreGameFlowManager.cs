@@ -78,10 +78,7 @@ public class PreGameFlowManager : MonoBehaviour
         playerNameHost.SetActive(true);
 
         MainManager.classSelected = (carClassMenu.value);
-        
-
-        
-                             
+                                     
     }
 
     public void SetLobbyTitle(string name)
@@ -111,9 +108,8 @@ public class PreGameFlowManager : MonoBehaviour
     }
 
     public void ContinueToMain()
-
     {      
-     SceneManager.LoadScene(LobbyHandler.Instance.ReturnJoinedLobby().Players.Count - 1);
+     //SceneManager.LoadScene(LobbyHandler.Instance.ReturnJoinedLobby().Players.Count - 1);
     }
         
 
@@ -133,9 +129,8 @@ public class PreGameFlowManager : MonoBehaviour
     public void BackToMainMenu()
     {
         tempPlayerName = null;
-
         
-
+        CloseLobbyWindow();
     }
 
 
@@ -179,7 +174,7 @@ public class PreGameFlowManager : MonoBehaviour
     }
         
 
-    internal void CloseLobbyWindow()
+    public void CloseLobbyWindow()
     {
         lobbyWindow.SetActive(false);
         clientSignUpWindow.SetActive(false);

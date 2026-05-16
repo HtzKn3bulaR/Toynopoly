@@ -5,12 +5,14 @@ using TMPro;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 
-public class GridGenerator3P : NetworkBehaviour
+public class GridGenerator3P : MonoBehaviour
 
 {
     public static GridGenerator3P Instance;
@@ -176,6 +178,7 @@ public class GridGenerator3P : NetworkBehaviour
     { };
 
 
+    public static event Action OnGameTableReady;
 
 
     List<T> GetUniqueRandomElements<T>(List<T> inputList, int count)
@@ -191,7 +194,7 @@ public class GridGenerator3P : NetworkBehaviour
         
     }
 
-    public void Start()
+    private void Start()
     {
         Instance = this;
 
@@ -810,15 +813,11 @@ public class GridGenerator3P : NetworkBehaviour
     {
         List<FixedString32Bytes> temporaryPlayerList = new List<FixedString32Bytes>();
 
-        for (int i = 0; i < LobbyHandler.Instance.ReturnJoinedLobby().Players.Count; i++)
-        {
-            temporaryPlayerList.Add(LobbyHandler.Instance.ReturnJoinedLobby().Players[i].Data["PlayerName"].Value);
-            Debug.Log("Player name added " + LobbyHandler.Instance.ReturnJoinedLobby().Players[i].Data["PlayerName"].Value);
-        }
+        temporaryPlayerList = OnlineManager.Instance.ReturnPlayerNamesList();     
 
         var randomPlayersList = GetUniqueRandomElements(temporaryPlayerList, temporaryPlayerList.Count);
 
-        for (int i = 0; i < LobbyHandler.Instance.ReturnJoinedLobby().Players.Count; i++)
+        for (int i = 0; i < randomPlayersList.Count; i++)
         {
             players.Add(randomPlayersList[i].ToSafeString());
 
@@ -836,7 +835,7 @@ public class GridGenerator3P : NetworkBehaviour
     {
         gameManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
 
-        switch (LobbyHandler.Instance.ReturnJoinedLobby().Players.Count)
+        switch (MainManager.playerNumber)
 
         {
             case 2:
@@ -874,7 +873,7 @@ public class GridGenerator3P : NetworkBehaviour
         StartCoroutine(WaitAfterLineupSelected());
                 
 
-        if (LobbyHandler.Instance.ReturnJoinedLobby().Players.Count == 5)
+        if (MainManager.playerNumber == 5)
         {
             gameManagerScript.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
         }
@@ -893,7 +892,6 @@ public class GridGenerator3P : NetworkBehaviour
 
             StartCoroutine(FieldsAppearingDelay());
         }
-
     }
 
 
@@ -945,6 +943,11 @@ public class GridGenerator3P : NetworkBehaviour
 
         rowShown++;
         ShowNextRow();
+
+        if(rowShown == 6)
+        {
+            OnGameTableReady?.Invoke();
+        }
     }
 
     IEnumerator WaitAfterLineupSelected()
@@ -955,12 +958,13 @@ public class GridGenerator3P : NetworkBehaviour
 
         gameSounds.PlayOneShot(transition);
         gameManagerScript.helpText.gameObject.SetActive(true);
-
+        
+        OnlineManager.Instance.ReadPlayerIDs();
+        
+        LobbyHandler.Instance.LeaveLobby();
         
         timerPanel.gameObject.SetActive(true);
         
-
-
         ShowNextRow();
     }
 

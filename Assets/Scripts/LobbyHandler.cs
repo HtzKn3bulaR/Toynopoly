@@ -31,13 +31,15 @@ public class LobbyHandler : MonoBehaviour
 
     private string originalHostId;
 
+    private bool gameHasStarted = false;
+    private bool deviceHasJoinedRelay = false;
 
     private async void Start()
-    {
-        Instance = this;
+    {               
 
-        DontDestroyOnLoad(this);
-        DontDestroyOnLoad(this.gameObject);
+        Instance = this;               
+
+        Debug.LogError("Console");
 
         await UnityServices.InitializeAsync();
         
@@ -56,13 +58,24 @@ public class LobbyHandler : MonoBehaviour
         
         */
 
-
     }
 
     private void Callbacks_LobbyChanged(ILobbyChanges obj)
     {
-        Debug.Log("Player Joined");
 
+        if(deviceHasJoinedRelay)
+        {
+            OnlineManager.Instance.GetPlayerCountConnectedToRelayRpc();
+            return;
+        }
+
+        if(joinedLobby == null)
+        {
+            OnlineManager.Instance.LoadMainScene();
+        }
+
+        Debug.Log("Lobby Change");
+                
         StartCoroutine(WaitAfterPlayerJoined());
     }
 
@@ -129,44 +142,57 @@ public class LobbyHandler : MonoBehaviour
     {
         yield return new WaitForSeconds(5f);
 
-        Debug.Log(joinedLobby.Players.Count);
-        PrintPlayers();
-        AdjustRoundsThresholdToPlayerNumber(joinedLobby.Players.Count);
-        MainManager.playerNumber = joinedLobby.Players.Count;
-
-        LobbyUIHandler.Instance.UpdatePlayerNumber(joinedLobby.Players.Count);
-
-
-        if (joinedLobby.HostId == originalHostId)
+        if (!deviceHasJoinedRelay)
         {
-            if (joinedLobby.Players.Count > 1)
+            Debug.Log(joinedLobby.Players.Count);
+            PrintPlayers();
+            AdjustRoundsThresholdToPlayerNumber(joinedLobby.Players.Count);
+            MainManager.playerNumber = joinedLobby.Players.Count;
+
+            if (!gameHasStarted)
             {
-                LobbyUIHandler.Instance.ShowStartGameButton();
+                LobbyUIHandler.Instance.UpdatePlayerNumber(joinedLobby.Players.Count);
+            }
+
+
+            if (joinedLobby.HostId == originalHostId)
+            {
+                if (joinedLobby.Players.Count > 1)
+                {
+                    if (!gameHasStarted)
+                    {
+                        LobbyUIHandler.Instance.ShowStartGameButton();
+                    }
+                }
             }
         }
-
-        else 
-        {
-            if (joinedLobby.Data["RelayJoinCode"].Value != "0")
-                //Game was started by Host
-            {
-                ToynopolyRelay.Instance.JoinRelay(joinedLobby.Data["RelayJoinCode"].Value);
-
-                PreGameFlowManager.Instance.CloseLobbyWindow();
-            }
-        }
-
+               
     }
+
+    private void InvitePlayersToJoinRelay()
+    {
+        if (joinedLobby.Data["RelayJoinCode"].Value != "0")
+        //Game was started by Host
+        {
+            if (joinedLobby.HostId == originalHostId)
+                return;
+
+            ToynopolyRelay.Instance.JoinRelay(joinedLobby.Data["RelayJoinCode"].Value);
+
+            deviceHasJoinedRelay = true;                                              
+
+            PreGameFlowManager.Instance.CloseLobbyWindow();
+        }
+    }
+
 
     private bool CheckIfLobbyHost()
     {
         Debug.Log("Local Player ID " + AuthenticationService.Instance.PlayerId);
         Debug.Log("Is Host " + AuthenticationService.Instance.PlayerId == joinedLobby.HostId);
-        return AuthenticationService.Instance.PlayerId == joinedLobby.HostId;
+        return originalHostId == joinedLobby.HostId;
                 
     }
-
-
      
 
     public void SetLobbyPlayerName(string lobbyPlayerName)
@@ -182,31 +208,42 @@ public class LobbyHandler : MonoBehaviour
     }
 
     private async void HandleLobbyHeartbeat()
-    {
-        if(hostLobby != null)
-        {
-            heartbeatTimer -= Time.deltaTime;
-            if(heartbeatTimer < 0f )
+    {        
+            if (hostLobby != null && !deviceHasJoinedRelay)
             {
-                float heartbeatTimerMax = 15f;
-                heartbeatTimer = heartbeatTimerMax;
-                await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
-                                
-            }
-        }
+                heartbeatTimer -= Time.deltaTime;
+                if (heartbeatTimer < 0f)
+                {
+                    float heartbeatTimerMax = 15f;
+                    heartbeatTimer = heartbeatTimerMax;
+                    await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
+
+                    PrintPlayers();
+
+                }
+            }        
     }
 
     private async void HandleLobbyPollForUpdate()
     {
-        if (joinedLobby != null)
+        if (joinedLobby != null && !deviceHasJoinedRelay)
         {
             lobbyUpdateTimer -= Time.deltaTime;
             if (lobbyUpdateTimer < 0f)
             {
                 float lobbyUpdateTimerMax = 1.1f;
                 lobbyUpdateTimer = lobbyUpdateTimerMax;
-                Lobby lobby = await LobbyService.Instance.GetLobbyAsync(joinedLobby.Id);
-                joinedLobby = lobby;
+                try
+                {
+                    Lobby lobby = await LobbyService.Instance.GetLobbyAsync(joinedLobby.Id);
+                    joinedLobby = lobby;
+                }
+                catch (Exception ex) { Debug.Log(ex); }
+
+                if (!deviceHasJoinedRelay)
+                {
+                    InvitePlayersToJoinRelay();
+                }
             }
         }
     }
@@ -220,7 +257,8 @@ public class LobbyHandler : MonoBehaviour
             CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions
             {
                 IsPrivate = true,
-                Player = GetPlayer(),
+                Player = GetPlayer(),                               
+
                 Data = new Dictionary<string, DataObject>
                 {
                     {"CarClass", new DataObject(DataObject.VisibilityOptions.Public, "Rookie") },
@@ -254,6 +292,8 @@ public class LobbyHandler : MonoBehaviour
 
             Debug.Log("Lobby created  " + lobbyTitle + " " + maxPlayers + " " + lobby.Id + " " + lobby.LobbyCode);
         }catch (LobbyServiceException e) { Debug.Log(e.ToString()); }
+
+        MainManager.localMultiplayerName = GetPlayer().Data["PlayerName"].Value;
 
         MainManager.roomCode = hostLobby.LobbyCode;
         Debug.Log("Room Code sent to Main Manager " + MainManager.roomCode);
@@ -349,6 +389,8 @@ public class LobbyHandler : MonoBehaviour
 
             OnLobbyJoined?.Invoke();
 
+            MainManager.localMultiplayerName = GetPlayer().Data["PlayerName"].Value;
+
             PrintPlayers();
 
             SetCarClassOnClients();
@@ -430,17 +472,22 @@ public class LobbyHandler : MonoBehaviour
 
     private void PrintPlayers()
     {
-        PrintPlayers(joinedLobby);
+        if (!gameHasStarted)
+        {
+            PrintPlayers(joinedLobby);
+        }
     }
 
     private void PrintPlayers(Lobby lobby)
     {
         Debug.Log("Players in Lobby " + lobby.Name + " " + lobby.Data["CarClass"].Value + " " + lobby.Data["MatchLength"].Value);
-               
+        
+        LobbyUIHandler.Instance.ResetPlayerBoxes();  
 
         for (int i = 0; i <  lobby.Players.Count; i++)
         {
             Debug.Log(lobby.Players[i].Id + " " + lobby.Players[i].Data["PlayerName"].Value);
+
 
             LobbyUIHandler.Instance.SetPlayerBox(i, lobby.Players[i].Data["PlayerName"].Value);
 
@@ -495,13 +542,12 @@ public class LobbyHandler : MonoBehaviour
     }
 
 
-
-
-    private async void LeaveLobby()
+    public async void LeaveLobby()
     {
         try
         {
             await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, AuthenticationService.Instance.PlayerId);
+            joinedLobby = null;
         }
         catch (LobbyServiceException e) { Debug.Log(e.ToString()); }
     }
@@ -529,15 +575,35 @@ public class LobbyHandler : MonoBehaviour
                 (LobbyServiceException e)
             { Debug.Log(e); 
                 }
-
-            
+                        
         }
+
+        gameHasStarted = true;
+        deviceHasJoinedRelay = true;
 
         //PreGameFlowManager.Instance.CloseLobbyWindow();
         Debug.Log("Game Started");
 
         //PreGameFlowManager.Instance.ContinueToMain();
-
     }
+
+            
+
+    public async void DeleteLobby()
+    {                
+        try
+        {
+            await LobbyService.Instance.DeleteLobbyAsync(joinedLobby.Id);
+            Debug.Log("Lobby Deleted");
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.Log(e);
+        }
+
+        joinedLobby = null;
+        hostLobby = null;
+    }
+        
 
 }
