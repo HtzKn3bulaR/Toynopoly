@@ -424,8 +424,10 @@ public class CSVFileReader : MonoBehaviour
 
     private void ShowResultsOnLocalMachine(FixedString32Bytes previousValue, FixedString32Bytes newValue)
     {
-        if (NetworkManager.Singleton.IsClient)
+        if (!NetworkManager.Singleton.IsHost)
         {
+            SetAutoResultsValid();
+
             Debug.Log("Processing Race Results On Local Machine " + NetworkManager.Singleton.LocalClientId);
 
             RaceInProgessPanelClose();
@@ -1201,34 +1203,7 @@ public class CSVFileReader : MonoBehaviour
     {
         return trackInfo;
     }
-
-
-
-
-    /*
-    [Rpc(SendTo.ClientsAndHost)]
-    private void SendResultListToClientsRpc(List<string> namesRanking, List<string> timesRanking, List<string> carsRanking, List<int> gapsRanking, string trackInfo)
-    {
-        if (NetworkManager.Singleton.IsClient)
-        {
-
-            playerNames.Clear();
-            playerNames = namesRanking;
-
-            carNames.Clear();
-            carNames = carsRanking;
-
-            times.Clear();
-            times = timesRanking;
-
-            gaps.Clear();
-            gaps = gapsRanking;
-
-            ResultsValidate();
-        }
-
-    }
-    */
+            
 
 
 }

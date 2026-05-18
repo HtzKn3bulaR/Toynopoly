@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.Netcode;
 
 
 
 
 public class DividendGenerator : MonoBehaviour
 {
+    public static DividendGenerator Instance;
 
     List<int> dividendList = new List<int>();
 
-    public List<int> actualDividendList = new List<int>();
+    //List only exists on the network
+    //public List<int> actualDividendList = new List<int>();
 
     int[] dividendsTenRounds = { 7, 7, 7, 0, 1, 2, 3, 4, 5 };
     int[] dividendsTwelveRounds = { 7, 7, 7, 7, 7, 0, 1, 2, 3, 4, 5 };
@@ -91,55 +94,49 @@ public class DividendGenerator : MonoBehaviour
 
         if (MainManager.gameResumed)
         {
-            actualDividendList.AddRange(MainManager.tempdividends);
+            //N/A in Netcode Version
+            //actualDividendList.AddRange(MainManager.tempdividends);
         }
+    }
 
+    private void Start()
+    {
+       Instance = this;
+
+        GridGenerator3P.OnGameTableReady += GridGenerator3P_OnGameTableReady;
+    }
+
+    private void GridGenerator3P_OnGameTableReady()
+    {
+        if(NetworkManager.Singleton.IsHost)
+        RandomizeDividend();
     }
 
     public void RandomizeDividend()
-
-    {
-
-        if (MainManager.playerNumber < 3)
-        {
-            //dividendList.AddRange(dividendsTwelveRounds);
-            //actualDividendList.AddRange(dividendsTwelveRounds);
-        }
-
-
-        if (MainManager.playerNumber == 5)
-
-        {
-            //raceThreshold = 11;
-            MainManager.raceThreshold = 11;
-        }
-
-        else
-
-        {
-           //raceThreshold = 13;
-           MainManager.raceThreshold = 13;
-        }
-        
-     
+    {                   
 
         var uniqueRandomList = GetUniqueRandomElements(dividendList, dividendList.Count);
 
         for (int i = 0; i < uniqueRandomList.Count; i++)
 
         {
-            actualDividendList.Add(uniqueRandomList[i]);
-            Debug.Log(MainManager.raceThreshold - 2);
-            Debug.Log(actualDividendList[i]);
+            OnlineManager.Instance.AddValueToDividendsNetworkList(uniqueRandomList[i]);
+            Debug.Log("Race Threshold This Match " + (MainManager.raceThreshold - 2));
+            Debug.Log("Car Index Added to Network List for Dividend Payout " + OnlineManager.Instance.GetDividendCarIndexNumberFromNetworkList(i));
 
         }
 
         //To make sure all dividends paid before last race
-        actualDividendList.Add(7);
+        OnlineManager.Instance.AddValueToDividendsNetworkList(7);
 
+        //Send Actual Dividend List To Server
+        //OnlineManager.Instance.ReportActualDividendListToServerRpc(actualDividendList);
+        
+    }
 
+    public void PrepareLevel2()
+    {
         if (MainManager.playerNumber < 3)
-
         {
             gameManagerScript.SetLevelChangePanelInactive();
         }
@@ -154,7 +151,7 @@ public class DividendGenerator : MonoBehaviour
     public void DividendCheck()
 
     {
-        if (actualDividendList[MainManager.roundCounter - 1] < 7)
+        if (OnlineManager.Instance.GetDividendCarIndexNumberFromNetworkList(MainManager.roundCounter - 1) < 7)
 
             PayDividend();
 
@@ -169,11 +166,11 @@ public class DividendGenerator : MonoBehaviour
         divGenAudio.PlayOneShot(dividend);
         diamond.Play();
 
-        dividendCarNamePanel.text = MainManager.cars[actualDividendList[MainManager.roundCounter - 1]];
-        dividendCarPrizePanel.text = MainManager.carPrizes[actualDividendList[MainManager.roundCounter - 1]].ToString();
+        dividendCarNamePanel.text = MainManager.cars[OnlineManager.Instance.GetDividendCarIndexNumberFromNetworkList(MainManager.roundCounter - 1)];
+        dividendCarPrizePanel.text = MainManager.carPrizes[OnlineManager.Instance.GetDividendCarIndexNumberFromNetworkList(MainManager.roundCounter - 1)].ToString();
 
-        MainManager.currentCarIndex = actualDividendList[MainManager.roundCounter - 1];
-        amountToPay = MainManager.carPrizes[actualDividendList[MainManager.roundCounter - 1]];
+        MainManager.currentCarIndex = OnlineManager.Instance.GetDividendCarIndexNumberFromNetworkList(MainManager.roundCounter - 1);
+        amountToPay = MainManager.carPrizes[OnlineManager.Instance.GetDividendCarIndexNumberFromNetworkList(MainManager.roundCounter - 1)];
 
         if (MainManager.playerNumber > 2)
         {

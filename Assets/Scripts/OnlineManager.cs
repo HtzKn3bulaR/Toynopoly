@@ -28,6 +28,7 @@ public class OnlineManager : NetworkBehaviour
     public NetworkVariable<FixedString32Bytes> selectedTrackNetwork = new NetworkVariable<FixedString32Bytes>();
 
     public NetworkVariable<bool> level1RaceIsInProgress = new NetworkVariable<bool>(false);
+    public NetworkVariable<bool> level2RaceIsInProgress = new NetworkVariable<bool>(false);
 
     //RANKING NETWORK LISTS
 
@@ -41,10 +42,23 @@ public class OnlineManager : NetworkBehaviour
 
     public NetworkVariable<FixedString32Bytes> trackInfoNetworkVariable;
 
+    //OTHER NETWORK VARIABLES
+
+
+    public NetworkList<int> actualDividendsNetworkList;
+
+
+    public NetworkVariable<int> randomMarketDelta;
+
+    public NetworkVariable<int> defenderPlayerIDNetworkVariable = new NetworkVariable<int>(9);
 
     private bool trackListReady = false;
     private bool carListReady = false;
     private bool playerListReady = false;
+
+    private int winnerLevel1;
+    private int secondPlaceLevel1;
+    private bool activePlayerWin;
 
     public NetworkVariable<bool> networkListsReady = new NetworkVariable<bool>(false);
 
@@ -66,9 +80,11 @@ public class OnlineManager : NetworkBehaviour
         carNamesRankingNetworkList = new NetworkList<FixedString32Bytes>();
         timesRankingNetworkList = new NetworkList<FixedString32Bytes>();
         gapsRankingNetworkList = new NetworkList<int>();
+        randomMarketDelta = new NetworkVariable<int>();
 
-
+        actualDividendsNetworkList = new NetworkList<int>();
     }
+        
 
     private void Singleton_OnClientConnectedCallback(ulong obj)
     {
@@ -124,6 +140,7 @@ public class OnlineManager : NetworkBehaviour
         LobbyUIHandler.Instance.ShowLoadingPanel();
 
         networkListsReady.OnValueChanged += OnNetworkListsReady;
+
 
     }
 
@@ -296,10 +313,22 @@ public class OnlineManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    internal void ReportRaceLevel1InProgressRpc()
+    internal void ReportRaceLevel1InProgressRpc(bool level1RaceStatus)
     {
-        level1RaceIsInProgress.Value = true;
+        if (level1RaceStatus == true)
+            randomMarketDelta.Value = UnityEngine.Random.Range(0, 15);
+
+        level1RaceIsInProgress.Value = level1RaceStatus;
     }
+
+    [Rpc(SendTo.Server)]
+    internal void ReportRaceLevel2InProgressRpc(bool level2RaceStatus)
+    {
+        level2RaceIsInProgress.Value = level2RaceStatus;
+    }
+
+    public int GetRandomMarketDelta()
+    { return randomMarketDelta.Value; }
 
 
     //RESULTS
@@ -351,4 +380,97 @@ public class OnlineManager : NetworkBehaviour
         trackInfoNetworkVariable.Value = CSVFileReader.Instance.GetTrackInfo();
 
     }
+
+
+    //Results Manual Reporting
+
+    [Rpc(SendTo.Server)]
+    public void Level1ReportManualResultsToServerRpc(int raceWinnerLevel1, int runnerUpLevel1, bool activePlayerWon)
+    {
+       winnerLevel1 = raceWinnerLevel1;
+       secondPlaceLevel1 = runnerUpLevel1;
+       activePlayerWin = activePlayerWon;
+
+       AckManualResultsLevel1ToClientRpc(winnerLevel1, secondPlaceLevel1, activePlayerWin);
+        
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void AckManualResultsLevel1ToClientRpc(int winnerLevel1, int secondPlaceLevel1, bool activePlayerWon)
+    {
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            PlayerManager3P.Instance.raceWinnerLevel1 = winnerLevel1;
+            PlayerManager3P.Instance.runnerUpLevel1 = secondPlaceLevel1;
+
+            MainManager.activePlayerWins = activePlayerWon;
+
+            MainManager.autoResultsValid = true;
+
+            //PlayerManager3P.Instance.RegisterResults();
+        }
+    }
+
+    //DIVIDENDS
+
+    public void AddValueToDividendsNetworkList(int dividendCarIndexNumber)
+    {
+        actualDividendsNetworkList.Add(dividendCarIndexNumber);
+    }
+
+    public int GetDividendCarIndexNumberFromNetworkList(int roundIndex)
+    {
+        return actualDividendsNetworkList[roundIndex];
+    }
+
+    //CHALLENGES
+
+    [Rpc(SendTo.Server)]
+    internal void ReportDefendingPlayerToNetworkRpc(int defender)
+    {
+        defenderPlayerIDNetworkVariable.Value = defender;
+
+        AckChallengeDefenderToInactivesRpc(defender);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void AckChallengeDefenderToInactivesRpc(int defendingPlayer)
+    {
+        if (defendingPlayer == 9)
+            return;
+
+        if (!PlayerManager3P.Instance.LocalIsActivePlayer())
+        {
+            MainManager.defendingPlayer = defendingPlayer;
+            PlayerManager3P.Instance.SetDefenderAndContinue(defendingPlayer);
+        }
+    }
+
+    //TIME BATTLE
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportTimeBattleCarIndexToNetworkRpc(int whichCar)
+    {
+       MainManager.currentCarIndex = whichCar;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportCarBuffToClientsRpc()
+    {
+        if (PlayerManager3P.Instance.IsTimeBattleWinner())
+            return;
+
+        PlayerManager3P.Instance.BuffCarAndContinue();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportCarNerfToClientsRpc()
+    {
+        if (PlayerManager3P.Instance.IsTimeBattleWinner())
+            return;
+
+        PlayerManager3P.Instance.BuffCarAndContinue();
+    }
+
+
 }

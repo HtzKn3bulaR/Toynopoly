@@ -12,6 +12,8 @@ using Unity.VisualScripting;
 
 public class PlayerManager3P : MonoBehaviour
 {
+    public static PlayerManager3P Instance;
+
     public Button[] fields;
     public Button[] playerSellButton;
 
@@ -102,6 +104,7 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] GameObject continueButtonToynopoly;
     [SerializeField] GameObject continueButtonToynopolyAuto;
     [SerializeField] GameObject continueButtonNormal;
+    [SerializeField] GameObject getManualResultsButtonL2;
     [SerializeField] GameObject getAutoResultsButtonNormal;
     [SerializeField] GameObject getAutoResultsButtonNormalL1;
 
@@ -247,6 +250,9 @@ public class PlayerManager3P : MonoBehaviour
     private LapDataReader lapCountScript;
 
     public static event Action OnLevel2Start;
+    public static event Action OnRoundChangeover;
+
+    private bool resultsRegisteredForRound = false;
 
     // Start is called before the first frame update
     private void Awake()
@@ -281,11 +287,15 @@ public class PlayerManager3P : MonoBehaviour
 
     private void Start()
     {
+        Instance =this;
+
         GridGenerator3P.OnGameTableReady += CallActivePlayer;
 
         OnlineManager.Instance.pendingFieldNetwork.OnValueChanged += OnPendingFieldChanged;
 
         OnlineManager.Instance.level1RaceIsInProgress.OnValueChanged += OnRaceLevel1InProgress;
+
+        OnlineManager.Instance.level2RaceIsInProgress.OnValueChanged += OnRaceLevel2InProgress;
     }
 
 
@@ -341,7 +351,7 @@ public class PlayerManager3P : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            pausePanel.gameObject.SetActive(true);
+            pausePanel.SetActive(true);
 
         }
     }
@@ -350,7 +360,7 @@ public class PlayerManager3P : MonoBehaviour
     public void Resume()
 
     {
-        pausePanel.gameObject.SetActive(false);
+        pausePanel.SetActive(false);
     }
 
     //FIRST NETWORK EVENT START---------------------------------------------------
@@ -472,11 +482,8 @@ public class PlayerManager3P : MonoBehaviour
     }
 
     void ShowNextRacePanel()
-    {
-        if (nextRaceComingUpPanel == null)
-            Debug.Log("Next Race Panel Is Null!");
-        else
-            nextRaceComingUpPanel.SetActive(true);
+    {        
+        nextRaceComingUpPanel.transform.localScale = new Vector3(0.824999988f, 0.738307893f, 1);
 
         audioSource.PlayOneShot(panelOpen);
 
@@ -486,7 +493,6 @@ public class PlayerManager3P : MonoBehaviour
         switch (MainManager.levelCounter)
         {
             case 1:
-
                 if (!LocalIsActivePlayer())
                 {
                     startRaceButton.SetActive(false);
@@ -503,23 +509,26 @@ public class PlayerManager3P : MonoBehaviour
                 break;
 
             case 2:
-
+                if (LocalIsActivePlayer())
                 buyCarButton.gameObject.SetActive(true);
+
                 activePlayerHasToynopoly = false;
 
                 FillInactivePlayersArray();
                 PerformLevel2Check();
 
-
                 switch (activePlayerHasToynopoly)
                 {
                     case true:
+                        if(LocalIsActivePlayer())
                         startRaceButton.SetActive(true);
+
                         continueToChallengeButton.SetActive(false);
                         activePlayerMessage.text = ("You have a Toynopoly for this car.");
 
                         if (MainManager.shieldAvailable[MainManager.activePlayer] == true)
                         {
+                            if(LocalIsActivePlayer())
                             protectButton.gameObject.SetActive(true);
                         }
 
@@ -527,12 +536,13 @@ public class PlayerManager3P : MonoBehaviour
                         {
                             buyCarButton.gameObject.SetActive(false);
                         }
-
                         break;
 
                     case false:
                         startRaceButton.SetActive(false);
                         protectButton.gameObject.SetActive(false);
+
+                        if(LocalIsActivePlayer())
                         continueToChallengeButton.SetActive(true);
                         break;
                 }
@@ -540,20 +550,21 @@ public class PlayerManager3P : MonoBehaviour
 
                 if (l2SelectionIsOkay == false)
                 {
-
                     if (buyingPossible == true && playerHasBoughtCarThisRound == false)
-
                     {
+                        if(LocalIsActivePlayer())
                         activePlayerMessage.text = ("You don't own this car. Would you like to buy it?");
+
                         startRaceButton.SetActive(false);
                         continueToChallengeButton.SetActive(false);
                         protectButton.gameObject.SetActive(false);
                     }
 
                     if (buyingPossible == true && playerHasBoughtCarThisRound == true)
-
                     {
+                        if(LocalIsActivePlayer())
                         activePlayerMessage.text = ("You don't own this car.");
+
                         buyCarButton.gameObject.SetActive(false);
                         continueToChallengeButton.SetActive(false);
                         startRaceButton.SetActive(false);
@@ -561,20 +572,19 @@ public class PlayerManager3P : MonoBehaviour
                     }
 
                     else if (buyingPossible == false)
-
                     {
+                        if(LocalIsActivePlayer())
                         activePlayerMessage.text = ("An opponent has a protected Toynopoly for this car. Please choose a different car");
+
                         continueToChallengeButton.SetActive(false);
                         startRaceButton.SetActive(false);
                         buyCarButton.gameObject.SetActive(false);
                         protectButton.gameObject.SetActive(false);
-
                     }
 
                 }
 
                 else if (activePlayerHasToynopoly)
-
                 {
                     activePlayerMessage.text = ($"{MainManager.playerNames[MainManager.activePlayer]} has made their selection:");
 
@@ -584,14 +594,16 @@ public class PlayerManager3P : MonoBehaviour
                     }
                     else
                     {
+                        if(LocalIsActivePlayer())
                         buyCarButton.gameObject.SetActive(true);
                     }
                     continueToChallengeButton.SetActive(false);
+
+                    if(LocalIsActivePlayer())
                     startRaceButton.SetActive(true);
                 }
 
                 else
-
                 {
                     activePlayerMessage.text = ($"{MainManager.playerNames[MainManager.activePlayer]} has made their selection:");
                     startRaceButton.SetActive(false);
@@ -603,19 +615,14 @@ public class PlayerManager3P : MonoBehaviour
                     }
 
                 }
-
-
-
                 break;
 
             case 3:
                 //fill for Level 3
                 break;
         }
-
     }
     public void OpenChallengePanel()
-
     {
         challengeButtonFirstInactive.gameObject.SetActive(true);
         challengeButtonSecondInactive.gameObject.SetActive(true);
@@ -626,19 +633,16 @@ public class PlayerManager3P : MonoBehaviour
         }
 
         if (MainManager.playerNumber > 4)
-
         {
             challengeButtonFourthInactive.gameObject.SetActive(true);
         }
 
-
-        nextRaceComingUpPanel.SetActive(false);
+        nextRaceComingUpPanel.gameObject.transform.localScale = new Vector3(0, 0, 0);
         challengePanel.SetActive(true);
         challengefirstInactive.text = MainManager.playerNames[MainManager.inactivePlayers[0]];
         challengeSecondInactive.text = MainManager.playerNames[MainManager.inactivePlayers[1]];
 
         if (MainManager.playerNumber > 3)
-
         {
             challengeThirdInactive.text = MainManager.playerNames[MainManager.inactivePlayers[2]];
         }
@@ -649,43 +653,34 @@ public class PlayerManager3P : MonoBehaviour
         }
 
         if (MainManager.playerInventory[MainManager.inactivePlayers[0], MainManager.currentCarIndex] < 1)
-
         {
             challengeButtonFirstInactive.gameObject.SetActive(false);
 
         }
 
         if (MainManager.playerInventory[MainManager.inactivePlayers[1], MainManager.currentCarIndex] < 1)
-
         {
             challengeButtonSecondInactive.gameObject.SetActive(false);
         }
 
         if (MainManager.playerNumber > 3)
-
         {
             if (MainManager.playerInventory[MainManager.inactivePlayers[2], MainManager.currentCarIndex] < 1)
-
             {
                 challengeButtonThirdInactive.gameObject.SetActive(false);
             }
         }
 
         if (MainManager.playerNumber > 4)
-
         {
             if (MainManager.playerInventory[MainManager.inactivePlayers[3], MainManager.currentCarIndex] < 1)
-
             {
                 challengeButtonFourthInactive.gameObject.SetActive(false);
             }
         }
-
-
     }
 
     public void ChallengeCancel()
-
     {
         challengePanel.SetActive(false);
     }
@@ -693,12 +688,31 @@ public class PlayerManager3P : MonoBehaviour
 
     public void SetDefenderAndContinue(int defender)
     {
+        if(!LocalIsActivePlayer())
+            nextRaceComingUpPanel.gameObject.transform.localScale = new Vector3(0, 0, 0);
+
         challengePanel.SetActive(false);
 
-        MainManager.defendingPlayer = MainManager.inactivePlayers[defender];
+        if (LocalIsActivePlayer())
+        {
+            MainManager.defendingPlayer = MainManager.inactivePlayers[defender];
+            
+        }
 
         raceInProgressPanelChallenge.SetActive(true);
-        getAutoResultsButtonNormal.SetActive(true);
+
+        if (NetworkManager.Singleton.IsHost)
+        {
+            getAutoResultsButtonNormal.SetActive(true);
+            getAutoResultsButtonNormal.gameObject.SetActive(true);
+            getManualResultsButtonL2.gameObject.SetActive(true);
+        }
+
+            if (!NetworkManager.Singleton.IsHost)
+        {
+            getAutoResultsButtonNormal.gameObject.SetActive(false);
+            getManualResultsButtonL2.gameObject.SetActive(false);
+        }
 
         lapCountScript.FindLapData(selectedTrack);
 
@@ -709,18 +723,19 @@ public class PlayerManager3P : MonoBehaviour
         challengerNameL2.text = MainManager.playerNames[MainManager.activePlayer];
         defenderNameL2.text = MainManager.playerNames[MainManager.defendingPlayer];
 
+        if(LocalIsActivePlayer())
+        OnlineManager.Instance.ReportDefendingPlayerToNetworkRpc(MainManager.defendingPlayer);
     }
 
 
     public void BuyCar()
-
     {
 
         if (MainManager.playerCash[MainManager.buyer] < MainManager.carPrizes[MainManager.currentCarIndex])
         {
             emptyInventoryScript.notEnoughCashPanel.SetActive(true);
             emptyInventoryScript.emptyInvDialoguePanel.SetActive(false);
-            nextRaceComingUpPanel.SetActive(false);
+            nextRaceComingUpPanel.gameObject.transform.localScale = new Vector3(0, 0, 0);
             return;
         }
 
@@ -734,7 +749,7 @@ public class PlayerManager3P : MonoBehaviour
             UpdateCashDisplay();
             UpdateInventoryDisplay();
 
-            nextRaceComingUpPanel.SetActive(false);
+            nextRaceComingUpPanel.gameObject.transform.localScale = new Vector3(0, 0, 0);
             l2SelectionIsOkay = true;
             buyingPossible = true;
             playerHasBoughtCarThisRound = true;
@@ -745,7 +760,6 @@ public class PlayerManager3P : MonoBehaviour
 
 
             if (activePlayerHasToynopoly == true && MainManager.fieldsLeftForCar[MainManager.currentCarIndex] > 9)
-
             {
                 OfferBuyOption();
 
@@ -866,7 +880,7 @@ public class PlayerManager3P : MonoBehaviour
     public void CancelRace()
 
     {
-        nextRaceComingUpPanel.SetActive(false);
+        nextRaceComingUpPanel.gameObject.transform.localScale = new Vector3(0, 0, 0);
         l2SelectionIsOkay = true;
         buyingPossible = true;
         protectButton.gameObject.SetActive(false);
@@ -877,31 +891,78 @@ public class PlayerManager3P : MonoBehaviour
 
     private void OnRaceLevel1InProgress(bool previousValue, bool newValue)
     {
-        if (LocalIsActivePlayer())
-            return;
-
         if (newValue == true)
         {
-            StartRace();
+            if (LocalIsActivePlayer())
+            { return; }
+            else
+                StartRace();        
+        } 
+
+        if (newValue == false)
+        {
+            if (NetworkManager.Singleton.IsHost)
+            {
+                return;
+            }
+            else
+            {
+                CSVFileReader.Instance.SetAutoResultsValid();                
+                CSVFileReader.Instance.LeaderboardClose();
+                RegisterResults();
+            }
+                
         }
     }
 
     //SECOND NETWORK EVENT END---------------------------
+    //THIRD NETWORK EVENT START----------------------------
+    private void OnRaceLevel2InProgress(bool previousValue, bool newValue)
+    {
+        if (newValue == true)
+        {
+            if (LocalIsActivePlayer())
+            { return; }
+            else
+                StartRace();
+        }
+
+        if (newValue == false)
+        {
+            if (NetworkManager.Singleton.IsHost)
+                return;                        
+            
+                CSVFileReader.Instance.SetAutoResultsValid();
+                CSVFileReader.Instance.LeaderboardClose();
+                RegisterResults();
+                CSVFileReader.Instance.RaceInProgessPanelClose();
+                CallTimeBattleWinnerDecision();
+        }
+    }
+    //THIRD NETWORK EVENT FINISHED--------------------------------------
 
     public void StartRace()
     {
-        if (LocalIsActivePlayer())
-        {
-            OnlineManager.Instance.ReportRaceLevel1InProgressRpc();
-        }
-
-        nextRaceComingUpPanel.SetActive(false);
+        
+        nextRaceComingUpPanel.gameObject.transform.localScale = new Vector3(0, 0, 0);
         protectButton.gameObject.SetActive(false);
 
+        if(MainManager.levelCounter == 2)
+        {
+            if (LocalIsActivePlayer())
+            {
+                OnlineManager.Instance.ReportRaceLevel2InProgressRpc(true);
+            }
+        }
 
         if (MainManager.levelCounter == 1)
         {
-            raceInProgressPanel.SetActive(true);
+            if (LocalIsActivePlayer())
+            {
+                OnlineManager.Instance.ReportRaceLevel1InProgressRpc(true);
+            }
+
+            raceInProgressPanel.gameObject.SetActive(true);
             lapCountScript.FindLapData(selectedTrack);
 
             if (NetworkManager.Singleton.IsHost)
@@ -940,7 +1001,7 @@ public class PlayerManager3P : MonoBehaviour
 
         else if (activePlayerHasToynopoly)
         {
-            raceInProgressPanel.SetActive(true);
+            raceInProgressPanel.gameObject.SetActive(true);
             lapCountScript.FindLapData(selectedTrack);
             continueButtonNormal.SetActive(false);
             getAutoResultsButtonNormal.SetActive(false);
@@ -959,8 +1020,10 @@ public class PlayerManager3P : MonoBehaviour
     //Only Call For Manual Results - Auto Results Determined through CSV Reader 
     public void ShowResultsPanel()
     {
-        raceInProgressPanel.SetActive(false);
-        raceInProgressPanelChallenge.SetActive(false);
+        CSVFileReader.Instance.SetAutoResultsInvalid();
+
+        raceInProgressPanel.gameObject.SetActive(false);
+        raceInProgressPanelChallenge.gameObject.SetActive(false);
 
         if (MainManager.levelCounter == 1)
         {
@@ -984,13 +1047,19 @@ public class PlayerManager3P : MonoBehaviour
 
     public void RegisterResults()
     {
+        if (resultsRegisteredForRound)
+            return;
+
+        resultsRegisteredForRound = true; 
+        //This is reset in Round Changeover
+
+
         fields[MainManager.pendingField].gameObject.SetActive(false);
         MainManager.fieldAvailable[MainManager.pendingField] = false;
 
         MainManager.fieldsLeftForCar[MainManager.currentCarIndex]--;
 
         switch (MainManager.levelCounter)
-
         {
             case 1:
 
@@ -1020,6 +1089,10 @@ public class PlayerManager3P : MonoBehaviour
                         thirdLevel1 = thirdPlaceDropdown.value;
                         Debug.Log(thirdPlaceDropdown.value);
                     }
+
+                    //Network Reporting Manual Results
+                    if(NetworkManager.Singleton.IsHost)                       
+                    OnlineManager.Instance.Level1ReportManualResultsToServerRpc(raceWinnerLevel1, runnerUpLevel1, MainManager.activePlayerWins);
                 }
 
                 else if (MainManager.autoResultsValid)
@@ -1029,15 +1102,19 @@ public class PlayerManager3P : MonoBehaviour
                 }
 
                 raceResultsPanelL1.SetActive(false);
+                                
 
                 Level1Scoring();
                 PostRaceRandomMarketProcedure();
+
+                if (NetworkManager.Singleton.IsHost)
+                    OnlineManager.Instance.ReportRaceLevel1InProgressRpc(false);
+
                 break;
 
             case 2:
 
                 raceResultsPanelL2.SetActive(true);
-
 
                 if (challengeWon == true)
 
@@ -1123,12 +1200,12 @@ public class PlayerManager3P : MonoBehaviour
 
                 }
 
-
                 break;
 
         }
 
     }
+    
 
     public void DisableProtectButton()
     {
@@ -1309,15 +1386,27 @@ public class PlayerManager3P : MonoBehaviour
     }
 
     public void Level2ChallengeScoring()
-
     {
-        challengeOutcomePanel.SetActive(false);
-        timeBattlePanel.SetActive(true);
-        TimeBattleOutcome();
+        challengeOutcomePanel.SetActive(false);                          
 
+        OnlineManager.Instance.ReportRaceLevel2InProgressRpc(false);
     }
 
+    public bool IsTimeBattleWinner()
+    {
+        ulong roundWinnerID = OnlineManager.Instance.GetPlayerID(MainManager.playerNames[MainManager.raceWinner]);
 
+        return NetworkManager.Singleton.LocalClientId == roundWinnerID;
+    }
+
+    private void CallTimeBattleWinnerDecision()
+    {
+        if (IsTimeBattleWinner())
+        {
+            timeBattlePanel.SetActive(true);
+            TimeBattleOutcome();
+        }
+    }
 
     void Level1Scoring()
 
@@ -1372,13 +1461,10 @@ public class PlayerManager3P : MonoBehaviour
     }
 
     public void TimeBattleOutcome()
-
     {
         int timeBattleWinner;
 
-
         timeBattleWinner = MainManager.raceWinner;
-
         {
             for (int i = 0; i < timeBattleNameDisplay.Length; i++)
 
@@ -1392,7 +1478,6 @@ public class PlayerManager3P : MonoBehaviour
                     {
                         timeBattleButtons[i].gameObject.SetActive(false);
                     }
-
             }
 
         }
@@ -1403,19 +1488,16 @@ public class PlayerManager3P : MonoBehaviour
 
     }
 
-
     public void TimeBattleCarSelect(int whichCar)
-
     {
         MainManager.TimeBattleCarIndex = whichCar;
         buffNerfPanel.SetActive(true);
         audioSource.PlayOneShot(panelOpen);
 
+        OnlineManager.Instance.ReportTimeBattleCarIndexToNetworkRpc(whichCar);
     }
 
-
     public void BuffCarAndContinue()
-
     {
         float oldCarValue = MainManager.carPrizes[MainManager.TimeBattleCarIndex];
 
@@ -1437,18 +1519,10 @@ public class PlayerManager3P : MonoBehaviour
         timeBattlePanel.SetActive(false);
         buffNerfPanel.SetActive(false);
 
-        /*if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
+        OnlineManager.Instance.ReportCarBuffToClientsRpc();
 
-        {
-            preSellingInfoPanel.SetActive(true);
-            audioSource.PlayOneShot(panelOpen);
-        }
-
-        else
-        */
-
+                
         if (MainManager.roundCounter % MainManager.playerNumber == 0)
-
         {
             ReInstateRows();
             preSellingInfoPanel.SetActive(true);
@@ -1481,15 +1555,8 @@ public class PlayerManager3P : MonoBehaviour
         timeBattlePanel.SetActive(false);
         buffNerfPanel.SetActive(false);
 
-        /*if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
-
-        {
-            preSellingInfoPanel.SetActive(true);
-            audioSource.PlayOneShot(panelOpen);
-        }
-
-        else
-        */
+        OnlineManager.Instance.ReportCarBuffToClientsRpc();
+                
 
         if (MainManager.roundCounter % MainManager.playerNumber == 0)
 
@@ -1620,11 +1687,10 @@ public class PlayerManager3P : MonoBehaviour
         UpdateInventoryDisplay();
     }
 
-    void PostRaceRandomMarketProcedure()
-
+    private void PostRaceRandomMarketProcedure()
     {
         int oldCarValue = MainManager.carPrizes[MainManager.currentCarIndex];
-        int randomValue = UnityEngine.Random.Range(0, 15);
+        int randomValue = OnlineManager.Instance.GetRandomMarketDelta();
         int newCarValue = (MainManager.carPrizes[MainManager.currentCarIndex] + (carValueChangeOptions[randomValue]));
         MainManager.carPrizes[MainManager.currentCarIndex] = (MainManager.carPrizes[MainManager.currentCarIndex] + (carValueChangeOptions[randomValue]));
 
@@ -1635,7 +1701,6 @@ public class PlayerManager3P : MonoBehaviour
 
             lastChangebeforeDefault = carValueChangeOptions[randomValue];
             CarHasDefaulted();
-
         }
 
 
@@ -1659,9 +1724,7 @@ public class PlayerManager3P : MonoBehaviour
             {
                 audioSource.PlayOneShot(success);
             }
-
-
-            //UpdateCarPrizesDisplay();
+                                    
         }
 
         else if (carValueChangeOptions[randomValue] < 0)
@@ -1673,8 +1736,7 @@ public class PlayerManager3P : MonoBehaviour
 
             countUpScript.AddValue(oldCarValue, MainManager.carPrizes[MainManager.currentCarIndex]);
 
-            //UpdateCarPrizesDisplay();
-
+            
         }
 
         else
@@ -1683,10 +1745,9 @@ public class PlayerManager3P : MonoBehaviour
             priceUpArrow.SetActive(false);
             priceDownArrow.SetActive(false);
             valueChangeMessage.text = "The price of this car remains unchanged";
-
-            //UpdateCarPrizesDisplay();
-
+                        
         }
+               
 
     }
 
@@ -1774,7 +1835,7 @@ public class PlayerManager3P : MonoBehaviour
 
     public void RoundChangeover()
     {
-
+        OnRoundChangeover?.Invoke();
         Save();
 
         carInDefaultPanel.SetActive(false);
@@ -1795,15 +1856,19 @@ public class PlayerManager3P : MonoBehaviour
         //l3SelectionIsOkay = true;
         buyingPossible = true;
         playerHasBoughtCarThisRound = false;
+        resultsRegisteredForRound = false;
         MainManager.IsToynopolyBattle = false;
 
         MainManager.activePlayer++;
+        
 
         if (MainManager.activePlayer > MainManager.playerNumber - 1)
 
         {
             MainManager.activePlayer = 0;
         }
+
+        CallActivePlayer();
 
         for (int i = 0; i < MainManager.playerNumber; i++)
 
@@ -1818,7 +1883,6 @@ public class PlayerManager3P : MonoBehaviour
         if (MainManager.levelCounter == 2)
         {
             if (MainManager.roundCounter < MainManager.raceThreshold)
-
             {
                 dividendScript.DividendCheck();
                 OutOfOptionsCheck();
@@ -1880,21 +1944,18 @@ public class PlayerManager3P : MonoBehaviour
 
             }
         }
-
-
-
     }
 
 
     public void StartLevel2()
-
     {
-
+        ResetThresholdForLevel();
 
         level2StartPanel.SetActive(false);
         OnLevel2Start?.Invoke();
 
         MainManager.activePlayer = GetIndexOfLowestValue(MainManager.playerCash);
+        CallActivePlayer();
 
         for (int i = 0; i < MainManager.playerNumber; i++)
 
@@ -1906,6 +1967,19 @@ public class PlayerManager3P : MonoBehaviour
 
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
+    }
+
+    private void ResetThresholdForLevel()
+    {        
+      Dictionary<int, int> thresholdForPlayers = new Dictionary<int, int>
+      {
+        {3, 13},
+        {4, 13},
+        {5, 11},
+       };
+
+        MainManager.raceThreshold = thresholdForPlayers[MainManager.playerNumber];
+        Debug.Log("Threshold Reset to " + thresholdForPlayers[MainManager.playerNumber]);
     }
 
     public int GetIndexOfLowestValue(int[] arr)
@@ -2158,7 +2232,9 @@ public class PlayerManager3P : MonoBehaviour
             matchlength = MainManager.raceThreshold,
             shields = MainManager.shieldAvailable,
             protection = MainManager.protection,
-            tempdividends = dividendScript.actualDividendList,
+            
+            //Resume N/A in Netcode Version
+            //tempdividends = dividendScript.actualDividendList,
 
 
         };

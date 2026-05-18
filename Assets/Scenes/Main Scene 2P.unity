@@ -68221,7 +68221,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46ab28f1d66929e4aa02e2513b1abaac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actualDividendList: 
   dividendPayPanel: {fileID: 971362751}
   dividendCarNamePanel: {fileID: 721143895}
   dividendCarPrizePanel: {fileID: 1906819881}
@@ -129000,7 +128999,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 751689116}
         m_TargetAssemblyTypeName: DividendGenerator, Assembly-CSharp
-        m_MethodName: RandomizeDividend
+        m_MethodName: DividendCheck
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -129012,7 +129011,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 751689116}
         m_TargetAssemblyTypeName: DividendGenerator, Assembly-CSharp
-        m_MethodName: DividendCheck
+        m_MethodName: PrepareLevel2
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -1717,7 +1717,9 @@ public class GameManager : MonoBehaviour
             matchlength = MainManager.raceThreshold,
             shields = MainManager.shieldAvailable,
             protection = MainManager.protection,
-            tempdividends = dividendScript.actualDividendList,
+            
+            //Resume N/A in Netcode Version
+            //tempdividends = dividendScript.actualDividendList,
 
         };
 

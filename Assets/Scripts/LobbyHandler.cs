@@ -75,13 +75,19 @@ public class LobbyHandler : MonoBehaviour
         }
 
         Debug.Log("Lobby Change");
-                
+
+        MainManager.playerNumber = joinedLobby.Players.Count;
+        Debug.Log(joinedLobby.Players.Count);
+        AdjustRoundsThresholdToPlayerNumber(joinedLobby.Players.Count);
+
         StartCoroutine(WaitAfterPlayerJoined());
     }
 
 
     private void AdjustRoundsThresholdToPlayerNumber(int players)
     {
+        Debug.Log("Setting Threshold with Values  - Threshold " + MainManager.raceThreshold + "Players " + players + " Short Match Bool " + MainManager.shortMatch);
+
         switch (players)
         {
             case 2:
@@ -92,7 +98,6 @@ public class LobbyHandler : MonoBehaviour
                 }
 
                 else
-
                     MainManager.raceThreshold = 13;
                 break;
 
@@ -132,28 +137,39 @@ public class LobbyHandler : MonoBehaviour
                 break;
 
             default:
-                
+
+                Debug.Log("Could not set Threshold with Values  - Threshold " + MainManager.raceThreshold + "Players " + players + " Short Match Bool " + MainManager.shortMatch);
                 break;               
 
         }
+
+        Debug.Log("Threshold Set to " + MainManager.raceThreshold);
+
     }
 
     private IEnumerator WaitAfterPlayerJoined()
     {
         yield return new WaitForSeconds(5f);
 
+        MainManager.playerNumber = joinedLobby.Players.Count;
+        Debug.Log(joinedLobby.Players.Count);
+        AdjustRoundsThresholdToPlayerNumber(joinedLobby.Players.Count);
+
         if (!deviceHasJoinedRelay)
-        {
-            Debug.Log(joinedLobby.Players.Count);
+        {            
             PrintPlayers();
-            AdjustRoundsThresholdToPlayerNumber(joinedLobby.Players.Count);
-            MainManager.playerNumber = joinedLobby.Players.Count;
+            
+            if (!CheckIfLobbyHost())
+            {
+                SetCarClassOnClients();
+
+                SetMatchLengthOnClients();
+            }                                  
 
             if (!gameHasStarted)
             {
                 LobbyUIHandler.Instance.UpdatePlayerNumber(joinedLobby.Players.Count);
             }
-
 
             if (joinedLobby.HostId == originalHostId)
             {
@@ -303,7 +319,7 @@ public class LobbyHandler : MonoBehaviour
 
         PrintPlayers();              
 
-        SetLobbyParameters();
+        SetLobbyParameters();                
 
     }
 
@@ -392,10 +408,12 @@ public class LobbyHandler : MonoBehaviour
             MainManager.localMultiplayerName = GetPlayer().Data["PlayerName"].Value;
 
             PrintPlayers();
-
+                        
             SetCarClassOnClients();
 
             SetMatchLengthOnClients();
+            
+
 
             var callbacks = new LobbyEventCallbacks();
             callbacks.LobbyChanged += Callbacks_LobbyChanged;
@@ -461,8 +479,7 @@ public class LobbyHandler : MonoBehaviour
                 MainManager.shortMatch = false;
                 break;
         }
-
-        AdjustRoundsThresholdToPlayerNumber(joinedLobby.Players.Count);
+        
     }
 
     public Lobby ReturnJoinedLobby()
