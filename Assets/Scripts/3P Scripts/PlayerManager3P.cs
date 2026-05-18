@@ -696,7 +696,7 @@ public class PlayerManager3P : MonoBehaviour
         if (LocalIsActivePlayer())
         {
             MainManager.defendingPlayer = MainManager.inactivePlayers[defender];
-            
+            StartRace();
         }
 
         raceInProgressPanelChallenge.SetActive(true);
@@ -730,7 +730,6 @@ public class PlayerManager3P : MonoBehaviour
 
     public void BuyCar()
     {
-
         if (MainManager.playerCash[MainManager.buyer] < MainManager.carPrizes[MainManager.currentCarIndex])
         {
             emptyInventoryScript.notEnoughCashPanel.SetActive(true);
@@ -740,7 +739,6 @@ public class PlayerManager3P : MonoBehaviour
         }
 
         else
-
         {
 
             MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
@@ -769,7 +767,6 @@ public class PlayerManager3P : MonoBehaviour
     }
 
     public void OfferBuyOption()
-
     {
         buyOptionPanel.SetActive(true);
 
@@ -786,13 +783,10 @@ public class PlayerManager3P : MonoBehaviour
         {
             fourthinactivePlayerName.text = MainManager.playerNames[MainManager.inactivePlayers[3]];
         }
-
-
     }
 
 
     public void AcceptBuyOption(int whichPlayer)
-
     {
         if (wantsToBuy[whichPlayer] == false)
 
@@ -801,8 +795,6 @@ public class PlayerManager3P : MonoBehaviour
         else
 
         { wantsToBuy[whichPlayer] = false; }
-
-
     }
 
 
@@ -907,11 +899,10 @@ public class PlayerManager3P : MonoBehaviour
             }
             else
             {
-                CSVFileReader.Instance.SetAutoResultsValid();                
+                CSVFileReader.Instance.SetAutoResultsValidRpc();                
                 CSVFileReader.Instance.LeaderboardClose();
                 RegisterResults();
-            }
-                
+            }                
         }
     }
 
@@ -919,6 +910,8 @@ public class PlayerManager3P : MonoBehaviour
     //THIRD NETWORK EVENT START----------------------------
     private void OnRaceLevel2InProgress(bool previousValue, bool newValue)
     {
+        Debug.Log("Race 2 In Progress Network Variable Changed To " + newValue);
+
         if (newValue == true)
         {
             if (LocalIsActivePlayer())
@@ -929,28 +922,36 @@ public class PlayerManager3P : MonoBehaviour
 
         if (newValue == false)
         {
-            if (NetworkManager.Singleton.IsHost)
-                return;                        
-            
-                CSVFileReader.Instance.SetAutoResultsValid();
+            Debug.Log("Local Is Host " + NetworkManager.Singleton.IsHost);
+
+            if (!NetworkManager.Singleton.IsHost)
+            {                
                 CSVFileReader.Instance.LeaderboardClose();
                 RegisterResults();
-                CSVFileReader.Instance.RaceInProgessPanelClose();
-                CallTimeBattleWinnerDecision();
+                CSVFileReader.Instance.ChallengeRaceInProgessPanelClose();
+
+                Debug.Log("Results Registered On Clients");                
+            }
+
+            promptText.text = ("Waiting for race winner " + MainManager.playerNames[MainManager.raceWinner] + " to change the value of a car");
+
+            CallTimeBattleWinnerDecision();
         }
     }
     //THIRD NETWORK EVENT FINISHED--------------------------------------
 
     public void StartRace()
-    {
-        
+    {        
         nextRaceComingUpPanel.gameObject.transform.localScale = new Vector3(0, 0, 0);
         protectButton.gameObject.SetActive(false);
 
         if(MainManager.levelCounter == 2)
         {
+            Debug.Log("Starting Race, Local Is Active And Will Report Level 2 Race In Progress " + LocalIsActivePlayer());
+
             if (LocalIsActivePlayer())
             {
+                Debug.Log("Level 2 Race In progress Network Variable Set To True");
                 OnlineManager.Instance.ReportRaceLevel2InProgressRpc(true);
             }
         }
@@ -1020,7 +1021,8 @@ public class PlayerManager3P : MonoBehaviour
     //Only Call For Manual Results - Auto Results Determined through CSV Reader 
     public void ShowResultsPanel()
     {
-        CSVFileReader.Instance.SetAutoResultsInvalid();
+        CSVFileReader.Instance.SetAutoResultsInvalidRpc();
+        Debug.Log("Host Requested Auto Results Invalid on Clients");
 
         raceInProgressPanel.gameObject.SetActive(false);
         raceInProgressPanelChallenge.gameObject.SetActive(false);
@@ -1114,60 +1116,62 @@ public class PlayerManager3P : MonoBehaviour
 
             case 2:
 
-                raceResultsPanelL2.SetActive(true);
+                //raceResultsPanelL2.SetActive(true);                               
 
+                Debug.Log("Challenge Won Bool " + challengeWon);
+                Debug.Log("Challenge Lost Bool " + challengeLost);
                 if (challengeWon == true)
-
                 {
                     PlayerWinsCar(MainManager.activePlayer);
                     PlayerLosesCar(MainManager.defendingPlayer);
 
                     if (!MainManager.autoResultsValid)
                     {
+                        if (NetworkManager.Singleton.IsHost)
+                        { OnlineManager.Instance.ReportManualChallengeGapsRpc(gapToDefender.value, gapToChallenger.value, gapStolenWin.value); }
+
                         if (!stolenWin)
                         {
                             MainManager.raceWinner = MainManager.activePlayer;
                             int gap;
-                            gap = System.Convert.ToInt32(gapToDefender.value);
+                            gap = MainManager.manualReportingGapToDefender;
                             MainManager.timeBattleSeconds = (gap);
                         }
 
                         else
-
                         {
                             MainManager.raceWinner = stealer;
                             int gap;
-                            gap = System.Convert.ToInt32(gapStolenWin.value);
+                            gap = MainManager.manualReportingGapStolenWin;
                             MainManager.timeBattleSeconds = (gap);
                         }
 
                     }
                 }
-
+                                
                 else if (challengeLost == true)
-
-
                 {
                     PlayerWinsCar(MainManager.defendingPlayer);
                     PlayerLosesCar(MainManager.activePlayer);
 
                     if (!MainManager.autoResultsValid)
                     {
+                        if (NetworkManager.Singleton.IsHost)
+                        { OnlineManager.Instance.ReportManualChallengeGapsRpc(gapToDefender.value, gapToChallenger.value, gapStolenWin.value); }
 
                         if (!stolenWin)
                         {
                             MainManager.raceWinner = MainManager.defendingPlayer;
                             int gap2;
-                            gap2 = System.Convert.ToInt32(gapToChallenger.value);
+                            gap2 = MainManager.manualReportingGapToChallenger;
                             MainManager.timeBattleSeconds = (gap2);
                         }
 
                         else
-
                         {
                             MainManager.raceWinner = stealer;
                             int gap;
-                            gap = System.Convert.ToInt32(gapStolenWin.value);
+                            gap = MainManager.manualReportingGapStolenWin;
                             MainManager.timeBattleSeconds = (gap);
 
                         }
@@ -1175,7 +1179,10 @@ public class PlayerManager3P : MonoBehaviour
                 }
 
                 raceResultsPanelL2.SetActive(false);
-                challengeOutcomePanel.SetActive(true);
+                
+                if(NetworkManager.Singleton.IsHost)
+                    challengeOutcomePanel.SetActive(true);
+                
                 challengeCarDisplay.text = selectedCar;
 
                 if (challengeWon == true)
@@ -1183,8 +1190,8 @@ public class PlayerManager3P : MonoBehaviour
                     challengeWinnerDisplay.text = MainManager.playerNames[MainManager.activePlayer];
                     challengeDefeatedDisplay.text = MainManager.playerNames[MainManager.defendingPlayer];
                 }
-                else if (challengeLost == true)
 
+                else if (challengeLost == true)
                 {
                     challengeWinnerDisplay.text = MainManager.playerNames[MainManager.defendingPlayer];
                     challengeDefeatedDisplay.text = MainManager.playerNames[MainManager.activePlayer];
@@ -1194,7 +1201,6 @@ public class PlayerManager3P : MonoBehaviour
                 protectionScript.CheckProtectionOptionAfterChallenge();
 
                 if (activePlayerHasToynopoly && MainManager.shieldAvailable[MainManager.activePlayer] == true)
-
                 {
                     preProtectButton.gameObject.SetActive(true);
 
@@ -1213,9 +1219,17 @@ public class PlayerManager3P : MonoBehaviour
         audioSource.PlayOneShot(panelOpen);
     }
 
+    public void SetStealerManualReporting(int stealerReported)
+    {
+        stealer = stealerReported;
+    }
+
     public void RegisterSteal()
     {
         stealer = playersL2WinnerDropdown.value;
+
+        if (NetworkManager.Singleton.IsHost)
+            OnlineManager.Instance.ManualReportStealToClientsRpc(stealer);
     }
 
 
@@ -1325,70 +1339,71 @@ public class PlayerManager3P : MonoBehaviour
 
     }
 
-
-
-
-
     public void GetChallengeResultWin(bool win)
-
     {
+        if(NetworkManager.Singleton.IsHost)
+        OnlineManager.Instance.ManualReportChallengeWinToServerRpc(win);
+
         challengeWon = win;
         Debug.Log(win);
-
-
     }
 
     public void GetChallengeResultLoss(bool loss)
-
     {
+        if (NetworkManager.Singleton.IsHost)
+            OnlineManager.Instance.ManualReportChallengeLossToServerRpc(loss);
+
         challengeLost = loss;
         Debug.Log(loss);
-
-
     }
 
-
-    public void SetStolenWinBool()
-
+    public void SetStolenWinBoolAfterManualReport(bool stolenWinBool)
     {
-        if (!stolenWin)
+        stolenWin = stolenWinBool;
+        Debug.Log("Stolen Win Set To " + stolenWinBool);
+    }
 
+    public void SetStolenWinBool(bool IsStolenWin)
+    {
+        if (IsStolenWin)
         {
             stolenWin = true;
+
+            if (NetworkManager.Singleton.IsHost)
+                OnlineManager.Instance.ManualReportStolenWinToServerRpc(true);
+
             playersL2WinnerDropdown.gameObject.SetActive(true);
             winnerGapSlider.SetActive(true);
             gapToDefender.gameObject.SetActive(false);
             gapToChallenger.gameObject.SetActive(false);
-
         }
 
-
         else
-
         {
             stolenWin = false;
+
+            if (NetworkManager.Singleton.IsHost)
+                OnlineManager.Instance.ManualReportStolenWinToServerRpc(false);
+
             playersL2WinnerDropdown.gameObject.SetActive(false);
             winnerGapSlider.SetActive(false);
             gapToDefender.gameObject.SetActive(true);
             gapToChallenger.gameObject.SetActive(true);
-
         }
-
     }
 
     public void DisplaySecondsGap()
-
     {
         gapSecondsDisplaySteal.text = gapStolenWin.value.ToString();
         gapSecondsDisplayWin.text = gapToDefender.value.ToString();
         gapSecondsDisplayLoss.text = gapToChallenger.value.ToString();
-
     }
 
     public void Level2ChallengeScoring()
     {
-        challengeOutcomePanel.SetActive(false);                          
+        challengeOutcomePanel.SetActive(false);
 
+        Debug.Log("Level 2 Race in Progress Network Variable set To False");
         OnlineManager.Instance.ReportRaceLevel2InProgressRpc(false);
     }
 
@@ -1396,11 +1411,15 @@ public class PlayerManager3P : MonoBehaviour
     {
         ulong roundWinnerID = OnlineManager.Instance.GetPlayerID(MainManager.playerNames[MainManager.raceWinner]);
 
+        Debug.Log("Round Winner ID is " + roundWinnerID);
+
         return NetworkManager.Singleton.LocalClientId == roundWinnerID;
     }
 
     private void CallTimeBattleWinnerDecision()
     {
+        Debug.Log("Checking If Local Is Time Battle Winner - " + IsTimeBattleWinner());
+
         if (IsTimeBattleWinner())
         {
             timeBattlePanel.SetActive(true);
@@ -1409,7 +1428,6 @@ public class PlayerManager3P : MonoBehaviour
     }
 
     void Level1Scoring()
-
     {
         switch (MainManager.playerNumber)
 
@@ -1431,7 +1449,6 @@ public class PlayerManager3P : MonoBehaviour
 
 
                 if (MainManager.activePlayerWins)
-
                 {
                     PlayerWinsCar(MainManager.activePlayer);
 
@@ -1446,7 +1463,6 @@ public class PlayerManager3P : MonoBehaviour
                 }
 
                 else
-
                 {
                     PlayerWinsCar(raceWinnerLevel1);
                     MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
@@ -1485,7 +1501,6 @@ public class PlayerManager3P : MonoBehaviour
         timeBattleWinnerDisplay.text = MainManager.playerNames[timeBattleWinner];
 
         timeBattleSecondsDisplay.text = MainManager.timeBattleSeconds.ToString();
-
     }
 
     public void TimeBattleCarSelect(int whichCar)
@@ -1519,9 +1534,11 @@ public class PlayerManager3P : MonoBehaviour
         timeBattlePanel.SetActive(false);
         buffNerfPanel.SetActive(false);
 
-        OnlineManager.Instance.ReportCarBuffToClientsRpc();
-
-                
+        if (IsTimeBattleWinner())
+        {            
+            OnlineManager.Instance.ReportCarBuffToClientsRpc();
+        }
+                        
         if (MainManager.roundCounter % MainManager.playerNumber == 0)
         {
             ReInstateRows();
@@ -1555,7 +1572,8 @@ public class PlayerManager3P : MonoBehaviour
         timeBattlePanel.SetActive(false);
         buffNerfPanel.SetActive(false);
 
-        OnlineManager.Instance.ReportCarBuffToClientsRpc();
+        if(IsTimeBattleWinner())
+        OnlineManager.Instance.ReportCarNerfToClientsRpc();
                 
 
         if (MainManager.roundCounter % MainManager.playerNumber == 0)
@@ -1843,7 +1861,6 @@ public class PlayerManager3P : MonoBehaviour
         hostOptionsPanel.SetActive(false);
         pausePanel.SetActive(false);
 
-
         for (int i = 0; i < MainManager.playerNumber; i++)
         {
             playerSellButton[i].gameObject.SetActive(false);
@@ -1859,11 +1876,9 @@ public class PlayerManager3P : MonoBehaviour
         resultsRegisteredForRound = false;
         MainManager.IsToynopolyBattle = false;
 
-        MainManager.activePlayer++;
-        
+        MainManager.activePlayer++;        
 
         if (MainManager.activePlayer > MainManager.playerNumber - 1)
-
         {
             MainManager.activePlayer = 0;
         }
@@ -1891,7 +1906,6 @@ public class PlayerManager3P : MonoBehaviour
         }
 
         if (MainManager.levelCounter == 3)
-
         {
             //InventoryCheck();
 
@@ -1907,41 +1921,33 @@ public class PlayerManager3P : MonoBehaviour
             timerScript.DisplayToggle(true);
 
         }
-
-
     }
 
 
     void LevelCheck()
-
     {
         if (MainManager.roundCounter > MainManager.raceThreshold - 1)
-
         {
             if (MainManager.levelCounter == 1)
-
             {
                 if (MainManager.roundCounter == MainManager.raceThreshold)
-
                 {
                     level2StartPanel.gameObject.SetActive(true);
                 }
 
                 MainManager.levelCounter = 2;
                 MainManager.roundCounter = 1;
-
-
             }
 
             else if (MainManager.levelCounter == 2)
-
             {
-                if (MainManager.roundCounter == MainManager.raceThreshold)
+                Debug.Log("Round Counter " + MainManager.roundCounter);
+                Debug.Log("Round Threshold " + MainManager.raceThreshold);
 
-                {
+                if (MainManager.roundCounter == MainManager.raceThreshold)
+                {                    
                     EndGame();
                 }
-
             }
         }
     }
@@ -2267,19 +2273,15 @@ public class PlayerManager3P : MonoBehaviour
 
 
     public void QuitGame()
-
     {
         Application.Quit();
     }
 
     System.Collections.IEnumerator WaitAfterCarFame()
-
     {
         yield return new WaitForSeconds(10.0f);
         ReInstateRows();
         RoundChangeover();
-
-
     }
 
     public void ReInstateRows()

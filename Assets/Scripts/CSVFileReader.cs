@@ -426,7 +426,7 @@ public class CSVFileReader : MonoBehaviour
     {
         if (!NetworkManager.Singleton.IsHost)
         {
-            SetAutoResultsValid();
+            SetAutoResultsValidRpc();
 
             Debug.Log("Processing Race Results On Local Machine " + NetworkManager.Singleton.LocalClientId);
 
@@ -799,8 +799,7 @@ public class CSVFileReader : MonoBehaviour
         if (resultsValid)
             { Debug.Log("All results validated");
                 
-            }
-         
+            }         
         }
 
         MoveCursorPosAfterSuccessfulRead();
@@ -1044,15 +1043,26 @@ public class CSVFileReader : MonoBehaviour
 
     }
 
-    public void SetAutoResultsValid()
+    
+    public void SetAutoResultsValidRpc()
     {
         MainManager.autoResultsValid = true;
-                
+
+        if (NetworkManager.Singleton.IsHost)
+            OnlineManager.Instance.ClientsSetAutoResultsValidRpc();
+
+        Debug.Log("Auto Results Set Valid");                
     }
 
-    public void SetAutoResultsInvalid()
+    
+    public void SetAutoResultsInvalidRpc()
     {
         MainManager.autoResultsValid = false;
+
+        if(NetworkManager.Singleton.IsHost)
+        OnlineManager.Instance.ClientsSetAutoResultsInvalidRpc();
+
+        Debug.Log("WARNING: Auto Results Set INVALID");
     }
 
     

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -53,6 +54,10 @@ public class MainManager : MonoBehaviour
 
     public static int[] inactivePlayers = { 0, 1, 2, 3, 4};
     public static int defendingPlayer = 0;
+
+    public static int manualReportingGapToDefender;
+    public static int manualReportingGapStolenWin;
+    public static int manualReportingGapToChallenger;
 
     public static int roundCounter = 1;
     public static int levelCounter = 1;

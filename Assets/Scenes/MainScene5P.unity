@@ -24842,7 +24842,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1896969731}
         m_TargetAssemblyTypeName: PlayerManager3P, Assembly-CSharp
         m_MethodName: SetStolenWinBool
-        m_Mode: 1
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -33617,7 +33617,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1027624879}
         m_TargetAssemblyTypeName: CSVFileReader, Assembly-CSharp
-        m_MethodName: SetAutoResultsValid
+        m_MethodName: SetAutoResultsValidRpc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -128740,7 +128740,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1027624879}
         m_TargetAssemblyTypeName: CSVFileReader, Assembly-CSharp
-        m_MethodName: SetAutoResultsValid
+        m_MethodName: SetAutoResultsValidRpc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -209454,7 +209454,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1027624879}
         m_TargetAssemblyTypeName: CSVFileReader, Assembly-CSharp
-        m_MethodName: SetAutoResultsValid
+        m_MethodName: SetAutoResultsValidRpc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -212505,6 +212505,7 @@ MonoBehaviour:
   continueButtonToynopoly: {fileID: 265270495}
   continueButtonToynopolyAuto: {fileID: 2030934368}
   continueButtonNormal: {fileID: 765720939}
+  getManualResultsButtonL2: {fileID: 0}
   getAutoResultsButtonNormal: {fileID: 505147557}
   getAutoResultsButtonNormalL1: {fileID: 1384514254}
   raceResultsPanelL2: {fileID: 719014371}

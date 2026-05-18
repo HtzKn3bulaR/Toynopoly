@@ -325,6 +325,7 @@ public class OnlineManager : NetworkBehaviour
     internal void ReportRaceLevel2InProgressRpc(bool level2RaceStatus)
     {
         level2RaceIsInProgress.Value = level2RaceStatus;
+        Debug.Log("Race In Progress Network Variable Set To " + level2RaceIsInProgress.Value);
     }
 
     public int GetRandomMarketDelta()
@@ -446,31 +447,89 @@ public class OnlineManager : NetworkBehaviour
         }
     }
 
+    //Challenge Manual Reporting
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ManualReportChallengeWinToServerRpc(bool win)
+    {
+        if(!NetworkManager.Singleton.IsHost)
+        PlayerManager3P.Instance.GetChallengeResultWin(win);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ManualReportChallengeLossToServerRpc(bool loss)
+    {
+        if (!NetworkManager.Singleton.IsHost)
+            PlayerManager3P.Instance.GetChallengeResultLoss(loss);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ManualReportStolenWinToServerRpc(bool stolenWin)
+    {
+        if (!NetworkManager.Singleton.IsHost)
+            PlayerManager3P.Instance.SetStolenWinBoolAfterManualReport(stolenWin);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportManualChallengeGapsRpc(float value1, float value2, float value3)
+    {
+        Debug.Log("Reported Gaps " + value1 + ", " + value2 + " , " + value3);
+                     
+        MainManager.manualReportingGapToDefender = System.Convert.ToInt32(value1);
+        MainManager.manualReportingGapToChallenger = System.Convert.ToInt32(value2);
+        MainManager.manualReportingGapStolenWin = System.Convert.ToInt32(value3);   
+        
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ManualReportStealToClientsRpc(int stealer)
+    {
+        if (!NetworkManager.Singleton.IsHost)
+            PlayerManager3P.Instance.SetStealerManualReporting(stealer);
+    }
+
     //TIME BATTLE
 
     [Rpc(SendTo.ClientsAndHost)]
     internal void ReportTimeBattleCarIndexToNetworkRpc(int whichCar)
     {
-       MainManager.currentCarIndex = whichCar;
+       MainManager.TimeBattleCarIndex = whichCar;
     }
 
     [Rpc(SendTo.ClientsAndHost)]
     internal void ReportCarBuffToClientsRpc()
     {
-        if (PlayerManager3P.Instance.IsTimeBattleWinner())
-            return;
-
-        PlayerManager3P.Instance.BuffCarAndContinue();
+        if (!PlayerManager3P.Instance.IsTimeBattleWinner())
+        {
+            PlayerManager3P.Instance.BuffCarAndContinue();
+        }
     }
 
     [Rpc(SendTo.ClientsAndHost)]
     internal void ReportCarNerfToClientsRpc()
     {
-        if (PlayerManager3P.Instance.IsTimeBattleWinner())
-            return;
-
-        PlayerManager3P.Instance.BuffCarAndContinue();
+        if (!PlayerManager3P.Instance.IsTimeBattleWinner())
+        {
+            PlayerManager3P.Instance.NerfCarAndContinue();
+        }
     }
 
 
+    //AUTO RESULT VALIDATION------------------------------------
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ClientsSetAutoResultsValidRpc()
+    {
+        if(!NetworkManager.Singleton.IsHost)
+            MainManager.autoResultsValid = true;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ClientsSetAutoResultsInvalidRpc()
+    {
+        if (!NetworkManager.Singleton.IsHost)
+            MainManager.autoResultsValid = false;
+    }
+
+    //---------------------------------------------------------------
 }
