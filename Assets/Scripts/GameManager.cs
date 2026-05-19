@@ -633,8 +633,7 @@ public class GameManager : MonoBehaviour
     public void ShowResultsPanel()
 
     {
-
-        raceInProgressPanel.SetActive(false);
+        //raceInProgressPanel.SetActive(false);
         raceResultsPanel.SetActive(true);
         resultPanelActivePlayer.text = MainManager.playerNames[MainManager.activePlayer];
 

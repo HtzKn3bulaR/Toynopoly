@@ -52,6 +52,12 @@ public class OnlineManager : NetworkBehaviour
 
     public NetworkVariable<int> defenderPlayerIDNetworkVariable = new NetworkVariable<int>(9);
 
+    //PLAYER STATES NETWORK VARIABLES
+
+    public NetworkVariable<int> numberOfPlayersReportedReadyForNextRound = new NetworkVariable<int>(0);
+
+
+
     private bool trackListReady = false;
     private bool carListReady = false;
     private bool playerListReady = false;
@@ -83,6 +89,8 @@ public class OnlineManager : NetworkBehaviour
         randomMarketDelta = new NetworkVariable<int>();
 
         actualDividendsNetworkList = new NetworkList<int>();
+
+        PlayerManager3P.OnActivePlayerHasBoughtCar += PlayerManager3P_OnActivePlayerHasBoughtCar;
     }
         
 
@@ -528,8 +536,91 @@ public class OnlineManager : NetworkBehaviour
     internal void ClientsSetAutoResultsInvalidRpc()
     {
         if (!NetworkManager.Singleton.IsHost)
+        {
             MainManager.autoResultsValid = false;
+            PlayerManager3P.Instance.GetChallengeResultWin(true);
+        }
     }
 
     //---------------------------------------------------------------
+
+
+    //TOYNOPOLY TIME BATTLE RESULTS
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ExecuteToynopolyTimeBattleResultsOnClientsRpc()
+    {
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            PlayerManager3P.Instance.ToynopolyTimeBattleResult();
+            PlayerManager3P.Instance.ToynopolyTimeBattleConclude();
+            CSVFileReader.Instance.LeaderboardClose();
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportChangeValueToClientsRpc(int changeValue)
+    {
+        if(!NetworkManager.Singleton.IsHost)
+        {
+            MainManager.changeValue = changeValue;
+        }
+    }
+
+    //PLAYER STATES
+
+    [Rpc(SendTo.Server)]
+    internal void ReportReadyForNextRoundToServerRpc()
+    {
+        numberOfPlayersReportedReadyForNextRound.Value++;
+        Debug.Log("Player Reported Ready For Next Round - Reported " + numberOfPlayersReportedReadyForNextRound.Value);
+
+        if (numberOfPlayersReportedReadyForNextRound.Value == MainManager.playerNumber)
+        {
+            SendAllClientsToNextRoundRpc();
+            numberOfPlayersReportedReadyForNextRound.Value = 0;
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SendAllClientsToNextRoundRpc()
+    {
+        PlayerManager3P.Instance.RoundChangeover();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void CheckAllPlayersSyncedToNewRoundRpc()
+    {
+        if (PlayerState.Instance.GetPlayerReadinessStatus() == false && numberOfPlayersReportedReadyForNextRound.Value == 0)
+        {
+            PlayerManager3P.Instance.RoundChangeover();
+            Debug.Log("One or more clients lagging behind - forcing Round Changeover");
+        }
+        else
+            Debug.Log("All Clients Synced");
+    }
+
+    //NETWORK CAR MARKET
+
+    private void PlayerManager3P_OnActivePlayerHasBoughtCar()
+    {
+        AckCarPurchaseToClientsRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void AckCarPurchaseToClientsRpc()
+    {
+        if (!PlayerManager3P.Instance.LocalIsActivePlayer())
+        {
+            MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
+            PlayerManager3P.Instance.PlayerWinsCar(MainManager.activePlayer);
+
+            PlayerManager3P.Instance.UpdateCashDisplay();
+            PlayerManager3P.Instance.UpdateInventoryDisplay();
+
+            PlayerManager3P.Instance.SetPromptText(MainManager.playerNames[MainManager.activePlayer] + " has bought a " + MainManager.cars[MainManager.currentCarIndex]);
+        }
+    }
+
+
 }

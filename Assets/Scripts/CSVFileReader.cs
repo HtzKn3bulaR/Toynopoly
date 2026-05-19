@@ -102,6 +102,8 @@ public class CSVFileReader : MonoBehaviour
         GameManager.Onlevel2Start += ValidateButtonsChange;
         GameManager.Onlevel3Start += ValidateButtonsLevel3;
 
+        PlayerManager3P.OnLevel2Start += ValidateButtonsChange;
+
         OnlineManager.Instance.trackInfoNetworkVariable.OnValueChanged += ShowResultsOnLocalMachine;
 
     }
@@ -1058,6 +1060,7 @@ public class CSVFileReader : MonoBehaviour
     public void SetAutoResultsInvalidRpc()
     {
         MainManager.autoResultsValid = false;
+        PlayerManager3P.Instance.GetChallengeResultWin(true);
 
         if(NetworkManager.Singleton.IsHost)
         OnlineManager.Instance.ClientsSetAutoResultsInvalidRpc();
@@ -1119,10 +1122,8 @@ public class CSVFileReader : MonoBehaviour
         if (MainManager.playerNumber > 2)
         {
             getResultsLevel1Button.gameObject.SetActive(false);
-            manualLevel1Button.gameObject.SetActive(false);
+            
         }
-
-
     }
 
     public void ActivateButtonToynopolyRound()
