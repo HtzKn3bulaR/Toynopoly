@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 
 
 
 public class EmptyInventoryHandler : MonoBehaviour
 {
+    public static EmptyInventoryHandler Instance;
 
     [SerializeField] Button[] emptyInvNameButtons;
     [SerializeField] Button[] emptyInvPrizeButtons;
@@ -31,8 +33,9 @@ public class EmptyInventoryHandler : MonoBehaviour
 
     private PlayerManager3P gameManagerScript;
 
-    int carBought = 0;
-
+    public static event Action OnPlayerHasEmptyInventory;
+    public static event Action OnPlayerHasMadeForcedPurchase;
+    
     private bool[] buyingPossible = { true, true, true, true, true, true };
 
     private bool[] wantsToBuy = { false, false, false, false, false };
@@ -44,38 +47,52 @@ public class EmptyInventoryHandler : MonoBehaviour
         gameManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
     }
 
-
-    public void CheckInactivePlayersInventory ()
-
+    private void Start()
     {
-        for (int i = 0; i < MainManager.playerNumber; i++)
+        Instance = this;
 
-        {
-            int inventoryCount = 0;
-
-            for (int j = 0; j < MainManager.cars.Length; j++)
-
-            {
-                if (MainManager.playerInventory[i, j] > 0)
-                {
-                    inventoryCount++;
-                }
-            }
-
-            if (inventoryCount == 0 && i != MainManager.activePlayer && !MainManager.spectator[i])
-
-            {
-                EmptyInventoryProcedure(i);
-            }
-
-        }
-
-
+        PlayerManager3P.OnActivePlayerCalled += CheckInactivePlayersInventory;
     }
 
-    public void EmptyInventoryProcedure(int emptyPlayer)
-    
+    public void CheckInactivePlayersInventory()
     {
+        if (MainManager.levelCounter == 2)
+        {
+            int myIndex = 9;
+
+            for (int i = 0; i < MainManager.playerNumber; i++)
+            {
+                if (MainManager.localMultiplayerName == MainManager.playerNames[i])
+                {
+                    myIndex = i;
+                }
+            }
+                       
+            int inventoryCount = 0;
+
+            for (int i = 0; i < MainManager.cars.Length; i++)
+                {
+                    if (MainManager.playerInventory[myIndex, i] > 0)
+                    {
+                        inventoryCount++;
+                    }
+                }
+
+                if (inventoryCount == 0 && myIndex != MainManager.activePlayer && !MainManager.spectator[myIndex])
+                {
+                    EmptyInventoryProcedure(myIndex);
+                }
+            
+        }
+    }
+
+    public void EmptyInventoryProcedure(int emptyPlayer)    
+    {
+        OnlineManager.Instance.ReportEmptyInventoryToClientsRpc(emptyPlayer);
+        IdleCountdown.Instance.StartIdleCountdownMax(60f);
+        PlayerManager3P.Instance.SetPromptText("Your Inventory is Empty!");
+        OnPlayerHasEmptyInventory?.Invoke();
+
         MainManager.buyer = emptyPlayer;
 
         CheckBuyOptions();
@@ -99,7 +116,6 @@ public class EmptyInventoryHandler : MonoBehaviour
 
 
     public void CheckBuyOptions ()
-
     {
         for (int i = 0; i < MainManager.cars.Length; i++)
 
@@ -118,30 +134,22 @@ public class EmptyInventoryHandler : MonoBehaviour
             if (numberOfOwners == 1 && MainManager.protection[i] || MainManager.fieldsLeftForCar[i] < 1 || MainManager.DefProcedureCompleted[i] || MainManager.carPrizes[i] > MainManager.playerCash[MainManager.buyer])
 
             { buyingPossible[i] = false; }
-
         }
-
     }
 
     public void UpdateDisplays()
-
     {
         buyerNameDisplay.text = MainManager.playerNames[MainManager.buyer];
 
         for (int i = 0; i < MainManager.cars.Length; i++)
-
         {
             emptyInvPanelNameDisplay[i].text = ($"{MainManager.cars[i]}");
-            emptyInvPanelPrizeDisplay[i].text = ($"{MainManager.carPrizes[i]}");
-                      
+            emptyInvPanelPrizeDisplay[i].text = ($"{MainManager.carPrizes[i]}");                      
         }
-
     }
 
     public void BuyCar(int car)
-
     {
-
         if (MainManager.playerCash[MainManager.buyer] < MainManager.carPrizes[car])
         {
             notEnoughCashPanel.SetActive(true);
@@ -149,40 +157,12 @@ public class EmptyInventoryHandler : MonoBehaviour
             nextRacePanel.SetActive(false);
             return;
         }
-
         else
-
         {
-
-            carBought = car;
-            MainManager.playerInventory[MainManager.buyer, car]++;
-            MainManager.playerCash[MainManager.buyer] -= MainManager.carPrizes[car];
-            gameManagerScript.UpdateInventoryDisplay();
-            gameManagerScript.cashDisplay[MainManager.buyer].text = MainManager.playerCash[MainManager.buyer].ToString();
-            emptyInvDialoguePanel.SetActive(false);
-            nextRacePanel.SetActive(false);
-
-
-            int numberOfOwners = 0;
-
-            for (int j = 0; j < MainManager.playerNumber; j++)
-
-            {
-                if (MainManager.playerInventory[j, car] > 0)
-
-                {
-                    numberOfOwners++;
-                }
-            }
-
-            if (numberOfOwners == 1)
-
-            {
-                OfferBuyOption();
-            }
-
-            gameManagerScript.PerformLevel2Check();
-
+            OnlineManager.Instance.ReportForcedCarPurchaseToClientsRpc(car, MainManager.buyer);
+            IdleCountdown.Instance.HideIdleCountdown();
+            OnPlayerHasMadeForcedPurchase?.Invoke();
+                        
         }
     }
 
@@ -191,11 +171,11 @@ public class EmptyInventoryHandler : MonoBehaviour
         emptyInvDialoguePanel.SetActive(false);
         MainManager.spectator[MainManager.buyer] = true;
         gameManagerScript.PerformLevel2Check();
+        IdleCountdown.Instance.HideIdleCountdown();
     }
 
-
+    /*
     void OfferBuyOption()
-
     {
         buyOptionPanelAfterForcedBuy.SetActive(true);
 
@@ -284,15 +264,19 @@ public class EmptyInventoryHandler : MonoBehaviour
 
         
 
-        
-
         gameManagerScript.UpdateInventoryDisplay();
         gameManagerScript.UpdateCashDisplay();
 
         buyOptionPanelAfterForcedBuy.SetActive(false);
 
     }
+    */
 
+
+    public void HideEmptyInventoryPanel()
+    {
+        emptyInvDialoguePanel.SetActive(false);
+    }
 
     public void NotEnoughCashPanelClose()
     {

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class SellingHandler : MonoBehaviour
 {
+    public static SellingHandler Instance; 
 
     [SerializeField] Button[] nameButtons;
     [SerializeField] Button[] prizeButtons;
@@ -37,6 +38,11 @@ public class SellingHandler : MonoBehaviour
     void Awake()
     {
         gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+    }
+
+    private void Start()
+    {
+        Instance = this;
     }
 
 

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 
 public class SellingHandlerP3 : MonoBehaviour
 {
+    public static SellingHandlerP3 Instance;
 
     [SerializeField] Button[] nameButtons;
     [SerializeField] Button[] prizeButtons;
@@ -27,22 +29,50 @@ public class SellingHandlerP3 : MonoBehaviour
      
     private PlayerManager3P gameManagerScript;
 
+    public static event Action OnCarSold;
+
     // Start is called before the first frame update
     void Awake()
     {
         gameManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
     }
 
+    private void Start()
+    {
+        Instance = this;
+    }
 
-    public void OpenSellingDialoguePanel(int seller)
 
+    public void OpenSellingDialoguePanel()
     {
         sellCarDialoguePanel.SetActive(true);
-        MainManager.seller = seller;
+
+        int myIndex = 9;
+
+        for (int i = 0; i < MainManager.playerNumber; i++)
+        {
+            if (MainManager.localMultiplayerName == MainManager.playerNames[i])
+            {
+                myIndex = i;
+            }
+        }
+
+        MainManager.seller = myIndex;
+        IdleCountdown.Instance.StartIdleCountdownMax(60f);
 
         CheckSellOptions();
         UpdateDisplays();
 
+    }
+
+    public void HideSellingDialoguePanel()
+    {
+        sellCarDialoguePanel.SetActive(false);
+    }
+
+    public void CloseWithoutSelling()
+    {
+        OnCarSold?.Invoke();
     }
 
 
@@ -83,7 +113,6 @@ public class SellingHandlerP3 : MonoBehaviour
 
 
     public void SellCar(int car)
-
     {
         if (inventoryNotEmpty[car])
         {
@@ -116,7 +145,9 @@ public class SellingHandlerP3 : MonoBehaviour
         else
 
             sellCarDialoguePanel.SetActive(false);
-            
+
+        OnCarSold?.Invoke();
+        OnlineManager.Instance.ReportCarSaleToClientsRpc(car, MainManager.seller);
     }
 
 

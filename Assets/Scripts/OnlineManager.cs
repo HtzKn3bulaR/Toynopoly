@@ -91,8 +91,11 @@ public class OnlineManager : NetworkBehaviour
         actualDividendsNetworkList = new NetworkList<int>();
 
         PlayerManager3P.OnActivePlayerHasBoughtCar += PlayerManager3P_OnActivePlayerHasBoughtCar;
+        PlayerManager3P.OnInactivePlayersHaveBuyOption += PlayerManager3P_OnInactivePlayersHaveBuyOptionRpc;
+       
     }
-        
+
+   
 
     private void Singleton_OnClientConnectedCallback(ulong obj)
     {
@@ -274,8 +277,6 @@ public class OnlineManager : NetworkBehaviour
             }
         }
     }
-
-
 
     internal ulong GetLocalClientID()
     {
@@ -568,6 +569,7 @@ public class OnlineManager : NetworkBehaviour
     }
 
     //PLAYER STATES
+       
 
     [Rpc(SendTo.Server)]
     internal void ReportReadyForNextRoundToServerRpc()
@@ -622,5 +624,72 @@ public class OnlineManager : NetworkBehaviour
         }
     }
 
+    [Rpc(SendTo.ClientsAndHost)]
+    private void PlayerManager3P_OnInactivePlayersHaveBuyOptionRpc()
+    {
+        if(!PlayerManager3P.Instance.LocalIsActivePlayer())
+        {
+            PlayerManager3P.Instance.OfferBuyOption();
+        }
+    }
 
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportPurchaseToClientsRpc(int buyerIndex)
+    {
+        PlayerManager3P.Instance.PlayerWinsCar(buyerIndex);
+        MainManager.playerCash[buyerIndex] -= MainManager.carPrizes[MainManager.currentCarIndex];       
+
+        PlayerManager3P.Instance.UpdateInventoryDisplay();
+        PlayerManager3P.Instance.UpdateCashDisplay();
+
+        PlayerManager3P.Instance.SetPromptText(MainManager.playerNames[buyerIndex] + " has bought a " + MainManager.cars[MainManager.currentCarIndex]);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportEmptyInventoryToClientsRpc(int emptyPlayer)
+    {
+        PlayerManager3P.Instance.SetPromptText(MainManager.playerNames[emptyPlayer] + " has no more cars in their inventory!");
+        IdleCountdown.Instance.StartIdleCountdownMax(60f);
+
+        PlayerManager3P.Instance.BlockFields();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportForcedCarPurchaseToClientsRpc(int car, int buyer)
+    {        
+        MainManager.playerInventory[buyer, car]++;
+        MainManager.playerCash[buyer] -= MainManager.carPrizes[car];
+        PlayerManager3P.Instance.UpdateInventoryDisplay();
+        PlayerManager3P.Instance.cashDisplay[buyer].text = MainManager.playerCash[MainManager.buyer].ToString();
+        EmptyInventoryHandler.Instance.HideEmptyInventoryPanel();
+        
+        int numberOfOwners = 0;
+
+        for (int j = 0; j < MainManager.playerNumber; j++)
+        {
+            if (MainManager.playerInventory[j, car] > 0)
+            {
+                numberOfOwners++;
+            }
+        }
+
+        if (numberOfOwners == 1)
+        {
+            PlayerManager3P.Instance.OfferBuyOption();
+        }
+        PlayerManager3P.Instance.PerformLevel2Check();
+
+        if (PlayerManager3P.Instance.LocalIsActivePlayer())
+            PlayerManager3P.Instance.UnlockFields();
+
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportCarSaleToClientsRpc(int car, int seller)
+    {
+        MainManager.playerInventory[seller, car]--;
+        MainManager.playerCash[seller] += MainManager.carPrizes[car];
+        PlayerManager3P.Instance.UpdateInventoryDisplay();
+        PlayerManager3P.Instance.cashDisplay[seller].text = MainManager.playerCash[seller].ToString();
+    }
 }

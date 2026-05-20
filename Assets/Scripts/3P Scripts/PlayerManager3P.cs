@@ -99,6 +99,8 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] GameObject continueToChallengeButton;
 
     [SerializeField] GameObject buyOptionPanel;
+    [SerializeField] TextMeshProUGUI buyOptionText;
+    [SerializeField] Image carToBuyImage;
 
     [SerializeField] GameObject challengePanel;
 
@@ -257,6 +259,11 @@ public class PlayerManager3P : MonoBehaviour
     public static event Action OnReadyForRoundChangeover;
 
     public static event Action OnActivePlayerHasBoughtCar;
+    public static event Action OnInactivePlayersHaveBuyOption;
+    public static event Action OnPlayerHasDecidedBuyOption;
+
+    public static event Action OnActivePlayerCalled;
+    public static event Action OnStartSellingRound;
 
     private bool resultsRegisteredForRound = false;
 
@@ -305,7 +312,6 @@ public class PlayerManager3P : MonoBehaviour
     }
 
 
-
     public bool LocalIsActivePlayer()
     {
         ulong activePlayerID = OnlineManager.Instance.GetPlayerID(MainManager.playerNames[MainManager.activePlayer]);
@@ -324,27 +330,37 @@ public class PlayerManager3P : MonoBehaviour
 
         if (OnlineManager.Instance.GetLocalClientID() != activePlayerID)
         {
-
             SetPromptText("Waiting for " + MainManager.playerNames[MainManager.activePlayer] + "s turn");
 
-            foreach (Button field in fields)
-            {
-                if (field != null)
-                    field.interactable = false;
-            }
+            BlockFields();
+
+            OnActivePlayerCalled?.Invoke();
         }
 
         else
         {
             SetPromptText("It's your turn! Select a field");
 
-            foreach (Button field in fields)
-            {
-                if (field != null)
-                    field.interactable = true;
-            }
+            UnlockFields();
         }
+    }
 
+    public void BlockFields()
+    {
+        foreach (Button field in fields)
+        {
+            if (field != null)
+                field.interactable = false;
+        }
+    }
+
+    public void UnlockFields()
+    {
+        foreach (Button field in fields)
+        {
+            if (field != null)
+                field.interactable = true;
+        }
     }
 
     public void SetPromptText(string message)
@@ -487,16 +503,31 @@ public class PlayerManager3P : MonoBehaviour
         }
     }
 
+    IEnumerator WaitForGameObject()
+
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        ShowNextRacePanel();
+    }
+
     void ShowNextRacePanel()
     {
         try
         {
             nextRaceComingUpPanel.transform.localScale = new Vector3(0.824999988f, 0.738307893f, 1);
         }
-        catch (Exception e) { Debug.Log("Game Object Busy " + e); };
+        catch (Exception e) { Debug.Log("Game Object Busy " + e);
+                              StartCoroutine(WaitForGameObject());
+                              return;
+        };
 
-        audioSource.PlayOneShot(panelOpen);
-
+        try
+        {
+            audioSource.PlayOneShot(panelOpen); ;
+        }
+        catch (Exception e) { Debug.Log("Game Object Busy " + e); };        
+            
         nextTrackDisplay.text = selectedTrack;
         nextCarDisplay.text = selectedCar;
 
@@ -775,69 +806,58 @@ public class PlayerManager3P : MonoBehaviour
             Debug.Log($"Inactive players are {MainManager.inactivePlayers[0]} + {MainManager.inactivePlayers[1]} + {MainManager.inactivePlayers[2]} + {MainManager.inactivePlayers[3]}");
             PerformLevel2Check();
 
-
             if (activePlayerHasToynopoly == true && MainManager.fieldsLeftForCar[MainManager.currentCarIndex] > 9)
             {
-                OfferBuyOption();
-
+                OnInactivePlayersHaveBuyOption?.Invoke();
+                SetPromptText("Waiting for other players to also buy or pass");
+                IdleCountdown.Instance.StartIdleCountdownMax(30f);
+                BlockFields();                
             }
         }
-
     }
 
     public void OfferBuyOption()
     {
         buyOptionPanel.SetActive(true);
 
-        firstinactivePlayerName.text = MainManager.playerNames[MainManager.inactivePlayers[0]];
-        secondinactivePlayerName.text = MainManager.playerNames[MainManager.inactivePlayers[1]];
+        buyOptionText.text = (MainManager.playerNames[MainManager.activePlayer] + " has bought a " + MainManager.cars[MainManager.currentCarIndex] + ". Would you also like to buy it for " + MainManager.carPrizes[MainManager.currentCarIndex] + "?");
 
-        if (MainManager.playerNumber > 3)
+        for (int i = 0; i < GridGenerator3P.Instance.activeList.Count; i++)
         {
-            thirdinactivePlayerName.text = MainManager.playerNames[MainManager.inactivePlayers[2]];
+            if (GridGenerator3P.Instance.activeList[i] == MainManager.cars[MainManager.currentCarIndex])
+
+            { carToBuyImage.sprite = GridGenerator3P.Instance.activeSpriteList[i]; }
         }
 
-        if (MainManager.playerNumber > 4)
-
-        {
-            fourthinactivePlayerName.text = MainManager.playerNames[MainManager.inactivePlayers[3]];
-        }
+        IdleCountdown.Instance.StartIdleCountdownMax(30f);
     }
 
 
-    public void AcceptBuyOption(int whichPlayer)
+    public void PassBuyOption()
     {
-        if (wantsToBuy[whichPlayer] == false)
-
-        { wantsToBuy[whichPlayer] = true; }
-
-        else
-
-        { wantsToBuy[whichPlayer] = false; }
+        buyOptionPanel.SetActive(false);
+        IdleCountdown.Instance.HideIdleCountdown();
+        OnPlayerHasDecidedBuyOption?.Invoke();
     }
-
 
     public void ConcludeBuyOption()
-
     {
-        for (int i = 0; i < MainManager.playerNumber - 1; i++)
+        int buyerIndex = 9;
 
+        for (int i = 0; i < MainManager.playerNumber;  i++)
         {
-            if (wantsToBuy[i] == true)
-
+            if(MainManager.localMultiplayerName == MainManager.playerNames[i])
             {
-                PlayerWinsCar(MainManager.inactivePlayers[i]);
-                MainManager.playerCash[MainManager.inactivePlayers[i]] -= MainManager.carPrizes[MainManager.currentCarIndex];
-
+                buyerIndex = i;
             }
-
         }
 
-        UpdateInventoryDisplay();
-        UpdateCashDisplay();
-
+        OnlineManager.Instance.ReportPurchaseToClientsRpc(buyerIndex);  
+        
         buyOptionPanel.SetActive(false);
+        IdleCountdown.Instance.HideIdleCountdown();
 
+        OnPlayerHasDecidedBuyOption?.Invoke();
     }
 
     void FillInactivePlayersArray()
@@ -860,7 +880,7 @@ public class PlayerManager3P : MonoBehaviour
 
     public void PerformLevel2Check()
     {
-        emptyInventoryScript.CheckInactivePlayersInventory();
+        //emptyInventoryScript.CheckInactivePlayersInventory();
 
         int numberOfOwners = 0;
 
@@ -1351,9 +1371,9 @@ public class PlayerManager3P : MonoBehaviour
 
         if (MainManager.roundCounter % MainManager.playerNumber == 0)
         {
+            OnStartSellingRound?.Invoke();
             ReInstateRows();
-            preSellingInfoPanel.SetActive(true);
-            audioSource.PlayOneShot(panelOpen);
+                        
         }
 
         else
@@ -1451,6 +1471,7 @@ public class PlayerManager3P : MonoBehaviour
         if (IsTimeBattleWinner())
         {
             timeBattlePanel.SetActive(true);
+            IdleCountdown.Instance.StartIdleCountdownMax(60f);
             TimeBattleOutcome();
         }
     }
@@ -1569,9 +1590,9 @@ public class PlayerManager3P : MonoBehaviour
                         
         if (MainManager.roundCounter % MainManager.playerNumber == 0)
         {
+            OnStartSellingRound?.Invoke();
             ReInstateRows();
-            preSellingInfoPanel.SetActive(true);
-            audioSource.PlayOneShot(panelOpen);
+            
         }
 
         else
@@ -1580,6 +1601,11 @@ public class PlayerManager3P : MonoBehaviour
 
         //RoundChangeover();
 
+    }
+
+    public void HideTimeBattleWindow()
+    {
+        timeBattlePanel.SetActive(false);
     }
 
     public void NerfCarAndContinue()
@@ -1607,9 +1633,9 @@ public class PlayerManager3P : MonoBehaviour
         if (MainManager.roundCounter % MainManager.playerNumber == 0)
 
         {
+            OnStartSellingRound?.Invoke();
             ReInstateRows();
-            preSellingInfoPanel.SetActive(true);
-            audioSource.PlayOneShot(panelOpen);
+            
         }
 
         else
@@ -1845,7 +1871,6 @@ public class PlayerManager3P : MonoBehaviour
         for (int i = 0; i < MainManager.carIsInDefault.Length; i++)
         {
             if (MainManager.carIsInDefault[i] && MainManager.DefProcedureCompleted[i] == false && MainManager.carPrizes[i] < 1)
-
             {
                 carInDefaultPanel.SetActive(true);
                 defaultDownArrow.SetActive(true);
@@ -1859,7 +1884,6 @@ public class PlayerManager3P : MonoBehaviour
                 MainManager.playerInventory[1, i] = 0;
                 rows[i].SetActive(false);
                 MainManager.DefProcedureCompleted[i] = true;
-
             }
         }
 
@@ -2038,19 +2062,24 @@ public class PlayerManager3P : MonoBehaviour
         return index;
     }
 
+    public void ShowPreSellingPanel()
+    {
+        preSellingInfoPanel.SetActive(true);
+        audioSource.PlayOneShot(panelOpen);
+    }
+
+    public void HidePreSellingPanel()
+    {
+        preSellingInfoPanel.SetActive(false);
+    }
+
 
     public void StartSellingRound()
 
     {
         preSellingInfoPanel.SetActive(false);
 
-        for (int i = 0; i < MainManager.playerNumber; i++)
-
-        { playerSellButton[i].gameObject.SetActive(true); }
-
-
-        SellDoneButton.gameObject.SetActive(true);
-
+        SellingHandlerP3.Instance.OpenSellingDialoguePanel();
     }
 
     public void AcceptDividend()
@@ -2326,7 +2355,7 @@ public class PlayerManager3P : MonoBehaviour
     {
         yield return new WaitForSeconds(10.0f);
         ReInstateRows();
-        RoundChangeover();
+        ReadyForRoundChangeover();
     }
 
     public void ReInstateRows()

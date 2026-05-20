@@ -14,6 +14,7 @@ public class PlayerState : MonoBehaviour
     {
         NewRound,
         FieldClicked,
+        Buying,
         ReadyForRace,
         RaceConcluded,
         InTimeBattleWindow,
@@ -35,8 +36,60 @@ public class PlayerState : MonoBehaviour
         PlayerManager3P.OnRaceConcluded += PlayerManager3P_OnRaceConcluded;
         PlayerManager3P.OnReadyForRoundChangeover += PlayerManager3P_OnReadyForRoundChangeover;
         PlayerManager3P.OnRoundChangeover += PlayerManager3P_OnRoundChangeover;
+        PlayerManager3P.OnActivePlayerHasBoughtCar += PlayerManager3P_OnActivePlayerHasBoughtCar;
+        PlayerManager3P.OnInactivePlayersHaveBuyOption += PlayerManager3P_OnInactivePlayersHaveBuyOption;
+        PlayerManager3P.OnPlayerHasDecidedBuyOption += PlayerManager3P_OnPlayerHasDecidedBuyOption;
+        EmptyInventoryHandler.OnPlayerHasEmptyInventory += EmptyInventoryHandler_OnPlayerHasEmptyInventory;
+        EmptyInventoryHandler.OnPlayerHasMadeForcedPurchase += EmptyInventoryHandler_OnPlayerHasMadeForcedPurchase;
+        SellingHandlerP3.OnCarSold += SellingHandlerP3_OnCarSold;
+
+        PlayerManager3P.OnStartSellingRound += PlayerManager3P_OnStartSellingRound;
+
 
         idleCountdown.GetComponent<IdleCountdown>().OnCountdownExpired += IdleCountdown_OnCountdownExpired;
+    }
+
+    
+
+    private void EmptyInventoryHandler_OnPlayerHasMadeForcedPurchase()
+    {
+        state = State.ReadyForRace;
+    }
+
+    private void EmptyInventoryHandler_OnPlayerHasEmptyInventory()
+    {
+        state = State.Buying;
+    }
+
+    private void PlayerManager3P_OnPlayerHasDecidedBuyOption()
+    {
+        state = State.ReadyForRace;
+        Debug.Log("State : Ready For Race");
+    }
+
+    private void PlayerManager3P_OnInactivePlayersHaveBuyOption()
+    {
+        if (MainManager.levelCounter == 2)
+        {
+            if (!PlayerManager3P.Instance.LocalIsActivePlayer())
+            {
+                state = State.Buying;
+                Debug.Log("State: Buying");
+            }
+                        
+        }
+    }
+
+    private void PlayerManager3P_OnActivePlayerHasBoughtCar()
+    {
+        if(MainManager.levelCounter == 2)
+        {
+            if(PlayerManager3P.Instance.LocalIsActivePlayer())
+            {
+                state = State.Buying;
+                Debug.Log("State: Buying");
+            }
+        }
     }
 
     private void IdleCountdown_OnCountdownExpired(object sender, EventArgs e)
@@ -45,6 +98,13 @@ public class PlayerState : MonoBehaviour
 
         switch (state)
         {
+            case State.NewRound:
+                if(PlayerManager3P.Instance.LocalIsActivePlayer())
+                {
+                    PlayerManager3P.Instance.UnlockFields();
+                }
+                break;
+
             case State.FieldClicked:
                 if (PlayerManager3P.Instance.LocalIsActivePlayer())
                 {
@@ -58,7 +118,57 @@ public class PlayerState : MonoBehaviour
                 PlayerManager3P.Instance.ReInstateRows();
                 break;
 
+            case State.Buying:
+                if (PlayerManager3P.Instance.LocalIsActivePlayer())
+                {
+                    PlayerManager3P.Instance.UnlockFields();
+                    state = State.FieldClicked;
+                    PlayerManager3P.Instance.SetPromptText("Select a field to start the next race");
+
+                }
+
+                if (!PlayerManager3P.Instance.LocalIsActivePlayer())
+                {
+                    state = State.ReadyForRace;
+                    PlayerManager3P.Instance.SetPromptText("Waiting for next race");
+
+                    if(MainManager.levelCounter == 2)
+                    {
+                        EmptyInventoryHandler.Instance.Spectate();
+                    }
+
+                }
+                break;
+
+            case State.InTimeBattleWindow:
+                {
+                    state = State.ReadyForNextRound;
+                    PlayerManager3P.Instance.HideTimeBattleWindow();
+                }
+                break;
+
+            case State.SellingCars:
+                {
+                    state = State.ReadyForNextRound;
+                    Debug.Log("State: Ready For Next Round");
+
+                    OnlineManager.Instance.ReportReadyForNextRoundToServerRpc();
+
+                    IdleCountdown.Instance.HideIdleCountdown();
+
+                    SellingHandlerP3.Instance.HideSellingDialoguePanel();
+
+                }
+                break;
+
+            case State.ReadyForRace:
+                IdleCountdown.Instance.HideIdleCountdown();
+                break;
+
+
             default:
+
+                IdleCountdown.Instance.HideIdleCountdown();
 
                 break;
         }
@@ -91,15 +201,13 @@ public class PlayerState : MonoBehaviour
                 }
             }
 
-            else
-                if (state == State.NewRound)
+            if (MainManager.levelCounter == 2)
             {
-                state = State.FieldClicked;                
+                if (state == State.NewRound)
+                {
+                    state = State.FieldClicked;
+                }                
             }
-
-
-
-
         }
 
         else
@@ -139,8 +247,28 @@ public class PlayerState : MonoBehaviour
         }
     }
 
-    private void PlayerManager3P_OnReadyForRoundChangeover()
+    private void PlayerManager3P_OnStartSellingRound()
     {
+        state = State.SellingCars;
+
+        PlayerManager3P.Instance.ShowPreSellingPanel();
+        PlayerManager3P.Instance.StartSellingRound();        
+    }
+
+    private void SellingHandlerP3_OnCarSold()
+    {
+        state = State.ReadyForNextRound;
+        Debug.Log("State: Ready For Next Round");
+
+        OnlineManager.Instance.ReportReadyForNextRoundToServerRpc();
+
+        IdleCountdown.Instance.HideIdleCountdown();
+    }
+
+
+    private void PlayerManager3P_OnReadyForRoundChangeover()
+    {        
+
         state = State.ReadyForNextRound;
         Debug.Log("State: Ready For Next Round");
 

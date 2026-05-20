@@ -417,6 +417,7 @@ public class CSVFileReader : MonoBehaviour
             {
                 validateButtonLevel1.SetActive(false);
                 manualLevel1Button.SetActive(false);
+                validateButtonLevel2.SetActive(false);
             }
 
         }
