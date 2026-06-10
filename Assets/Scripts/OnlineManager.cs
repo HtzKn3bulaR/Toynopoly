@@ -56,6 +56,7 @@ public class OnlineManager : NetworkBehaviour
 
     public NetworkVariable<int> numberOfPlayersReportedReadyForNextRound = new NetworkVariable<int>(0);
 
+    public NetworkVariable<bool> skippingRoundNetworkVariable = new NetworkVariable<bool>(false);
 
 
     private bool trackListReady = false;
@@ -92,10 +93,12 @@ public class OnlineManager : NetworkBehaviour
 
         PlayerManager3P.OnActivePlayerHasBoughtCar += PlayerManager3P_OnActivePlayerHasBoughtCar;
         PlayerManager3P.OnInactivePlayersHaveBuyOption += PlayerManager3P_OnInactivePlayersHaveBuyOptionRpc;
+
+        PlayerManager3P.OnActivePlayerCanProtectAfterChallenge += PlayerManager3P_OnActivePlayerCanProtectAfterChallengeRpc;
        
     }
 
-   
+    
 
     private void Singleton_OnClientConnectedCallback(ulong obj)
     {
@@ -456,6 +459,23 @@ public class OnlineManager : NetworkBehaviour
         }
     }
 
+    [Rpc(SendTo.ClientsAndHost)]
+    private void PlayerManager3P_OnActivePlayerCanProtectAfterChallengeRpc()
+    {
+        if(PlayerManager3P.Instance.LocalIsActivePlayer())
+        {
+            PlayerManager3P.Instance.ShowProtectionOptionAfterChallengePanel();
+            IdleCountdown.Instance.StartIdleCountdownMax(30f);
+            PlayerManager3P.Instance.SetPromptText("You can enable protection for one of your cars");
+        }
+
+        else
+        {
+            IdleCountdown.Instance.StartIdleCountdownMax(30f);
+            PlayerManager3P.Instance.SetPromptText("Waiting for " + MainManager.playerNames[MainManager.activePlayer]);
+        }
+    }
+
     //Challenge Manual Reporting
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -543,6 +563,12 @@ public class OnlineManager : NetworkBehaviour
         }
     }
 
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ClientsSetToynopolyAutoResultsInvalidRpc()
+    {
+        MainManager.autoResultsValid = false;
+    }
+
     //---------------------------------------------------------------
 
 
@@ -556,6 +582,7 @@ public class OnlineManager : NetworkBehaviour
             PlayerManager3P.Instance.ToynopolyTimeBattleResult();
             PlayerManager3P.Instance.ToynopolyTimeBattleConclude();
             CSVFileReader.Instance.LeaderboardClose();
+            Debug.Log("Manual Toynopoly Result Registered On This Client");
         }
     }
 
@@ -565,7 +592,14 @@ public class OnlineManager : NetworkBehaviour
         if(!NetworkManager.Singleton.IsHost)
         {
             MainManager.changeValue = changeValue;
+            Debug.Log("Client received Toynopoly change Value " + changeValue);
         }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void MarkNextRaceAsToynopolyBattleRpc()
+    {
+        MainManager.IsToynopolyBattle = true;
     }
 
     //PLAYER STATES
@@ -656,13 +690,17 @@ public class OnlineManager : NetworkBehaviour
 
     [Rpc(SendTo.ClientsAndHost)]
     internal void ReportForcedCarPurchaseToClientsRpc(int car, int buyer)
-    {        
+    {
+        MainManager.currentCarIndex = car;
         MainManager.playerInventory[buyer, car]++;
         MainManager.playerCash[buyer] -= MainManager.carPrizes[car];
         PlayerManager3P.Instance.UpdateInventoryDisplay();
         PlayerManager3P.Instance.cashDisplay[buyer].text = MainManager.playerCash[MainManager.buyer].ToString();
         EmptyInventoryHandler.Instance.HideEmptyInventoryPanel();
-        
+        IdleCountdown.Instance.HideIdleCountdown();
+
+        PlayerManager3P.Instance.SetPromptText(MainManager.playerNames[buyer] + " has bought a " + MainManager.cars[car].ToString());
+
         int numberOfOwners = 0;
 
         for (int j = 0; j < MainManager.playerNumber; j++)
@@ -675,7 +713,7 @@ public class OnlineManager : NetworkBehaviour
 
         if (numberOfOwners == 1)
         {
-            PlayerManager3P.Instance.OfferBuyOption();
+            PlayerManager3P.Instance.OfferBuyOptionAfterForcedBuy(car, buyer);
         }
         PlayerManager3P.Instance.PerformLevel2Check();
 
@@ -687,9 +725,87 @@ public class OnlineManager : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     internal void ReportCarSaleToClientsRpc(int car, int seller)
     {
-        MainManager.playerInventory[seller, car]--;
-        MainManager.playerCash[seller] += MainManager.carPrizes[car];
-        PlayerManager3P.Instance.UpdateInventoryDisplay();
-        PlayerManager3P.Instance.cashDisplay[seller].text = MainManager.playerCash[seller].ToString();
+        if (MainManager.localMultiplayerName != MainManager.playerNames[seller])
+        {
+            MainManager.playerInventory[seller, car]--;
+            MainManager.playerCash[seller] += MainManager.carPrizes[car];
+            PlayerManager3P.Instance.UpdateInventoryDisplay();
+            PlayerManager3P.Instance.cashDisplay[seller].text = MainManager.playerCash[seller].ToString();
+        }
     }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void SendProtectionToClientsRpc()
+    {
+        ProtectionHandler.Instance.ProtectionEnable();
+    }
+
+   
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportChallengeAutoResultToClientsRpc(bool challengeWon, bool challengeLost, int raceWinner)
+    {
+        PlayerManager3P.Instance.SetChallengeOutcomeBools(challengeWon, challengeLost);
+        MainManager.raceWinner = raceWinner;
+    }
+
+    [Rpc(SendTo.Server)]
+    internal void SkippingRoundNetworkVariableChangeRpc(bool v)
+    {
+        skippingRoundNetworkVariable.Value = v;
+    }
+
+    //MATCH SCORE EDITOR NETWORK HANDOUT
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportPlayerCashBalanceChangeToClientsRpc(int newCash, int playerIndex)
+    {
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            MainManager.playerCash[playerIndex] = newCash;
+
+            if (MainManager.playerNumber < 3)
+            {
+                GameManager.Instance.AcceptDividend();
+            }
+
+            else
+                PlayerManager3P.Instance.AcceptDividend();
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportCarValueChangeToClientsRpc(int price, int carIndex)
+    {
+        if (!NetworkManager.Singleton.IsHost)
+        {
+
+            MainManager.carPrizes[carIndex] = price;
+
+
+            if (MainManager.playerNumber < 3)
+            {
+                GameManager.Instance.UpdateCarPrizesDisplay();
+            }
+
+            else
+                PlayerManager3P.Instance.UpdateCarPrizesDisplay();
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void InventorySubmitRpc(int inventoryPlayerIndex, int inventoryCarIndex, int inventoryContent)
+    {
+        MainManager.playerInventory[inventoryPlayerIndex, inventoryCarIndex] = inventoryContent;
+
+        if (MainManager.playerNumber > 2)
+        {
+            PlayerManager3P.Instance.UpdateInventoryDisplay();
+        }
+
+        else
+
+            GameManager.Instance.UpdateInventoryDisplay();
+
+    }
+
 }

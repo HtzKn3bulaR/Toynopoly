@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using Unity.Netcode;
 
 public class MatchScoreEditor : MonoBehaviour
 {
@@ -80,7 +81,8 @@ public class MatchScoreEditor : MonoBehaviour
 
     }
 
-    public void NewDataPlayer1 (string cash)
+    [Rpc(SendTo.ClientsAndHost)]
+    public void NewDataPlayer1Rpc (string cash)
     {
         int tempCash = int.Parse(cash);
 
@@ -94,11 +96,13 @@ public class MatchScoreEditor : MonoBehaviour
         }
 
         else
-
             playerManagerScript.AcceptDividend();
+
+        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 0);
     }
 
-    public void NewDataPlayer2(string cash)
+    [Rpc(SendTo.ClientsAndHost)]
+    public void NewDataPlayer2Rpc(string cash)
     {
         int tempCash = int.Parse(cash);
 
@@ -112,11 +116,13 @@ public class MatchScoreEditor : MonoBehaviour
         }
 
         else
-
             playerManagerScript.AcceptDividend();
+
+        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 1);
     }
 
-    public void NewDataPlayer3(string cash)
+    [Rpc(SendTo.ClientsAndHost)]
+    public void NewDataPlayer3Rpc(string cash)
     {
         int tempCash = int.Parse(cash);
 
@@ -132,9 +138,12 @@ public class MatchScoreEditor : MonoBehaviour
         else
 
             playerManagerScript.AcceptDividend();
+
+        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 2);
     }
 
-    public void NewDataPlayer4(string cash)
+    [Rpc(SendTo.ClientsAndHost)]
+    public void NewDataPlayer4Rpc(string cash)
     {
         int tempCash = int.Parse(cash);
 
@@ -150,9 +159,12 @@ public class MatchScoreEditor : MonoBehaviour
         else
 
             playerManagerScript.AcceptDividend();
+
+        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 3);
     }
 
-    public void NewDataPlayer5(string cash)
+    [Rpc(SendTo.ClientsAndHost)]
+    public void NewDataPlayer5Rpc(string cash)
     {
         int tempCash = int.Parse(cash);
 
@@ -168,14 +180,12 @@ public class MatchScoreEditor : MonoBehaviour
         else
 
             playerManagerScript.AcceptDividend();
+
+        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 4);
     }
 
-
-
-
-
-
-    public void NewDataCar1(string price)
+    [Rpc(SendTo.ClientsAndHost)]
+    public void NewDataCar1Rpc(string price)
     {
         int tempPrize = int.Parse(price);
                     
@@ -195,9 +205,12 @@ public class MatchScoreEditor : MonoBehaviour
 
             playerManagerScript.UpdateCarPrizesDisplay();
 
+        OnlineManager.Instance.ReportCarValueChangeToClientsRpc(tempPrize, 0);
+
     }
 
-    public void NewDataCar2(string price)
+    [Rpc(SendTo.ClientsAndHost)]
+    public void NewDataCar2Rpc(string price)
     {
 
         int tempPrize = int.Parse(price);
@@ -218,9 +231,12 @@ public class MatchScoreEditor : MonoBehaviour
 
             playerManagerScript.UpdateCarPrizesDisplay();
 
+        OnlineManager.Instance.ReportCarValueChangeToClientsRpc(tempPrize, 1);
+
     }
 
-    public void NewDataCar3(string price)
+    [Rpc(SendTo.ClientsAndHost)]
+    public void NewDataCar3Rpc(string price)
     {
 
         int tempPrize = int.Parse(price);
@@ -241,9 +257,12 @@ public class MatchScoreEditor : MonoBehaviour
 
             playerManagerScript.UpdateCarPrizesDisplay();
 
+        OnlineManager.Instance.ReportCarValueChangeToClientsRpc(tempPrize, 2);
+
     }
 
-    public void NewDataCar4(string price)
+    [Rpc(SendTo.ClientsAndHost)]
+    public void NewDataCar4Rpc(string price)
     {
 
         int tempPrize = int.Parse(price);
@@ -264,9 +283,12 @@ public class MatchScoreEditor : MonoBehaviour
 
             playerManagerScript.UpdateCarPrizesDisplay();
 
+        OnlineManager.Instance.ReportCarValueChangeToClientsRpc(tempPrize, 3);
+
     }
 
-    public void NewDataCar5(string price)
+    [Rpc(SendTo.ClientsAndHost)]
+    public void NewDataCar5Rpc(string price)
     {
 
         int tempPrize = int.Parse(price);
@@ -286,9 +308,13 @@ public class MatchScoreEditor : MonoBehaviour
 
             playerManagerScript.UpdateCarPrizesDisplay();
 
+        OnlineManager.Instance.ReportCarValueChangeToClientsRpc(tempPrize, 4);
+
     }
 
-    public void NewDataCar6(string price)
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void NewDataCar6Rpc(string price)
     {
 
         int tempPrize = int.Parse(price);
@@ -307,6 +333,8 @@ public class MatchScoreEditor : MonoBehaviour
         else
 
         playerManagerScript.UpdateCarPrizesDisplay();
+
+        OnlineManager.Instance.ReportCarValueChangeToClientsRpc(tempPrize, 5);
 
     }
 
@@ -404,18 +432,9 @@ public class MatchScoreEditor : MonoBehaviour
 
     public void InventorySubmit()
     {
-        MainManager.playerInventory[inventoryPlayerIndex, inventoryCarIndex] = inventoryContent;
-
-        if (MainManager.playerNumber > 2)
-        {
-            playerManagerScript.UpdateInventoryDisplay();
-        }
-
-        else
-
-        gameManagerScript.UpdateInventoryDisplay();
-
+        OnlineManager.Instance.InventorySubmitRpc(inventoryPlayerIndex, inventoryCarIndex, inventoryContent);
     }
+        
 
     public void ClosePanel()
     {

@@ -105,11 +105,9 @@ public class EmptyInventoryHandler : MonoBehaviour
 
         {
             if (!buyingPossible[i])
-
             {
                 emptyInvNameButtons[i].gameObject.SetActive(false);
                 emptyInvPrizeButtons[i].gameObject.SetActive(false);
-
             }
         }
     }
@@ -160,9 +158,8 @@ public class EmptyInventoryHandler : MonoBehaviour
         else
         {
             OnlineManager.Instance.ReportForcedCarPurchaseToClientsRpc(car, MainManager.buyer);
-            IdleCountdown.Instance.HideIdleCountdown();
-            OnPlayerHasMadeForcedPurchase?.Invoke();
-                        
+            
+            OnPlayerHasMadeForcedPurchase?.Invoke();                        
         }
     }
 

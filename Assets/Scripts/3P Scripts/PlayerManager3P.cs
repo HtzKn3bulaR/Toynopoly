@@ -95,6 +95,8 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] GameObject level2StartPanel;
     [SerializeField] GameObject startRaceButton;
     [SerializeField] GameObject preProtectButton;
+    [SerializeField] GameObject protectOptionPanel;
+    [SerializeField] TextMeshProUGUI protectionOptionCarName;
 
     [SerializeField] GameObject continueToChallengeButton;
 
@@ -264,6 +266,8 @@ public class PlayerManager3P : MonoBehaviour
 
     public static event Action OnActivePlayerCalled;
     public static event Action OnStartSellingRound;
+    public static event Action OnActivePlayerCanProtectAfterChallenge;
+    
 
     private bool resultsRegisteredForRound = false;
 
@@ -302,6 +306,8 @@ public class PlayerManager3P : MonoBehaviour
     {
         Instance =this;
 
+        DontDestroyOnLoad(this.gameObject);
+
         GridGenerator3P.OnGameTableReady += CallActivePlayer;
 
         OnlineManager.Instance.pendingFieldNetwork.OnValueChanged += OnPendingFieldChanged;
@@ -309,6 +315,8 @@ public class PlayerManager3P : MonoBehaviour
         OnlineManager.Instance.level1RaceIsInProgress.OnValueChanged += OnRaceLevel1InProgress;
 
         OnlineManager.Instance.level2RaceIsInProgress.OnValueChanged += OnRaceLevel2InProgress;
+
+        BlockFields();
     }
 
 
@@ -374,7 +382,7 @@ public class PlayerManager3P : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             pausePanel.SetActive(true);
-
+            pausePanel.GetComponent<PausePanelHandler>().HideGameHostOptionsForClient();          
         }
     }
 
@@ -402,7 +410,8 @@ public class PlayerManager3P : MonoBehaviour
 
 
     public void FieldClicked(int fieldNumber)
-    {
+    {        
+
         Debug.Log("In Field Clicked Method - Local Is Active Player " + LocalIsActivePlayer());
         if (LocalIsActivePlayer())
         {
@@ -502,23 +511,18 @@ public class PlayerManager3P : MonoBehaviour
             timerPanel.gameObject.SetActive(false);
         }
     }
-
-    IEnumerator WaitForGameObject()
-
-    {
-        yield return new WaitForSeconds(0.5f);
-
-        ShowNextRacePanel();
-    }
+       
 
     void ShowNextRacePanel()
     {
+        BlockFields();
+
         try
         {
             nextRaceComingUpPanel.transform.localScale = new Vector3(0.824999988f, 0.738307893f, 1);
         }
         catch (Exception e) { Debug.Log("Game Object Busy " + e);
-                              StartCoroutine(WaitForGameObject());
+                              
                               return;
         };
 
@@ -554,11 +558,14 @@ public class PlayerManager3P : MonoBehaviour
                 {
                     buyCarButton.gameObject.SetActive(true);
                     cancelNextRaceButton.SetActive(true);
+                    startRaceButton.SetActive(true);
                 }
 
                 if (!LocalIsActivePlayer())
                 {
                     cancelNextRaceButton.SetActive(false);
+                    buyCarButton.gameObject.SetActive(false);
+                    startRaceButton.SetActive(false);
                 }
 
                     activePlayerHasToynopoly = false;
@@ -671,6 +678,17 @@ public class PlayerManager3P : MonoBehaviour
                 break;
         }
     }
+    
+    public void ReportNextRaceIsToynopolyBattleToClients()
+    {
+        if(MainManager.levelCounter == 2)
+        {
+            OnlineManager.Instance.MarkNextRaceAsToynopolyBattleRpc();
+            Debug.Log("Active Player Reported Next Round As Toynopoly Battle");
+        }
+    }
+
+
     public void OpenChallengePanel()
     {
         challengeButtonFirstInactive.gameObject.SetActive(true);
@@ -801,17 +819,21 @@ public class PlayerManager3P : MonoBehaviour
             playerHasBoughtCarThisRound = true;
 
             OnActivePlayerHasBoughtCar?.Invoke();
+            if(LocalIsActivePlayer())
+            {
+                UnlockFields();
+            }
 
             FillInactivePlayersArray();
             Debug.Log($"Inactive players are {MainManager.inactivePlayers[0]} + {MainManager.inactivePlayers[1]} + {MainManager.inactivePlayers[2]} + {MainManager.inactivePlayers[3]}");
             PerformLevel2Check();
-
+            
             if (activePlayerHasToynopoly == true && MainManager.fieldsLeftForCar[MainManager.currentCarIndex] > 9)
             {
                 OnInactivePlayersHaveBuyOption?.Invoke();
                 SetPromptText("Waiting for other players to also buy or pass");
                 IdleCountdown.Instance.StartIdleCountdownMax(30f);
-                BlockFields();                
+                //BlockFields();                
             }
         }
     }
@@ -827,6 +849,27 @@ public class PlayerManager3P : MonoBehaviour
             if (GridGenerator3P.Instance.activeList[i] == MainManager.cars[MainManager.currentCarIndex])
 
             { carToBuyImage.sprite = GridGenerator3P.Instance.activeSpriteList[i]; }
+        }
+
+        IdleCountdown.Instance.StartIdleCountdownMax(30f);
+    }
+
+    public void OfferBuyOptionAfterForcedBuy(int car, int buyer)
+    {
+        if (MainManager.localMultiplayerName != MainManager.playerNames[buyer])
+        {
+            buyOptionPanel.SetActive(true);
+
+            buyOptionText.text = (MainManager.playerNames[buyer] + " has bought a " + MainManager.cars[car] + ". Would you also like to buy it for " + MainManager.carPrizes[car] + "?");
+
+            for (int i = 0; i < GridGenerator3P.Instance.activeList.Count; i++)
+            {
+                if (GridGenerator3P.Instance.activeList[i] == MainManager.cars[car])
+
+                { carToBuyImage.sprite = GridGenerator3P.Instance.activeSpriteList[i]; }
+            }
+            
+            MainManager.currentCarIndex = car;
         }
 
         IdleCountdown.Instance.StartIdleCountdownMax(30f);
@@ -859,6 +902,7 @@ public class PlayerManager3P : MonoBehaviour
 
         OnPlayerHasDecidedBuyOption?.Invoke();
     }
+        
 
     void FillInactivePlayersArray()
 
@@ -909,12 +953,12 @@ public class PlayerManager3P : MonoBehaviour
     }
 
     public void CancelRace()
-
     {
         nextRaceComingUpPanel.gameObject.transform.localScale = new Vector3(0, 0, 0);
         l2SelectionIsOkay = true;
         buyingPossible = true;
         protectButton.gameObject.SetActive(false);
+        UnlockFields();
     }
 
 
@@ -979,12 +1023,19 @@ public class PlayerManager3P : MonoBehaviour
     }
     //THIRD NETWORK EVENT FINISHED--------------------------------------
 
-    public void StartRace()
+    public void HideNextRaceComingUpPanel()
     {
         try
         {
             nextRaceComingUpPanel.gameObject.transform.localScale = new Vector3(0, 0, 0);
-        }catch (Exception ex) {Debug.Log(ex.ToString());}
+        }
+        catch (Exception ex) { Debug.Log(ex.ToString()); }
+    }
+
+
+    public void StartRace()
+    {
+        HideNextRaceComingUpPanel();
 
         protectButton.gameObject.SetActive(false);
 
@@ -998,6 +1049,29 @@ public class PlayerManager3P : MonoBehaviour
             {
                 Debug.Log("Level 2 Race In progress Network Variable Set To True");
                 OnlineManager.Instance.ReportRaceLevel2InProgressRpc(true);
+            }
+
+            Debug.Log("This Round Is Toynopoly Battle " + MainManager.IsToynopolyBattle);
+
+            if (MainManager.IsToynopolyBattle == true)
+            {
+                raceInProgressPanel.gameObject.SetActive(true);
+                lapCountScript.FindLapData(selectedTrack);
+                continueButtonNormal.SetActive(false);
+                getAutoResultsButtonNormal.SetActive(false);
+                getAutoResultsButtonNormalL1.SetActive(false);
+
+                if (NetworkManager.Singleton.IsHost)
+                {
+                    continueButtonToynopoly.SetActive(true);
+                    continueButtonToynopolyAuto.SetActive(true);
+                }
+
+                audioSource.PlayOneShot(stageReady);
+                currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} in progress");
+                currentRaceInfoTrack.text = selectedTrack;
+                currentRaceInfoCar.text = selectedCar;
+                currentRaceOpponent1.text = MainManager.playerNames[MainManager.activePlayer];
             }
         }
 
@@ -1045,26 +1119,7 @@ public class PlayerManager3P : MonoBehaviour
         }
 
 
-        else if (activePlayerHasToynopoly)
-        {
-            raceInProgressPanel.gameObject.SetActive(true);
-            lapCountScript.FindLapData(selectedTrack);
-            continueButtonNormal.SetActive(false);
-            getAutoResultsButtonNormal.SetActive(false);
-            getAutoResultsButtonNormalL1.SetActive(false);
-
-            if (NetworkManager.Singleton.IsHost)
-            {
-                continueButtonToynopoly.SetActive(true);
-                continueButtonToynopolyAuto.SetActive(true);
-            }
-
-            audioSource.PlayOneShot(stageReady);
-            currentRaceInfoRound.text = ($"Level {MainManager.levelCounter}, Race {MainManager.roundCounter} in progress");
-            currentRaceInfoTrack.text = selectedTrack;
-            currentRaceInfoCar.text = selectedCar;
-            currentRaceOpponent1.text = MainManager.playerNames[MainManager.activePlayer];
-        }
+        
     }
 
     //Only Call For Manual Results - Auto Results Determined through CSV Reader 
@@ -1098,7 +1153,7 @@ public class PlayerManager3P : MonoBehaviour
 
     public void RegisterResults()
     {
-        OnRaceConcluded?.Invoke();
+        
 
         if (resultsRegisteredForRound)
             return;
@@ -1181,12 +1236,15 @@ public class PlayerManager3P : MonoBehaviour
                         if (NetworkManager.Singleton.IsHost)
                         { OnlineManager.Instance.ReportManualChallengeGapsRpc(gapToDefender.value, gapToChallenger.value, gapStolenWin.value); }
 
-                        if (!stolenWin)
+                        if (stolenWin == false)
                         {
                             MainManager.raceWinner = MainManager.activePlayer;
+                            Debug.Log("Race Winner Set : " + MainManager.raceWinner);
                             int gap;
                             gap = MainManager.manualReportingGapToDefender;
+                            Debug.Log("Gap Set : " +  gap);
                             MainManager.timeBattleSeconds = (gap);
+                            Debug.Log("Time Battle Seconds Set : " + MainManager.timeBattleSeconds);
                         }
 
                         else
@@ -1196,7 +1254,6 @@ public class PlayerManager3P : MonoBehaviour
                             gap = MainManager.manualReportingGapStolenWin;
                             MainManager.timeBattleSeconds = (gap);
                         }
-
                     }
                 }
                                 
@@ -1230,9 +1287,17 @@ public class PlayerManager3P : MonoBehaviour
                 }
 
                 raceResultsPanelL2.SetActive(false);
-                
-                if(NetworkManager.Singleton.IsHost)
+
+                if (NetworkManager.Singleton.IsHost)
+                {
                     challengeOutcomePanel.SetActive(true);
+                    OnlineManager.Instance.ReportChallengeAutoResultToClientsRpc(challengeWon, challengeLost, MainManager.raceWinner);
+
+                    if (!MainManager.autoResultsValid)
+                    {
+                        Level2ChallengeScoring();
+                    }
+                }
                 
                 challengeCarDisplay.text = selectedCar;
 
@@ -1253,16 +1318,33 @@ public class PlayerManager3P : MonoBehaviour
 
                 if (activePlayerHasToynopoly && MainManager.shieldAvailable[MainManager.activePlayer] == true)
                 {
-                    preProtectButton.gameObject.SetActive(true);
-
+                    OnActivePlayerCanProtectAfterChallenge?.Invoke();
                 }
 
                 break;
-
         }
 
+        OnRaceConcluded?.Invoke();
     }
-    
+
+    public void SetChallengeOutcomeBools(bool won, bool lost)
+    {
+        challengeWon = won;
+        challengeLost = lost;
+    }
+
+
+    public void ShowProtectionOptionAfterChallengePanel()
+    {
+        protectOptionPanel.SetActive(true);
+        protectionOptionCarName.text = MainManager.cars[MainManager.currentCarIndex];                
+    }
+
+    public void HideProtectionOptionPanel()
+    {
+        protectOptionPanel.SetActive(false);
+    }
+
 
     public void DisableProtectButton()
     {
@@ -1286,10 +1368,15 @@ public class PlayerManager3P : MonoBehaviour
 
     public void OpenToynopolyTimeBattlePanel()
     {
+        MainManager.autoResultsValid = false;
+
         raceResultsPanelL2T.SetActive(true);
         raceInProgressPanel.SetActive(false);
 
         toynopolyHolderName.text = MainManager.playerNames[MainManager.activePlayer];
+
+        OnlineManager.Instance.ClientsSetToynopolyAutoResultsInvalidRpc();
+        Debug.Log("Toynopoly Auto Results Set Invalid");
     }
 
 
@@ -1307,12 +1394,13 @@ public class PlayerManager3P : MonoBehaviour
 
         if (!MainManager.autoResultsValid)
         {
-            MainManager.changeValue = System.Convert.ToInt32(gapToLast.value) + System.Convert.ToInt32(-gapToFirst.value);
-
-            if (NetworkManager.Singleton.IsHost)
-                OnlineManager.Instance.ReportChangeValueToClientsRpc(MainManager.changeValue);
+            MainManager.changeValue = System.Convert.ToInt32(gapToLast.value) + System.Convert.ToInt32(-gapToFirst.value);                        
         }
 
+        if (NetworkManager.Singleton.IsHost)
+        {
+            OnlineManager.Instance.ReportChangeValueToClientsRpc(MainManager.changeValue);
+        }
 
         int ToynopolyTimeBattleSeconds = Mathf.Abs(Mathf.Clamp(MainManager.changeValue, -20, 20));
         Debug.Log("Time Battle Seconds value is " + ToynopolyTimeBattleSeconds);
@@ -1358,8 +1446,9 @@ public class PlayerManager3P : MonoBehaviour
         }
 
         //SendSyncRequestToOtherClients
-        if (NetworkManager.Singleton.IsHost)
-            OnlineManager.Instance.ExecuteToynopolyTimeBattleResultsOnClientsRpc();
+        //if (NetworkManager.Singleton.IsHost)
+        //{ OnlineManager.Instance.ExecuteToynopolyTimeBattleResultsOnClientsRpc(); }
+
     }
 
     public void ToynopolyTimeBattleConclude()
@@ -1369,11 +1458,13 @@ public class PlayerManager3P : MonoBehaviour
 
         MainManager.fieldsLeftForCar[MainManager.currentCarIndex]--;
 
+        if (NetworkManager.Singleton.IsHost)
+        { OnlineManager.Instance.ExecuteToynopolyTimeBattleResultsOnClientsRpc(); }
+
         if (MainManager.roundCounter % MainManager.playerNumber == 0)
         {
             OnStartSellingRound?.Invoke();
-            ReInstateRows();
-                        
+            ReInstateRows();                        
         }
 
         else
@@ -1382,6 +1473,7 @@ public class PlayerManager3P : MonoBehaviour
         }
 
         raceResultsPanelL2T.SetActive(false);
+        raceInProgressPanel.SetActive(false);
 
         //RoundChangeover();
 
@@ -1460,6 +1552,7 @@ public class PlayerManager3P : MonoBehaviour
         ulong roundWinnerID = OnlineManager.Instance.GetPlayerID(MainManager.playerNames[MainManager.raceWinner]);
 
         Debug.Log("Round Winner ID is " + roundWinnerID);
+        Debug.Log("Rount Winner Name is " + MainManager.playerNames[MainManager.raceWinner]);
 
         return NetworkManager.Singleton.LocalClientId == roundWinnerID;
     }
@@ -1471,9 +1564,10 @@ public class PlayerManager3P : MonoBehaviour
         if (IsTimeBattleWinner())
         {
             timeBattlePanel.SetActive(true);
-            IdleCountdown.Instance.StartIdleCountdownMax(60f);
             TimeBattleOutcome();
         }
+
+        IdleCountdown.Instance.StartIdleCountdownMax(60f);
     }
 
     void Level1Scoring()
@@ -1661,7 +1755,6 @@ public class PlayerManager3P : MonoBehaviour
 
     {
         for (int i = 0; i < MainManager.cars.Length; i++)
-
         {
             invDisplayP1[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[0, i].ToString();
             invDisplayP2[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[1, i].ToString();
@@ -1825,7 +1918,6 @@ public class PlayerManager3P : MonoBehaviour
 
 
     void CarHasDefaulted()
-
     {
         carInDefaultPanel.SetActive(true);
         defaultDownArrow.SetActive(true);
@@ -1858,7 +1950,6 @@ public class PlayerManager3P : MonoBehaviour
             rows[MainManager.TimeBattleCarIndex].SetActive(false);
             MainManager.DefProcedureCompleted[MainManager.TimeBattleCarIndex] = true;
         }
-
 
         UpdateInventoryDisplay();
         UpdateCarPrizesDisplay();
@@ -2370,6 +2461,7 @@ public class PlayerManager3P : MonoBehaviour
         }
     }
 
+    
 
     public class SaveGameData
     {

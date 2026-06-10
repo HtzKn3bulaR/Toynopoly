@@ -9,6 +9,8 @@ using UnityEngine.Events;
 
 public class GameManager : MonoBehaviour
 {   
+    public static GameManager Instance;
+
     public AudioClip panelOpen;
     public AudioClip stageReady;
     public AudioClip coinFalling;
@@ -220,6 +222,11 @@ public class GameManager : MonoBehaviour
             pausePanel.gameObject.SetActive(true);
         }
 
+    }
+
+    private void Start()
+    {
+        Instance = this;
     }
 
     public void Resume()

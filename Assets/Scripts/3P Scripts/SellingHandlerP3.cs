@@ -68,11 +68,13 @@ public class SellingHandlerP3 : MonoBehaviour
     public void HideSellingDialoguePanel()
     {
         sellCarDialoguePanel.SetActive(false);
+        PlayerManager3P.Instance.CheckForDefaultCars();
     }
 
     public void CloseWithoutSelling()
     {
         OnCarSold?.Invoke();
+        HideSellingDialoguePanel();
     }
 
 
@@ -94,7 +96,6 @@ public class SellingHandlerP3 : MonoBehaviour
 
 
     public void UpdateDisplays()
-
     {
         sellerNameDisplay.text = MainManager.playerNames[MainManager.seller];
 
@@ -105,49 +106,60 @@ public class SellingHandlerP3 : MonoBehaviour
             sellPanelPrizeDisplay[i].text = ($"{MainManager.carPrizes[i]}");
 
             sellPanelInventoryDisplay[i].text = MainManager.playerInventory[MainManager.seller, i].ToString();
-
         }
-
-
     }
-
 
     public void SellCar(int car)
     {
-        if (inventoryNotEmpty[car])
+        int sellerIndex = 9;
+
+        for (int i = 0; i < MainManager.playerNumber; i++)
         {
-            MainManager.playerInventory[MainManager.seller, car]--;
-            MainManager.playerCash[MainManager.seller] += MainManager.carPrizes[car];
-            gameManagerScript.UpdateInventoryDisplay();
-            gameManagerScript.cashDisplay[MainManager.seller].text = MainManager.playerCash[MainManager.seller].ToString();
+            if (MainManager.localMultiplayerName == MainManager.playerNames[i])
+            {
+                sellerIndex = i;
+            }
+        }
+
+        if (inventoryNotEmpty[car])
+        {   MainManager.playerInventory[sellerIndex, car]--;
+            MainManager.playerCash[sellerIndex] += MainManager.carPrizes[car];
+            PlayerManager3P.Instance.UpdateInventoryDisplay();
+            gameManagerScript.cashDisplay[sellerIndex].text = MainManager.playerCash[sellerIndex].ToString();
             sellCarDialoguePanel.SetActive(false);
 
             if (MainManager.roundCounter == MainManager.raceThreshold - 1)
-
             {
+                carsSoldFinalRound[sellerIndex]++;
+                OnlineManager.Instance.ReportCarSaleToClientsRpc(car, sellerIndex);
 
-                carsSoldFinalRound[MainManager.seller]++;
-
-                if (carsSoldFinalRound[MainManager.seller] >= 3)
-
+                if (carsSoldFinalRound[sellerIndex] >= 3)
                 {
-                    sellButtons[MainManager.seller].SetActive(false);
+                    sellButtons[sellerIndex].SetActive(false);
+                    OnCarSold?.Invoke();
                 }
 
+                else
+                {
+                    sellCarDialoguePanel.SetActive(true);
+                    CheckSellOptions();
+                    UpdateDisplays();
+                }
             }
 
             else
-
-            { sellButtons[MainManager.seller].SetActive(false); }
-
+            { 
+                sellButtons[sellerIndex].SetActive(false);
+                OnlineManager.Instance.ReportCarSaleToClientsRpc(car, sellerIndex);
+                OnCarSold?.Invoke();
+            }
         }
 
         else
 
-            sellCarDialoguePanel.SetActive(false);
+            sellCarDialoguePanel.SetActive(false);        
 
-        OnCarSold?.Invoke();
-        OnlineManager.Instance.ReportCarSaleToClientsRpc(car, MainManager.seller);
+        
     }
 
 

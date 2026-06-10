@@ -6,6 +6,8 @@ using TMPro;
 
 public class ProtectionHandler : MonoBehaviour
 {
+    public static ProtectionHandler Instance;
+
     public AudioClip shieldDeployed;
     public AudioSource protectionAudio;
 
@@ -63,10 +65,20 @@ public class ProtectionHandler : MonoBehaviour
 
     }
 
+    private void Start()
+    {
+        Instance = this;
+    }
+
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    public void SendProtection()
+    {
+        OnlineManager.Instance.SendProtectionToClientsRpc();
     }
 
     public void ProtectionEnable()
@@ -94,15 +106,9 @@ public class ProtectionHandler : MonoBehaviour
                 break;
 
         }
-
         shieldDeployedPanel.gameObject.SetActive(true);
         DisplayShieldDeployedPanel();
-
     }
-
-
-
-
 
 
     public void CheckProtectionOptionAfterChallenge()
@@ -110,16 +116,12 @@ public class ProtectionHandler : MonoBehaviour
         int numberOfOwners = 0;
 
         for (int i = 0; i < MainManager.playerNumber; i++)
-
         {
             if (MainManager.playerInventory[i, MainManager.currentCarIndex] > 0)
             {
                 numberOfOwners++;
             }
-
-        }
-
-        
+        }               
 
         if (MainManager.playerInventory[MainManager.activePlayer, MainManager.currentCarIndex] > 0 && numberOfOwners < 2)
 
