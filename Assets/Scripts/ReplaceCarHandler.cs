@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 
 public class ReplaceCarHandler : MonoBehaviour
@@ -114,8 +115,7 @@ public class ReplaceCarHandler : MonoBehaviour
 
     public void ExecuteCarReplace()
         {
-
-        MainManager.cars[newCarPosition] = gridGeneratorScript.activeList[newCarIndex];
+        MainManager.cars[newCarPosition] = GridGenerator3P.Instance.activeList[newCarIndex].ToSafeString();
         
         switch(newCarPosition)
         {

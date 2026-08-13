@@ -9,13 +9,15 @@ public class Timer : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI timerText;
     private float elapsedTime;
-    private DateTime dateTimeOfPause;
+    private DateTime dateTimeOfStart;
     
 
     private void Awake()
     {
         elapsedTime = 0;
         elapsedTime = elapsedTime - 47;
+
+        dateTimeOfStart = DateTime.Now;
     }
             
 
@@ -26,8 +28,6 @@ public class Timer : MonoBehaviour
         {
             ResetTimer();
         }
-
-
             elapsedTime += Time.deltaTime;
             int hours = Mathf.FloorToInt(elapsedTime / 3600);
             int minutes = Mathf.FloorToInt(elapsedTime % 3600) / 60;
@@ -42,20 +42,20 @@ public class Timer : MonoBehaviour
         if (displayOn)
         {
             MainManager.matchTimeDisplayed = true;
-            elapsedTime += (float)(DateTime.Now - dateTimeOfPause).TotalSeconds;
+            elapsedTime = (float)(DateTime.Now - dateTimeOfStart).TotalSeconds;
             Debug.Log("Elapsed Time" + elapsedTime);
         }
 
         else
         {
             MainManager.matchTimeDisplayed = false;
-            dateTimeOfPause = DateTime.Now;
+            //dateTimeOfStart = DateTime.Now;
             Debug.Log("Elapsed Time" + elapsedTime);
         }
                
     }
 
-
+    /*
     private void OnApplicationPause(bool isPaused)
     {
                      
@@ -86,6 +86,7 @@ public class Timer : MonoBehaviour
         }
 
     }
+    */
 
     void ResetTimer()
     {

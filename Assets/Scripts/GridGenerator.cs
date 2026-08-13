@@ -1,15 +1,21 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
-using System;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
+using Unity.VisualScripting;
 using UnityEditor;
+using UnityEngine;
+using UnityEngine.UI;
 
 
 public class GridGenerator : MonoBehaviour
 
 {
+    public static GridGenerator Instance;
 
     public Button carPicA;
     public Button carPicB;
@@ -18,31 +24,27 @@ public class GridGenerator : MonoBehaviour
     public Button carPicE;
     public Button carPicF;
 
-    [SerializeField] GameObject carCarrousel;
-
     public AudioClip carPopulateSound;
     public AudioClip stageReady;
     public AudioClip transition;
-    public AudioClip newGame;
     public AudioSource gameSounds;
 
     public ParticleSystem bliss;
-    
-    
-    public  TextMeshPro track1;
-    public  TextMeshPro track2;
-    public  TextMeshPro track3;
-    public  TextMeshPro track4;
-    public  TextMeshPro track5;
-    public  TextMeshPro track6;
-    public  TextMeshPro track7;
-    public  TextMeshPro track8;
-    public  TextMeshPro track9;
-    
 
-    public TextMeshProUGUI[] trackDisplays;
 
-    public TextMeshPro bonusTrack;
+    [SerializeField] GameObject carCarrousel;
+
+    public TextMeshProUGUI track1;
+    public TextMeshProUGUI track2;
+    public TextMeshProUGUI track3;
+    public TextMeshProUGUI track4;
+    public TextMeshProUGUI track5;
+    public TextMeshProUGUI track6;
+    public TextMeshProUGUI track7;
+    public TextMeshProUGUI track8;
+    public TextMeshProUGUI track9;
+
+    public TextMeshProUGUI bonusTrack;
 
     public TextMeshProUGUI carAText;
     public TextMeshProUGUI carBText;
@@ -51,25 +53,28 @@ public class GridGenerator : MonoBehaviour
     public TextMeshProUGUI carEText;
     public TextMeshProUGUI carFText;
 
-    [SerializeField] TextMeshProUGUI player1NameField;
-    [SerializeField] TextMeshProUGUI player2NameField;
-    [SerializeField] TextMeshProUGUI player3NameField;
-    
+    public TextMeshProUGUI player1NameField;
+    public TextMeshProUGUI player2NameField;
+    public TextMeshProUGUI player3NameField;
+    public TextMeshProUGUI player4NameField;
+    public TextMeshProUGUI player5NameField;
 
-    [SerializeField] Button carASprite;
-    [SerializeField] Button carBSprite;
-    [SerializeField] Button carCSprite;
-    [SerializeField] Button carDSprite;
-    [SerializeField] Button carESprite;
-    [SerializeField] Button carFSprite;
+
+    public Button carASprite;
+    public Button carBSprite;
+    public Button carCSprite;
+    public Button carDSprite;
+    public Button carESprite;
+    public Button carFSprite;
 
     [SerializeField] Button carrouselSprite;
-        
+
+
     [SerializeField] GameObject gameStartingPanel;
     [SerializeField] GameObject timerPanel;
 
-    private GameManager gameManagerScript;
-    
+    private PlayerManager3P gameManagerScript;
+    private Timer timerScript;
 
     private Animator carAPresentation;
     private Animator carBPresentation;
@@ -78,13 +83,9 @@ public class GridGenerator : MonoBehaviour
     private Animator carEPresentation;
     private Animator carFPresentation;
 
-
-
-
-    private int carCardsPopulated = 0;
-
     private int rowShown = 0;
 
+    private int carCardsPopulated = 0;
 
     public TextAsset standardTrackNames;
     public TextAsset bonusTrackNames;
@@ -95,9 +96,26 @@ public class GridGenerator : MonoBehaviour
     public TextAsset semiProNames;
     public TextAsset proNames;
     public TextAsset superProNames;
-        
-    public static event Action OnTrackPanelPopulate;      
-      
+
+
+    private List<FixedString32Bytes> trackList = new List<FixedString32Bytes>();
+
+    //ACTIVE TRACKS LIST
+    public List<FixedString32Bytes> activeTracks = new List<FixedString32Bytes>();
+
+    //BONUS TRACK NETWORK VARIABLE
+    public FixedString64Bytes activeBonusTrack;
+
+    //ACTIVE CARS LIST
+    public List<FixedString32Bytes> cars = new List<FixedString32Bytes>();
+
+    //PLAYER SEQUENCED LIST
+    public List<FixedString32Bytes> players = new List<FixedString32Bytes>();
+
+    public List<string> bonusTrackList = new List<string>();
+
+    public static event Action OnTrackPanelPopulate;
+
 
     public event EventHandler<OnCarCardPopulateEventArgs> OnCarCardPopulate;
 
@@ -107,57 +125,61 @@ public class GridGenerator : MonoBehaviour
     }
 
 
-    List<string> trackList = new List<string>();
+    public List<FixedString32Bytes> activeList = new List<FixedString32Bytes>();
+    public List<Sprite> activeSpriteList;
 
-    List<string> bonusTrackList = new List<string>();
-       
-
-    public List<string> activeList = new List<string>();
-    public List<Sprite> activeSpriteList = new List<Sprite>();
-
-    public List<string> rookieNamesList = new List<string>();
-       
-    public List<Sprite> rookieSpriteList = new List<Sprite>();
+    List<FixedString32Bytes> rookieNamesList = new List<FixedString32Bytes>();
 
 
 
-    List<string> amateurNamesList = new List<string>();
+    public List<Sprite> rookieSpriteList = new List<Sprite>
 
-    
+    { };
+
+    List<FixedString32Bytes> amateurNamesList = new List<FixedString32Bytes>();
+
+
+
     public List<Sprite> amateurSpriteList = new List<Sprite>
 
     { };
 
-    List<string> advancedNamesList = new List<string>();
+    List<FixedString32Bytes> advancedNamesList = new List<FixedString32Bytes>();
 
-    
+
+
     public List<Sprite> advancedSpriteList = new List<Sprite>
 
     { };
 
-    List<string> semiProNamesList = new List<string>();
+    List<FixedString32Bytes> semiProNamesList = new List<FixedString32Bytes>();
 
-   
+
+
     public List<Sprite> semiProSpriteList = new List<Sprite>
 
     { };
 
-    List<string> proNamesList = new List<string>();
+    List<FixedString32Bytes> proNamesList = new List<FixedString32Bytes>();
 
-    
+
+
     public List<Sprite> proSpriteList = new List<Sprite>
 
     { };
 
-    List<string> superProNamesList = new List<string>();
 
-    
+    List<FixedString32Bytes> superProNamesList = new List<FixedString32Bytes>();
+
+
 
     public List<Sprite> superProSpriteList = new List<Sprite>
 
     { };
 
-   
+
+    public static event Action OnGameTableReady;
+
 
     List<T> GetUniqueRandomElements<T>(List<T> inputList, int count)
 
@@ -165,61 +187,89 @@ public class GridGenerator : MonoBehaviour
         List<T> inputListClone = new List<T>(inputList);
         Shuffle(inputListClone);
         return inputListClone.GetRange(0, count);
+    }
+
+    public void Awake()
+    {
 
     }
 
-    void Awake()
+    private void Start()
     {
+        Instance = this;
 
-        //Read-in Track Lists
-        
         ReadTrackLists();
         ReadCarLists();
-       
 
-        if (MainManager.gameResumed)
+        gameSounds = GetComponent<AudioSource>();
+
+        carAPresentation = carPicA.GetComponent<Animator>();
+        carBPresentation = carPicB.GetComponent<Animator>();
+        carCPresentation = carPicC.GetComponent<Animator>();
+        carDPresentation = carPicD.GetComponent<Animator>();
+        carEPresentation = carPicE.GetComponent<Animator>();
+        carFPresentation = carPicF.GetComponent<Animator>();
+
+        PrepareCarClassLists();
+
+        if (NetworkManager.Singleton.LocalClientId == 0)
         {
-            gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
-            
-            PopulateCarCards();
-            PopulateTrackPanel();
-            player1NameField.text = MainManager.playerNames[0];
-            player2NameField.text = MainManager.playerNames[1];
-            carCarrousel.SetActive(false);
-
-            foreach (GameObject row in gameManagerScript.rows)
-            {
-                row.SetActive(true);
-            }
-            
-            
-            for (int i = 0; i < MainManager.fieldAvailable.Length; i++)
-            {
-                if (!MainManager.fieldAvailable[i])
-                {
-                    gameManagerScript.fields[i].gameObject.SetActive(false);
-                }
-            }
-
-            gameSounds = GetComponent<AudioSource>();
-        }
-        else
-        {
-
             TrackSelect();
-
-            gameSounds = GetComponent<AudioSource>();
-
-            carAPresentation = carPicA.GetComponent<Animator>();
-            carBPresentation = carPicB.GetComponent<Animator>();
-            carCPresentation = carPicC.GetComponent<Animator>();
-            carDPresentation = carPicD.GetComponent<Animator>();
-            carEPresentation = carPicE.GetComponent<Animator>();
-            carFPresentation = carPicF.GetComponent<Animator>();
-
             CarSelect();
 
+            SetRandomPlayerSequence();
         }
+
+        PropagateGridToClients();
+
+    }
+
+    private void PropagateGridToClients()
+    {
+        if (NetworkManager.Singleton.LocalClientId != 0)
+        {
+            GetTrackLineup();
+            GetCarLineup();
+            GetPlayerLineup();
+        }
+    }
+
+    private void GetTrackLineup()
+    {
+        var temporaryTrackList = OnlineManager.Instance.ReturnTrackNetworkList();
+
+        for (int i = 0; i < temporaryTrackList.Count; i++)
+        {
+            MainManager.activeTracks[i] = temporaryTrackList[i].Value;
+        }
+
+        MainManager.bonusTrack = OnlineManager.Instance.networkBonusTrack.Value.ToSafeString();
+    }
+
+    private void GetCarLineup()
+    {
+        var temporaryCarList = OnlineManager.Instance.ReturnCarNetworkList();
+
+        for (int i = 0; i < temporaryCarList.Count; i++)
+        {
+            MainManager.cars[i] = temporaryCarList[i].Value;
+        }
+    }
+
+    private void GetPlayerLineup()
+    {
+        var temporaryPlayerList = OnlineManager.Instance.ReturnPlayerNetworkList();
+
+        for (int i = 0; i < temporaryPlayerList.Count; i++)
+        {
+            MainManager.playerNames[i] = temporaryPlayerList[i].Value;
+        }
+
+
+        StartCarrousel();
+
+        StartCoroutine(FirstCarPresentationDelay());
+
     }
 
 
@@ -227,13 +277,12 @@ public class GridGenerator : MonoBehaviour
     void ReadTrackLists()
     {
 
-        string[] standardData = standardTrackNames.text.Split(new string[] {"\n" }, StringSplitOptions.None);
+        string[] standardData = standardTrackNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
 
         string[] bonusData = bonusTrackNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
 
         int tableSize = standardData.Length;
-        Debug.Log("Table size " + tableSize);
-        
+
         for (int i = 0; i < tableSize; i++)
         {
             string nameTrimmed;
@@ -242,9 +291,10 @@ public class GridGenerator : MonoBehaviour
             nameTrimmed = nameTrimmed.TrimStart(new char[] { '\r', ' ' });
 
             trackList.Add(nameTrimmed);
+
         }
 
-        for(int i = 0; i < tableSize; i++)
+        for (int i = 0; i < tableSize; i++)
         {
 
             string nameTrimmed;
@@ -255,7 +305,9 @@ public class GridGenerator : MonoBehaviour
             bonusTrackList.Add(nameTrimmed);
         }
 
+
     }
+
 
     void ReadCarLists()
     {
@@ -264,26 +316,26 @@ public class GridGenerator : MonoBehaviour
         {
             case 0:
 
-        string[] rookieData = rookieNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
+                string[] rookieData = rookieNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
 
-        int rookieCount = rookieData.Length;
-        
-        string nameTrimmed;
+                int rookieCount = rookieData.Length;
 
-        foreach (string s in rookieData)
-        {
-            nameTrimmed = s.TrimEnd(new char[] { '\r', ' ' });
-            nameTrimmed = nameTrimmed.TrimStart(new char[] { '\r', ' ' });
-            rookieNamesList.Add(nameTrimmed);
-        }
+                string nameTrimmed;
+
+                foreach (string s in rookieData)
+                {
+                    nameTrimmed = s.TrimEnd(new char[] { '\r', ' ' });
+                    nameTrimmed = nameTrimmed.TrimStart(new char[] { '\r', ' ' });
+                    rookieNamesList.Add(nameTrimmed);
+                }
                 break;
 
-        case 1:
+            case 1:
 
                 string[] amateurData = amateurNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
 
                 int amateurCount = amateurData.Length;
-                
+
                 string nameTrimmedAm;
 
                 foreach (string s in amateurData)
@@ -300,7 +352,7 @@ public class GridGenerator : MonoBehaviour
                 string[] advancedData = advancedNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
 
                 int advancedCount = advancedData.Length;
-               
+
                 string nameTrimmedAd;
 
                 foreach (string s in advancedData)
@@ -371,7 +423,6 @@ public class GridGenerator : MonoBehaviour
 
 
 
-
     void Shuffle<T>(List<T> inputList)
 
     {
@@ -385,157 +436,84 @@ public class GridGenerator : MonoBehaviour
         }
     }
 
+    private void PrepareCarClassLists()
+    {
+        switch (MainManager.classSelected)
+
+        {
+            case 0:
+                activeList = rookieNamesList;
+                activeSpriteList = rookieSpriteList;
+                break;
+
+            case 1:
+                activeList = amateurNamesList;
+                activeSpriteList = amateurSpriteList;
+                break;
+
+            case 2:
+                activeList = advancedNamesList;
+                activeSpriteList = advancedSpriteList;
+                break;
+
+            case 3:
+                activeList = semiProNamesList;
+                activeSpriteList = semiProSpriteList;
+                break;
+
+            case 4:
+                activeList = proNamesList;
+                activeSpriteList = proSpriteList;
+                break;
+
+            case 5:
+                activeList = superProNamesList;
+                activeSpriteList = superProSpriteList;
+                break;
+        }
+
+        Debug.Log("Active List first entry " + activeList[0]);
+    }
+
+
     public void CarSelect()
 
     {
-        switch (MainManager.classSelected)
 
+        if (NetworkManager.Singleton.LocalClientId == 0)
         {
-            case 0:
-                activeList = rookieNamesList;
-                activeSpriteList = rookieSpriteList;
-                break;
+            var uniqueRandomList = GetUniqueRandomElements(activeList, 6);
 
-            case 1:
-                activeList = amateurNamesList;
-                activeSpriteList = amateurSpriteList;
-                break;
+            cars.Clear();
+            Debug.Log("Cars in Network List " + cars.Count);
 
-            case 2:
-                activeList = advancedNamesList;
-                activeSpriteList = advancedSpriteList;
-                break;
+            for (int i = 0; i < uniqueRandomList.Count; i++)
+            {
+                Debug.Log(uniqueRandomList[i]);
+                cars.Add(uniqueRandomList[i].Value);
 
-            case 3:
-                activeList = semiProNamesList;
-                activeSpriteList = semiProSpriteList;
-                break;
+                MainManager.cars[i] = cars[i].Value;
+            }
 
-            case 4:
-                activeList = proNamesList;
-                activeSpriteList = proSpriteList;
-                break;
-
-            case 5:
-                activeList = superProNamesList;
-                activeSpriteList = superProSpriteList;
-                break;
-
+            OnlineManager.Instance.SendDataToCarNetworkList(cars);
         }
 
+        Debug.Log("First Car" + cars[0].Value);
 
-
-        var uniqueRandomList = GetUniqueRandomElements(activeList, 6);
-
-        for (int i = 0; i < uniqueRandomList.Count; i++)
-
-        {
-            MainManager.cars[i] = uniqueRandomList[i];
-
-
-        }
-
-        Debug.Log("First Car" + MainManager.cars[0]);
-
-
-
-        
         StartCarrousel();
 
-
         StartCoroutine(FirstCarPresentationDelay());
-        
-
-        
 
     }
 
-    //populate without delay:
-    
-    void PopulateCarCards()
-
-    {
-        switch (MainManager.classSelected)
-
-        {
-            case 0:
-                activeList = rookieNamesList;
-                activeSpriteList = rookieSpriteList;
-                break;
-
-            case 1:
-                activeList = amateurNamesList;
-                activeSpriteList = amateurSpriteList;
-                break;
-
-            case 2:
-                activeList = advancedNamesList;
-                activeSpriteList = advancedSpriteList;
-                break;
-
-            case 3:
-                activeList = semiProNamesList;
-                activeSpriteList = semiProSpriteList;
-                break;
-
-            case 4:
-                activeList = proNamesList;
-                activeSpriteList = proSpriteList;
-                break;
-
-            case 5:
-                activeList = superProNamesList;
-                activeSpriteList = superProSpriteList;
-                break;
-
-        }
-
-
-        carAText.text = MainManager.cars[0];
-        carBText.text = MainManager.cars[1];
-        carCText.text = MainManager.cars[2];
-        carDText.text = MainManager.cars[3];
-        carEText.text = MainManager.cars[4];
-        carFText.text = MainManager.cars[5];
-
-        for (int i = 0; i < activeList.Count; i++)
-
-        {
-            if (activeList[i] == MainManager.cars[0])
-
-            { carPicA.image.sprite = activeSpriteList[i]; }
-
-            else if (activeList[i] == MainManager.cars[1])
-
-            { carPicB.image.sprite = activeSpriteList[i]; }
-
-            else if (activeList[i] == MainManager.cars[2])
-
-            { carPicC.image.sprite = activeSpriteList[i]; }
-
-            else if (activeList[i] == MainManager.cars[3])
-
-            { carPicD.image.sprite = activeSpriteList[i]; }
-
-            else if (activeList[i] == MainManager.cars[4])
-
-            { carPicE.image.sprite = activeSpriteList[i]; }
-
-            else if (activeList[i] == MainManager.cars[5])
-
-            { carPicF.image.sprite = activeSpriteList[i]; }
-
-        }
-    }
-
-    
 
     void StartCarrousel()
 
     {
-        carCarrousel.SetActive(true);
         bliss.Play();
-        
+
+
+        carCarrousel.SetActive(true);
 
 
 
@@ -574,11 +552,87 @@ public class GridGenerator : MonoBehaviour
 
     }
 
+    //populate without delay:
 
-    void PopulateCarCardA()
+    void PopulateCarCards()
 
     {
-               
+
+        switch (MainManager.classSelected)
+
+        {
+            case 0:
+                activeList = rookieNamesList;
+                activeSpriteList = rookieSpriteList;
+                break;
+
+            case 1:
+                activeList = amateurNamesList;
+                activeSpriteList = amateurSpriteList;
+                break;
+
+            case 2:
+                activeList = advancedNamesList;
+                activeSpriteList = advancedSpriteList;
+                break;
+
+            case 3:
+                activeList = semiProNamesList;
+                activeSpriteList = semiProSpriteList;
+                break;
+
+            case 4:
+                activeList = proNamesList;
+                activeSpriteList = proSpriteList;
+                break;
+
+            case 5:
+                activeList = superProNamesList;
+                activeSpriteList = superProSpriteList;
+                break;
+
+        }
+
+        carAText.text = MainManager.cars[0];
+        carBText.text = MainManager.cars[1];
+        carCText.text = MainManager.cars[2];
+        carDText.text = MainManager.cars[3];
+        carEText.text = MainManager.cars[4];
+        carFText.text = MainManager.cars[5];
+
+        for (int i = 0; i < activeList.Count; i++)
+
+        {
+            if (activeList[i] == MainManager.cars[0])
+
+            { carPicA.image.sprite = activeSpriteList[i]; }
+
+            else if (activeList[i] == MainManager.cars[1])
+
+            { carPicB.image.sprite = activeSpriteList[i]; }
+
+            else if (activeList[i] == MainManager.cars[2])
+
+            { carPicC.image.sprite = activeSpriteList[i]; }
+
+            else if (activeList[i] == MainManager.cars[3])
+
+            { carPicD.image.sprite = activeSpriteList[i]; }
+
+            else if (activeList[i] == MainManager.cars[4])
+
+            { carPicE.image.sprite = activeSpriteList[i]; }
+
+            else if (activeList[i] == MainManager.cars[5])
+
+            { carPicF.image.sprite = activeSpriteList[i]; }
+
+        }
+    }
+
+    void PopulateCarCardA()
+    {
+
         carAText.text = MainManager.cars[0];
         OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carAText });
         gameSounds.PlayOneShot(carPopulateSound);
@@ -589,10 +643,7 @@ public class GridGenerator : MonoBehaviour
         {
             if (activeList[i] == MainManager.cars[0])
 
-            { carPicA.image.sprite = activeSpriteList[i];
-                
-            }
-
+            { carPicA.image.sprite = activeSpriteList[i]; }
 
         }
 
@@ -613,10 +664,7 @@ public class GridGenerator : MonoBehaviour
         {
             if (activeList[i] == MainManager.cars[1])
 
-            { carPicB.image.sprite = activeSpriteList[i];
-
-                
-            }
+            { carPicB.image.sprite = activeSpriteList[i]; }
 
         }
 
@@ -636,10 +684,7 @@ public class GridGenerator : MonoBehaviour
         {
             if (activeList[i] == MainManager.cars[2])
 
-            { carPicC.image.sprite = activeSpriteList[i];
-               
-                
-            }
+            { carPicC.image.sprite = activeSpriteList[i]; }
 
         }
 
@@ -648,10 +693,11 @@ public class GridGenerator : MonoBehaviour
     }
 
     void PopulateCarCardD()
-    {        
+    {
         carDText.text = MainManager.cars[3];
         OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carDText });
         gameSounds.PlayOneShot(carPopulateSound);
+        carDPresentation.SetTrigger("PresentCarD");
 
         for (int i = 0; i < activeList.Count; i++)
 
@@ -664,7 +710,6 @@ public class GridGenerator : MonoBehaviour
 
         carCardsPopulated++;
         StartCoroutine(TablePopulateDelayRoutine());
-        carDPresentation.SetTrigger("PresentCarD");
 
     }
 
@@ -674,6 +719,7 @@ public class GridGenerator : MonoBehaviour
         carEText.text = MainManager.cars[4];
         //OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carEText });
         gameSounds.PlayOneShot(carPopulateSound);
+        carEPresentation.SetTrigger("PresentCarE");
 
         for (int i = 0; i < activeList.Count; i++)
 
@@ -686,7 +732,6 @@ public class GridGenerator : MonoBehaviour
 
         carCardsPopulated++;
         StartCoroutine(TablePopulateDelayRoutine());
-        carEPresentation.SetTrigger("PresentCarE");
 
     }
 
@@ -696,6 +741,7 @@ public class GridGenerator : MonoBehaviour
         carFText.text = MainManager.cars[5];
         OnCarCardPopulate?.Invoke(this, new OnCarCardPopulateEventArgs { carCard = carFText });
         gameSounds.PlayOneShot(carPopulateSound);
+
 
         for (int i = 0; i < activeList.Count; i++)
 
@@ -709,77 +755,126 @@ public class GridGenerator : MonoBehaviour
         carCardsPopulated++;
         StartCoroutine(TablePopulateDelayRoutine());
         carFPresentation.SetTrigger("PresentCarF");
-        //gameSounds.PlayOneShot(stageReady);
+
 
     }
 
 
-
-
-
-    void TrackSelect()
+    public void TrackSelect()
 
     {
-
-        var uniqueRandomList = GetUniqueRandomElements(trackList, 9);
-
-
-        for (int i = 0; i < uniqueRandomList.Count; i++)
-
+        if (NetworkManager.Singleton.LocalClientId == 0)
         {
-            MainManager.activeTracks[i] = uniqueRandomList[i];
+            var uniqueRandomList = GetUniqueRandomElements(trackList, 9);
+
+            for (int i = 0; i < uniqueRandomList.Count; i++)
+
+            {
+                activeTracks.Add(uniqueRandomList[i].Value);
+
+                MainManager.activeTracks[i] = activeTracks[i].Value;
+            }
+
+            int rand = UnityEngine.Random.Range(0, bonusTrackList.Count);
+            activeBonusTrack = bonusTrackList[rand];
+
+            MainManager.bonusTrack = activeBonusTrack.Value;
+
+            OnlineManager.Instance.SendDataToTrackNetworkList(activeTracks, activeBonusTrack.Value);
         }
 
 
-        int rand = UnityEngine.Random.Range(0, bonusTrackList.Count);
-        MainManager.bonusTrack = bonusTrackList[rand];
 
-                       
+        //PopulateTrackPanel();
     }
 
-
-    
     void PopulateTrackPanel()
 
     {
-
         OnTrackPanelPopulate?.Invoke();
 
-        for (int i = 0; i < trackDisplays.Length-1; i++)
+        track1.text = MainManager.activeTracks[0];
+        track2.text = MainManager.activeTracks[1];
+        track3.text = MainManager.activeTracks[2];
+        track4.text = MainManager.activeTracks[3];
+        track5.text = MainManager.activeTracks[4];
+        track6.text = MainManager.activeTracks[5];
+        track7.text = MainManager.activeTracks[6];
+        track8.text = MainManager.activeTracks[7];
+        track9.text = MainManager.activeTracks[8];
 
+        bonusTrack.text = MainManager.bonusTrack;
+    }
+
+
+    //PLAYERS SECTION
+
+    void SetRandomPlayerSequence()
+    {
+        List<FixedString32Bytes> temporaryPlayerList = new List<FixedString32Bytes>();
+
+        temporaryPlayerList = OnlineManager.Instance.ReturnPlayerNamesList();
+
+        var randomPlayersList = GetUniqueRandomElements(temporaryPlayerList, temporaryPlayerList.Count);
+
+        for (int i = 0; i < randomPlayersList.Count; i++)
         {
-            trackDisplays[i].text = MainManager.activeTracks[i];
-                               
+            players.Add(randomPlayersList[i].ToSafeString());
+
+            MainManager.playerNames[i] = players[i].Value;
         }
-                               
-        trackDisplays[9].text = MainManager.bonusTrack;
-        
+
+        OnlineManager.Instance.SendDataToPlayerNetworkList(players);
 
     }
 
-    public void PopulatePlayerPanel()
 
-    {
-       
+
+    public void PopulatePlayerPanel()
+    {   
 
         switch (MainManager.playerNumber)
 
         {
             case 2:
 
-                gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
                 player1NameField.text = MainManager.playerNames[0];
                 player2NameField.text = MainManager.playerNames[1];
-                gameManagerScript.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {13 - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
                 break;
 
-            case >2:
+            case 3:
+
+                player1NameField.text = MainManager.playerNames[0];
+                player2NameField.text = MainManager.playerNames[1];
+                player3NameField.text = MainManager.playerNames[2];
+                break;
+
+            case 4:
+
+                player1NameField.text = MainManager.playerNames[0];
+                player2NameField.text = MainManager.playerNames[1];
+                player3NameField.text = MainManager.playerNames[2];
+                player4NameField.text = MainManager.playerNames[3];
+                break;
+
+            case 5:
+
+                player1NameField.text = players[0].Value;
+                player2NameField.text = players[1].Value;
+                player3NameField.text = players[2].Value;
+                player4NameField.text = players[3].Value;
+                player5NameField.text = players[4].Value;
                 break;
 
         }
 
         StartCoroutine(WaitAfterLineupSelected());
-                       
+
+        if (MainManager.playerNumber == 5)
+        {
+            GameManager.Instance.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+        }
+
     }
 
     void ShowNextRow()
@@ -787,15 +882,10 @@ public class GridGenerator : MonoBehaviour
         if (rowShown < 6)
 
         {
-            if (MainManager.playerNumber < 16)
-            {
-
-                gameManagerScript.rows[rowShown].SetActive(true);
-            }
+            GameManager.Instance.rows[rowShown].SetActive(true);
 
             StartCoroutine(FieldsAppearingDelay());
         }
-
     }
 
 
@@ -833,6 +923,7 @@ public class GridGenerator : MonoBehaviour
                 break;
             default:
                 gameStartingPanel.SetActive(true);
+                PopulateTrackPanel();
                 bliss.Stop();
                 PopulatePlayerPanel();
                 break;
@@ -846,6 +937,11 @@ public class GridGenerator : MonoBehaviour
 
         rowShown++;
         ShowNextRow();
+
+        if (rowShown == 6)
+        {
+            OnGameTableReady?.Invoke();
+        }
     }
 
     IEnumerator WaitAfterLineupSelected()
@@ -853,18 +949,17 @@ public class GridGenerator : MonoBehaviour
     {
         yield return new WaitForSeconds(6.0f);
         gameStartingPanel.SetActive(false);
-        PopulateTrackPanel();
 
         gameSounds.PlayOneShot(transition);
 
-        if (MainManager.playerNumber < 16)
-        {
-            gameManagerScript.helpText.gameObject.SetActive(true);
-        }
-        
+        OnlineManager.Instance.ReadPlayerIDs();
+
+        LobbyHandler.Instance.LeaveLobby();
+
         timerPanel.gameObject.SetActive(true);
-        
+
         ShowNextRow();
     }
+
 
 }

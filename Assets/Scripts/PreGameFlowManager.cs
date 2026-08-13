@@ -30,6 +30,8 @@ public class PreGameFlowManager : MonoBehaviour
     [SerializeField] GameObject lobbyWindow;
 
     [SerializeField] TextMeshProUGUI roomCodeInfo;
+    [SerializeField] GameObject roomCodeEntryField;
+    [SerializeField] TextMeshProUGUI advisoryText;
         
     [SerializeField] Button[] StartGame;
 
@@ -121,7 +123,13 @@ public class PreGameFlowManager : MonoBehaviour
         entry = entry.TrimStart(new char[] { '\r', ' ' });
         entry = entry.ToUpper();
         tempPlayerName = entry;
-        LobbyHandler.Instance.SetLobbyPlayerName(tempPlayerName); 
+        LobbyHandler.Instance.SetLobbyPlayerName(tempPlayerName);
+    }
+
+    public void ShowRoomCodeEntryField()
+    {
+        roomCodeEntryField.SetActive(true);
+        advisoryText.text = "Please type in the Room Code for the Lobby and confirm with Enter";
     }
 
     

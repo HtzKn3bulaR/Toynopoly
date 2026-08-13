@@ -298,7 +298,7 @@ public class PlayerManager3P : MonoBehaviour
 
         GridGenerator3P.OnGameTableReady += CallActivePlayer;
 
-        OnlineManager.Instance.pendingFieldNetwork.OnValueChanged += OnPendingFieldChanged;
+        //OnlineManager.Instance.pendingFieldNetwork.OnValueChanged += OnPendingFieldChanged;
 
     }
 
@@ -309,6 +309,7 @@ public class PlayerManager3P : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
 
         GridGenerator3P.OnGameTableReady += CallActivePlayer;
+        GridGenerator3P.OnGameTableReady += ShowHelp;
 
         OnlineManager.Instance.pendingFieldNetwork.OnValueChanged += OnPendingFieldChanged;
 
@@ -316,7 +317,13 @@ public class PlayerManager3P : MonoBehaviour
 
         OnlineManager.Instance.level2RaceIsInProgress.OnValueChanged += OnRaceLevel2InProgress;
 
-        BlockFields();
+        BlockFields();        
+    }
+
+    private void ShowHelp()
+    {
+        helpText.gameObject.SetActive(true);
+        statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
     }
 
 
@@ -335,7 +342,7 @@ public class PlayerManager3P : MonoBehaviour
         activePlayerID = OnlineManager.Instance.GetPlayerID(MainManager.playerNames[MainManager.activePlayer]);
         Debug.Log("Active Player ID is " + activePlayerID);
         Debug.Log("Local Player ID is " + OnlineManager.Instance.GetLocalClientID());
-
+        
         if (OnlineManager.Instance.GetLocalClientID() != activePlayerID)
         {
             SetPromptText("Waiting for " + MainManager.playerNames[MainManager.activePlayer] + "s turn");
@@ -1005,20 +1012,23 @@ public class PlayerManager3P : MonoBehaviour
 
         if (newValue == false)
         {
-            Debug.Log("Local Is Host " + NetworkManager.Singleton.IsHost);
+            if (!MainManager.IsToynopolyBattle)
+            {
+                Debug.Log("Local Is Host " + NetworkManager.Singleton.IsHost);
 
-            if (!NetworkManager.Singleton.IsHost)
-            {                
-                CSVFileReader.Instance.LeaderboardClose();
-                RegisterResults();
-                CSVFileReader.Instance.ChallengeRaceInProgessPanelClose();
+                if (!NetworkManager.Singleton.IsHost)
+                {
+                    CSVFileReader.Instance.LeaderboardClose();
+                    RegisterResults();
+                    CSVFileReader.Instance.ChallengeRaceInProgessPanelClose();
 
-                Debug.Log("Results Registered On Clients");                
+                    Debug.Log("Results Registered On Clients");
+                }
+
+                promptText.text = ("Waiting for race winner " + MainManager.playerNames[MainManager.raceWinner] + " to change the value of a car");
+
+                CallTimeBattleWinnerDecision();
             }
-
-            promptText.text = ("Waiting for race winner " + MainManager.playerNames[MainManager.raceWinner] + " to change the value of a car");
-
-            CallTimeBattleWinnerDecision();
         }
     }
     //THIRD NETWORK EVENT FINISHED--------------------------------------
@@ -1153,8 +1163,6 @@ public class PlayerManager3P : MonoBehaviour
 
     public void RegisterResults()
     {
-        
-
         if (resultsRegisteredForRound)
             return;
 
@@ -1394,7 +1402,12 @@ public class PlayerManager3P : MonoBehaviour
 
         if (!MainManager.autoResultsValid)
         {
-            MainManager.changeValue = System.Convert.ToInt32(gapToLast.value) + System.Convert.ToInt32(-gapToFirst.value);                        
+            Debug.Log("Toynopoly Auto Results Not Valid");
+
+            if (NetworkManager.Singleton.IsHost)
+            {
+                MainManager.changeValue = System.Convert.ToInt32(gapToLast.value) + System.Convert.ToInt32(-gapToFirst.value);
+            }
         }
 
         if (NetworkManager.Singleton.IsHost)
@@ -1474,6 +1487,8 @@ public class PlayerManager3P : MonoBehaviour
 
         raceResultsPanelL2T.SetActive(false);
         raceInProgressPanel.SetActive(false);
+
+        OnlineManager.Instance.ReportRaceLevel2InProgressRpc(false);
 
         //RoundChangeover();
 
@@ -1711,7 +1726,6 @@ public class PlayerManager3P : MonoBehaviour
         countUpScript.AddValue(oldCarValue, MainManager.carPrizes[MainManager.TimeBattleCarIndex]);
 
         if (MainManager.carPrizes[MainManager.TimeBattleCarIndex] <= 0)
-
         {
             MainManager.carPrizes[MainManager.TimeBattleCarIndex] = 0;
             CarHasDefaulted();
@@ -2083,6 +2097,7 @@ public class PlayerManager3P : MonoBehaviour
                 if (MainManager.roundCounter == MainManager.raceThreshold)
                 {
                     level2StartPanel.gameObject.SetActive(true);
+                    BlockFields();
                 }
 
                 MainManager.levelCounter = 2;
@@ -2119,7 +2134,7 @@ public class PlayerManager3P : MonoBehaviour
             turnIndicator[i].SetActive(false);
         }
 
-        turnIndicator[MainManager.activePlayer].SetActive(true);
+        turnIndicator[MainManager.activePlayer].SetActive(true);              
 
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
 
@@ -2177,7 +2192,6 @@ public class PlayerManager3P : MonoBehaviour
     {
 
         for (int i = 0; i < cashDisplay.Length; i++)
-
         {
             cashDisplay[i].text = MainManager.playerCash[i].ToString();
         }

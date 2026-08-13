@@ -139,6 +139,8 @@ public class ProtectionHandler : MonoBehaviour
     public void P2ProtectionPanelClose()
     {
         P2protectionPanel.gameObject.SetActive(false);
+
+        GameManager.Instance.ResumeFromProtectOption();
     }
 
     public void DisplayShieldDeployedPanel()

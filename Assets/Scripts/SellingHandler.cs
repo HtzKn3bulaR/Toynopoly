@@ -25,10 +25,9 @@ public class SellingHandler : MonoBehaviour
     [SerializeField] GameObject p1SellButton;
     [SerializeField] GameObject p2SellButton;
     [SerializeField] GameObject sellerDisplay;
-       
 
-    private int P1carsSoldFinalRound = 0;
-    private int P2carsSoldFinalRound = 0;
+    private int[] carsSoldFinalRound = { 0, 0, 0, 0, 0, 0 };
+           
 
     private GameManager gameManagerScript;
 
@@ -46,12 +45,20 @@ public class SellingHandler : MonoBehaviour
     }
 
 
-    public void OpenSellingDialoguePanel(int seller)
-
+    public void OpenSellingDialoguePanel()
     {
         sellCarDialoguePanel.SetActive(true);
-        MainManager.seller = seller;
+        int myIndex = 9;
 
+        for (int i = 0; i < MainManager.playerNumber; i++)
+        {
+            if (MainManager.localMultiplayerName == MainManager.playerNames[i])
+            {
+                myIndex = i;
+            }
+        }
+
+        MainManager.seller = myIndex;
         CheckSellOptions();
         UpdateDisplays();
 
@@ -85,88 +92,86 @@ public class SellingHandler : MonoBehaviour
             SellPanelNameDisplay[i].text = MainManager.cars[i];
             SellPanelPrizeDisplay[i].text = MainManager.carPrizes[i].ToString();
            
-           SellPanelInventoryDisplay[i].text = MainManager.playerInventory[MainManager.seller,i].ToString();
-
+            SellPanelInventoryDisplay[i].text = MainManager.playerInventory[MainManager.seller,i].ToString();
                    
-          }
-                     
+        }                  
                           
     }
 
 
     public void SellCar(int car)
-
     {
-        if (inventoryNotEmpty[car])
+        int sellerIndex = 9;
 
+        for (int i = 0; i < MainManager.playerNumber; i++)
         {
-
-            switch (MainManager.seller)
+            if (MainManager.localMultiplayerName == MainManager.playerNames[i])
             {
-
-                case 0:
-                    MainManager.playerInventory[0, car]--;
-                    MainManager.playerCash[0] += MainManager.carPrizes[car];
-                    gameManagerScript.UpdateInventoryDisplay();
-                    gameManagerScript.cashDisplay[0].text = MainManager.playerCash[0].ToString();
-                    sellCarDialoguePanel.SetActive(false);
-
-                    if (MainManager.roundCounter == 12)
-
-                    {
-                        P1carsSoldFinalRound++;
-
-                        if (P1carsSoldFinalRound >= 3)
-
-                        {
-                            p1SellButton.SetActive(false);
-                        }
-
-                    }
-
-                    else
-
-                    { p1SellButton.SetActive(false); }
-
-                    break;
-
-                case 1:
-                    MainManager.playerInventory[1, car]--;
-                    MainManager.playerCash[1] += MainManager.carPrizes[car];
-                    gameManagerScript.UpdateInventoryDisplay();
-                    gameManagerScript.cashDisplay[1].text = MainManager.playerCash[1].ToString();
-                    sellCarDialoguePanel.SetActive(false);
-
-                    if (MainManager.roundCounter == 12)
-
-                    {
-                        P2carsSoldFinalRound++;
-
-                        if (P2carsSoldFinalRound >= 3)
-
-                        {
-                            p2SellButton.SetActive(false);
-                        }
-
-                    }
-
-                    else
-
-                    { p2SellButton.SetActive(false); }
-                    break;
-            
+                sellerIndex = i;
+                Debug.Log("Seller Index " + sellerIndex);
             }
-
         }
 
-        else
+        if (inventoryNotEmpty[car])
+        {
+            MainManager.playerInventory[sellerIndex, car]--;
+            MainManager.playerCash[sellerIndex] += MainManager.carPrizes[car];
 
-        { sellCarDialoguePanel.SetActive(false); }
+            if (MainManager.playerNumber > 2)
+            {
+                PlayerManager3P.Instance.UpdateInventoryDisplay();
+            }
+            if (MainManager.playerNumber < 3)
+            {
+                GameManager.Instance.UpdateInventoryDisplay();
+            }
+
+            gameManagerScript.cashDisplay[sellerIndex].text = MainManager.playerCash[sellerIndex].ToString();
+            sellCarDialoguePanel.SetActive(false);
+
+            Debug.Log("This is Round " + MainManager.roundCounter + " Last round is: " + (MainManager.raceThreshold-1));
+
+            if (MainManager.roundCounter == (MainManager.raceThreshold - 1))
+            {
+                Debug.Log("This is the last selling Round");
+
+                carsSoldFinalRound[sellerIndex]++;
+                Debug.Log("Cars Sold Final Round " + carsSoldFinalRound[sellerIndex]);
+                OnlineManager.Instance.ReportCarSaleToClientsRpc(car, sellerIndex);
+
+                if (carsSoldFinalRound[sellerIndex] >= 3)
+                {
+                    OnlineManager.Instance.ReportReadyForNextRoundToServerRpc();
+                }
+
+                else
+                {
+                    sellCarDialoguePanel.SetActive(true);
+                    CheckSellOptions();
+                    UpdateDisplays();
+                }
+            }
+
+            else
+            {
+                
+                OnlineManager.Instance.ReportCarSaleToClientsRpc(car, sellerIndex);
+                OnlineManager.Instance.ReportReadyForNextRoundToServerRpc();
+                sellCarDialoguePanel.SetActive(false);
+            }
+        }              
+
+    }
+
+    public void CloseWithoutSelling()
+    {       
+        sellCarDialoguePanel.SetActive(false);
+        OnlineManager.Instance.ReportReadyForNextRoundToServerRpc();
     }
 
 
-    // Update is called once per frame
-    void Update()
+        // Update is called once per frame
+        void Update()
     {
 
     }

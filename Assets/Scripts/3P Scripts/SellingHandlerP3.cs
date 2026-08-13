@@ -124,7 +124,16 @@ public class SellingHandlerP3 : MonoBehaviour
         if (inventoryNotEmpty[car])
         {   MainManager.playerInventory[sellerIndex, car]--;
             MainManager.playerCash[sellerIndex] += MainManager.carPrizes[car];
-            PlayerManager3P.Instance.UpdateInventoryDisplay();
+
+            if (MainManager.playerNumber > 2)
+            {
+                PlayerManager3P.Instance.UpdateInventoryDisplay();
+            }
+            if (MainManager.playerNumber < 3)
+            {                
+                GameManager.Instance.UpdateInventoryDisplay();
+            }
+                        
             gameManagerScript.cashDisplay[sellerIndex].text = MainManager.playerCash[sellerIndex].ToString();
             sellCarDialoguePanel.SetActive(false);
 

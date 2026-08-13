@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
 using System.Xml;
 using Unity.Collections;
 using Unity.Netcode;
@@ -55,6 +56,7 @@ public class OnlineManager : NetworkBehaviour
     //PLAYER STATES NETWORK VARIABLES
 
     public NetworkVariable<int> numberOfPlayersReportedReadyForNextRound = new NetworkVariable<int>(0);
+    public NetworkVariable<int> numberOfPlayersReadyForSellingRound = new NetworkVariable<int>(0);
 
     public NetworkVariable<bool> skippingRoundNetworkVariable = new NetworkVariable<bool>(false);
 
@@ -404,17 +406,34 @@ public class OnlineManager : NetworkBehaviour
        secondPlaceLevel1 = runnerUpLevel1;
        activePlayerWin = activePlayerWon;
 
-       AckManualResultsLevel1ToClientRpc(winnerLevel1, secondPlaceLevel1, activePlayerWin);
-        
+       AckManualResultsLevel1ToClientRpc(winnerLevel1, secondPlaceLevel1, activePlayerWin);       
     }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void Level2ReportManualResultsToServerRpc(int v1, int v2, bool activePlayerWins, int timeBattleSeconds)
+    {
+        if(!GameManager.Instance.LocalIsActivePlayer())
+        {
+            MainManager.activePlayerWins = activePlayerWins;
+            MainManager.timeBattleSeconds = timeBattleSeconds;
+            GameManager.Instance.Level2Scoring();
+        }
+    }
+
+
+
+
 
     [Rpc(SendTo.ClientsAndHost)]
     private void AckManualResultsLevel1ToClientRpc(int winnerLevel1, int secondPlaceLevel1, bool activePlayerWon)
     {
         if (!NetworkManager.Singleton.IsHost)
         {
-            PlayerManager3P.Instance.raceWinnerLevel1 = winnerLevel1;
-            PlayerManager3P.Instance.runnerUpLevel1 = secondPlaceLevel1;
+            if (MainManager.playerNumber > 2)
+            {
+                PlayerManager3P.Instance.raceWinnerLevel1 = winnerLevel1;
+                PlayerManager3P.Instance.runnerUpLevel1 = secondPlaceLevel1;
+            }
 
             MainManager.activePlayerWins = activePlayerWon;
 
@@ -535,11 +554,32 @@ public class OnlineManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
+    internal void DuelReportCarBuffToClientsRpc(int car)
+    {
+        if (!GameManager.Instance.IsTimeBattleWinner())
+        {
+            MainManager.TimeBattleCarIndex = car;
+            GameManager.Instance.BuffCarAndContinue();
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
     internal void ReportCarNerfToClientsRpc()
     {
         if (!PlayerManager3P.Instance.IsTimeBattleWinner())
         {
+            
             PlayerManager3P.Instance.NerfCarAndContinue();
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void DuelReportCarNerfToClientsRpc(int car)
+    {
+        if (!GameManager.Instance.IsTimeBattleWinner())
+        {
+            MainManager.TimeBattleCarIndex = car;
+            GameManager.Instance.NerfCarAndContinue();
         }
     }
 
@@ -559,7 +599,11 @@ public class OnlineManager : NetworkBehaviour
         if (!NetworkManager.Singleton.IsHost)
         {
             MainManager.autoResultsValid = false;
-            PlayerManager3P.Instance.GetChallengeResultWin(true);
+
+            if (MainManager.playerNumber > 2)
+            {
+                PlayerManager3P.Instance.GetChallengeResultWin(true);
+            }
         }
     }
 
@@ -621,7 +665,14 @@ public class OnlineManager : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void SendAllClientsToNextRoundRpc()
     {
-        PlayerManager3P.Instance.RoundChangeover();
+        if (MainManager.playerNumber > 2)
+        {
+            PlayerManager3P.Instance.RoundChangeover();
+        }
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.RoundChangeover();
+        }
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -657,6 +708,32 @@ public class OnlineManager : NetworkBehaviour
             PlayerManager3P.Instance.SetPromptText(MainManager.playerNames[MainManager.activePlayer] + " has bought a " + MainManager.cars[MainManager.currentCarIndex]);
         }
     }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void DuelAckCarPurchaseToClientsRpc()
+    {
+        if (!GameManager.Instance.LocalIsActivePlayer())
+        {
+            MainManager.playerCash[MainManager.activePlayer] -= MainManager.carPrizes[MainManager.currentCarIndex];
+            GameManager.Instance.PlayerWinsCar(MainManager.activePlayer);
+
+            GameManager.Instance.UpdateCashDisplay();
+            GameManager.Instance.UpdateInventoryDisplay();
+
+            GameManager.Instance.SetPromptText(MainManager.playerNames[MainManager.activePlayer] + " has bought a " + MainManager.cars[MainManager.currentCarIndex]);
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void DuelInactivePlayerHasBuyOptionRpc(int playerWithBuyOption)
+    {
+        if (!GameManager.Instance.LocalIsActivePlayer())
+        {
+            MainManager.playerWithBuyOption = playerWithBuyOption;
+            GameManager.Instance.OfferBuyOption();
+        }
+    }
+
 
     [Rpc(SendTo.ClientsAndHost)]
     private void PlayerManager3P_OnInactivePlayersHaveBuyOptionRpc()
@@ -729,8 +806,17 @@ public class OnlineManager : NetworkBehaviour
         {
             MainManager.playerInventory[seller, car]--;
             MainManager.playerCash[seller] += MainManager.carPrizes[car];
-            PlayerManager3P.Instance.UpdateInventoryDisplay();
-            PlayerManager3P.Instance.cashDisplay[seller].text = MainManager.playerCash[seller].ToString();
+
+            if (MainManager.playerNumber > 2)
+            {
+                PlayerManager3P.Instance.UpdateInventoryDisplay();
+                PlayerManager3P.Instance.cashDisplay[seller].text = MainManager.playerCash[seller].ToString();
+            }
+            if (MainManager.playerNumber < 3)
+            {
+               GameManager.Instance.cashDisplay[seller].text = MainManager.playerCash[seller].ToString();
+               GameManager.Instance.UpdateInventoryDisplay();
+            }            
         }
     }
 
@@ -808,4 +894,32 @@ public class OnlineManager : NetworkBehaviour
 
     }
 
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportAcceptedBuyOptionToActiveRpc()
+    {
+        if(GameManager.Instance.LocalIsActivePlayer())
+        {
+            GameManager.Instance.AcceptBuyOption();
+        }
+    }
+
+    [Rpc(SendTo.Server)]
+    internal void ReportReadyForSellingRoundToServerRpc()
+    {
+        numberOfPlayersReadyForSellingRound.Value++;
+        Debug.Log("Player Reported Ready For Selling - Reported " + numberOfPlayersReadyForSellingRound.Value);
+
+        if (numberOfPlayersReadyForSellingRound.Value == MainManager.playerNumber)
+        {
+            SendAllClientsToSellingRoundRpc();
+            numberOfPlayersReadyForSellingRound.Value = 0;
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SendAllClientsToSellingRoundRpc()
+    {
+        GameManager.Instance.StartSellingRound();
+    }
 }
+

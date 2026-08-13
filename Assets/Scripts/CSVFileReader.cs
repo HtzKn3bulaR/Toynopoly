@@ -1061,7 +1061,11 @@ public class CSVFileReader : MonoBehaviour
     public void SetAutoResultsInvalidRpc()
     {
         MainManager.autoResultsValid = false;
-        PlayerManager3P.Instance.GetChallengeResultWin(true);
+
+        if (MainManager.playerNumber > 2)
+        {
+            PlayerManager3P.Instance.GetChallengeResultWin(true);
+        }
 
         if(NetworkManager.Singleton.IsHost)
         OnlineManager.Instance.ClientsSetAutoResultsInvalidRpc();

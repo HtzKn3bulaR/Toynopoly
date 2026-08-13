@@ -861,26 +861,22 @@ public class GridGenerator3P : MonoBehaviour
 
             case 5:
 
-                player1NameField.text = players[0].Value;
-                player2NameField.text = players[1].Value;
-                player3NameField.text = players[2].Value;
-                player4NameField.text = players[3].Value;
-                player5NameField.text = players[4].Value;
+                player1NameField.text = MainManager.playerNames[0];
+                player2NameField.text = MainManager.playerNames[1];
+                player3NameField.text = MainManager.playerNames[2];
+                player4NameField.text = MainManager.playerNames[3];
+                player5NameField.text = MainManager.playerNames[4];
                 break;
 
         }
 
-        StartCoroutine(WaitAfterLineupSelected());
-                
+        StartCoroutine(WaitAfterLineupSelected());                
 
         if (MainManager.playerNumber == 5)
         {
             gameManagerScript.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
         }
-        else
-        {
-            gameManagerScript.statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
-        }
+        
     }
 
     void ShowNextRow()
@@ -888,7 +884,7 @@ public class GridGenerator3P : MonoBehaviour
         if (rowShown < 6)
 
         {
-            gameManagerScript.rows[rowShown].SetActive(true);
+            PlayerManager3P.Instance.rows[rowShown].SetActive(true);
 
             StartCoroutine(FieldsAppearingDelay());
         }
@@ -957,8 +953,7 @@ public class GridGenerator3P : MonoBehaviour
         gameStartingPanel.SetActive(false);
 
         gameSounds.PlayOneShot(transition);
-        gameManagerScript.helpText.gameObject.SetActive(true);
-        
+                
         OnlineManager.Instance.ReadPlayerIDs();
         
         LobbyHandler.Instance.LeaveLobby();

@@ -281,7 +281,7 @@ public class PlayerState : MonoBehaviour
         state = State.SellingCars;
 
         PlayerManager3P.Instance.ShowPreSellingPanel();
-        PlayerManager3P.Instance.StartSellingRound();        
+               
     }
 
     private void SellingHandlerP3_OnCarSold()

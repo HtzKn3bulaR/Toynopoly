@@ -104,6 +104,7 @@ public class DividendGenerator : MonoBehaviour
        Instance = this;
 
         GridGenerator3P.OnGameTableReady += GridGenerator3P_OnGameTableReady;
+        GridGenerator.OnGameTableReady += GridGenerator3P_OnGameTableReady;
     }
 
     private void GridGenerator3P_OnGameTableReady()
@@ -139,26 +140,25 @@ public class DividendGenerator : MonoBehaviour
         if (MainManager.playerNumber < 3)
         {
             gameManagerScript.SetLevelChangePanelInactive();
+                        
         }
 
         if (MainManager.playerNumber > 2)
         {
             playerManagerScript.StartLevel2();
+
         }
     }
 
 
     public void DividendCheck()
-
     {
         if (OnlineManager.Instance.GetDividendCarIndexNumberFromNetworkList(MainManager.roundCounter - 1) < 7)
 
             PayDividend();
-
     }
 
     public void PayDividend()
-
     {
         int amountToPay;
 
@@ -175,19 +175,16 @@ public class DividendGenerator : MonoBehaviour
         if (MainManager.playerNumber > 2)
         {
             for (int i = 0; i < gridGeneratorScript.activeList.Count; i++)
-
             {
                 if (gridGeneratorScript.activeList[i] == MainManager.cars[MainManager.currentCarIndex])
 
                 { dividendCarPicture.image.sprite = gridGeneratorScript.activeSpriteList[i]; }
-            }
-            
+            }            
         }
 
         else
 
             for (int i = 0; i < gridGenerate2PScript.activeList.Count; i++)
-
             {
                 if (gridGenerate2PScript.activeList[i] == MainManager.cars[MainManager.currentCarIndex])
 
@@ -199,7 +196,6 @@ public class DividendGenerator : MonoBehaviour
 
 
         for (int i = 0; i < MainManager.playerNumber; i++)
-
         {
             MainManager.playerCash[i] += (MainManager.playerInventory[i, MainManager.currentCarIndex]) * amountToPay;
         }

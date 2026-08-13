@@ -35,8 +35,7 @@ public class LobbyHandler : MonoBehaviour
     private bool deviceHasJoinedRelay = false;
 
     private async void Start()
-    {               
-
+    {  
         Instance = this;               
 
         Debug.LogError("Console");
@@ -57,12 +56,10 @@ public class LobbyHandler : MonoBehaviour
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
         
         */
-
     }
 
     private void Callbacks_LobbyChanged(ILobbyChanges obj)
     {
-
         if(deviceHasJoinedRelay)
         {
             OnlineManager.Instance.GetPlayerCountConnectedToRelayRpc();
