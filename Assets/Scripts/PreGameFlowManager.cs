@@ -54,11 +54,14 @@ public class PreGameFlowManager : MonoBehaviour
 
 
     public void ShowNewGameBox()
-
     {
         welcomePanel.SetActive(false);
         newGamePanel.SetActive(true);
+    }
 
+    public void HideWelcomePanel()
+    {
+        welcomePanel.SetActive(false);
     }
 
     public void ShowClientSignUpPanel()
@@ -79,7 +82,12 @@ public class PreGameFlowManager : MonoBehaviour
         newGamePanel.SetActive(false);
         playerNameHost.SetActive(true);
 
-        MainManager.classSelected = (carClassMenu.value);
+        if(carClassMenu.value == 6)
+        {
+            MainManager.classSelected = Random.Range(0, 6);
+        }
+        else
+            MainManager.classSelected = (carClassMenu.value);
                                      
     }
 
@@ -139,6 +147,8 @@ public class PreGameFlowManager : MonoBehaviour
         tempPlayerName = null;
         
         CloseLobbyWindow();
+        playerNameHost.SetActive(false);
+        welcomePanel.SetActive(true);
     }
 
 

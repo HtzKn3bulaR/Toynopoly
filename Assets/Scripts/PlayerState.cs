@@ -147,17 +147,17 @@ public class PlayerState : MonoBehaviour
                     PlayerManager3P.Instance.UnlockFields();
                     state = State.NewRound;
                     PlayerManager3P.Instance.SetPromptText("Select a field to start the next race");
-
                 }
-
+                
                 if (!PlayerManager3P.Instance.LocalIsActivePlayer())
                 {
                     state = State.ReadyForRace;
                     PlayerManager3P.Instance.SetPromptText("Waiting for next race");
 
-                    if(MainManager.levelCounter == 2)
+                    if (MainManager.levelCounter == 2)
                     {
                         EmptyInventoryHandler.Instance.Spectate();
+                        PlayerManager3P.Instance.PassBuyOption();
                     }
 
                 }
@@ -280,6 +280,8 @@ public class PlayerState : MonoBehaviour
     {
         state = State.SellingCars;
 
+        PlayerManager3P.Instance.SetPromptText("Players Are Selling Cars");
+
         PlayerManager3P.Instance.ShowPreSellingPanel();
                
     }
@@ -335,7 +337,12 @@ public class PlayerState : MonoBehaviour
                     IdleCountdown.Instance.HideIdleCountdown();
                     PlayerManager3P.Instance.ReadyForRoundChangeover();
                 }
-                break;
+                else
+                {
+                    PlayerManager3P.Instance.ReadyForRoundChangeover();
+                    PlayerManager3P.Instance.PassBuyOption();
+                }
+                    break;
 
             case State.RaceConcluded:                
                 PlayerManager3P.Instance.ReInstateRows();
@@ -353,7 +360,8 @@ public class PlayerState : MonoBehaviour
             case State.SellingCars:
                 Debug.Log("State: Ready For Next Round");
                 SellingHandlerP3.Instance.HideSellingDialoguePanel();
-                
+
+                PlayerManager3P.Instance.HidePreSellingPanel();
                 IdleCountdown.Instance.HideIdleCountdown();
                 PlayerManager3P.Instance.ReadyForRoundChangeover();
                 break;

@@ -44557,10 +44557,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -111825,7 +111825,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1456073166
 RectTransform:
   m_ObjectHideFlags: 0
@@ -159992,13 +159992,12 @@ MonoBehaviour:
   carPicD: {fileID: 2008665605}
   carPicE: {fileID: 188141075}
   carPicF: {fileID: 10994601}
-  carCarrousel: {fileID: 699887251}
   carPopulateSound: {fileID: 8300000, guid: db02785c36b284c7fadc46ca1e0a7a06, type: 3}
   stageReady: {fileID: 8300000, guid: 9e985a7cc3e181e4e8d284c60349b475, type: 3}
   transition: {fileID: 8300000, guid: 9a6f456077e43b84ab321cf49832f7f1, type: 3}
-  newGame: {fileID: 0}
   gameSounds: {fileID: 938512960}
   bliss: {fileID: 1130604430}
+  carCarrousel: {fileID: 699887251}
   track1: {fileID: 0}
   track2: {fileID: 0}
   track3: {fileID: 0}
@@ -160008,17 +160007,6 @@ MonoBehaviour:
   track7: {fileID: 0}
   track8: {fileID: 0}
   track9: {fileID: 0}
-  trackDisplays:
-  - {fileID: 1341496055}
-  - {fileID: 1955391712}
-  - {fileID: 1513677903}
-  - {fileID: 1375639692}
-  - {fileID: 255233686}
-  - {fileID: 213145035}
-  - {fileID: 920101701}
-  - {fileID: 349788651}
-  - {fileID: 1238981394}
-  - {fileID: 693268843}
   bonusTrack: {fileID: 0}
   carAText: {fileID: 828469589}
   carBText: {fileID: 1675037852}
@@ -160029,6 +160017,8 @@ MonoBehaviour:
   player1NameField: {fileID: 160286552}
   player2NameField: {fileID: 1033544705}
   player3NameField: {fileID: 0}
+  player4NameField: {fileID: 0}
+  player5NameField: {fileID: 0}
   carASprite: {fileID: 0}
   carBSprite: {fileID: 0}
   carCSprite: {fileID: 0}
@@ -160046,9 +160036,82 @@ MonoBehaviour:
   semiProNames: {fileID: 4900000, guid: 568c89084e9199d48aab29d610eae84c, type: 3}
   proNames: {fileID: 4900000, guid: 7128c7c1e61efa64b8118279db9bad3a, type: 3}
   superProNames: {fileID: 4900000, guid: 128fe84a3cf9fa4439c714d0cb2db115, type: 3}
+  reverseAvailableTracks: {fileID: 0}
+  activeTracks: []
+  activeBonusTrack:
+    utf8LengthInBytes: 0
+    bytes:
+      offset0000:
+        byte0000: 0
+        byte0001: 0
+        byte0002: 0
+        byte0003: 0
+        byte0004: 0
+        byte0005: 0
+        byte0006: 0
+        byte0007: 0
+        byte0008: 0
+        byte0009: 0
+        byte0010: 0
+        byte0011: 0
+        byte0012: 0
+        byte0013: 0
+        byte0014: 0
+        byte0015: 0
+      offset0016:
+        byte0000: 0
+        byte0001: 0
+        byte0002: 0
+        byte0003: 0
+        byte0004: 0
+        byte0005: 0
+        byte0006: 0
+        byte0007: 0
+        byte0008: 0
+        byte0009: 0
+        byte0010: 0
+        byte0011: 0
+        byte0012: 0
+        byte0013: 0
+        byte0014: 0
+        byte0015: 0
+      offset0032:
+        byte0000: 0
+        byte0001: 0
+        byte0002: 0
+        byte0003: 0
+        byte0004: 0
+        byte0005: 0
+        byte0006: 0
+        byte0007: 0
+        byte0008: 0
+        byte0009: 0
+        byte0010: 0
+        byte0011: 0
+        byte0012: 0
+        byte0013: 0
+        byte0014: 0
+        byte0015: 0
+      byte0048: 0
+      byte0049: 0
+      byte0050: 0
+      byte0051: 0
+      byte0052: 0
+      byte0053: 0
+      byte0054: 0
+      byte0055: 0
+      byte0056: 0
+      byte0057: 0
+      byte0058: 0
+      byte0059: 0
+      byte0060: 0
+      byte0061: 0
+  reverseAvailableList: []
+  cars: []
+  players: []
+  bonusTrackList: []
   activeList: []
   activeSpriteList: []
-  rookieNamesList: []
   rookieSpriteList:
   - {fileID: 21300000, guid: 7505a56f49060804e8cafef18ce5a434, type: 3}
   - {fileID: 21300000, guid: 7c77feb74dc1493498093dcbfae67054, type: 3}

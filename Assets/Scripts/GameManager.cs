@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
@@ -83,6 +84,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI activePlayerMessage;
     [SerializeField] TextMeshProUGUI nextTrackDisplay;
     [SerializeField] TextMeshProUGUI nextCarDisplay;
+    [SerializeField] TextMeshProUGUI reverseFlag;
+
     [SerializeField] TextMeshProUGUI resultPanelActivePlayer;
     [SerializeField] TextMeshProUGUI valueChangeMessage;
     [SerializeField] TextMeshProUGUI defaultPanelTextMessage;
@@ -274,6 +277,12 @@ public class GameManager : MonoBehaviour
             FieldClicked(newValue);
         }
     }
+
+    public FixedString32Bytes ReturnSelectedTrack()
+    {
+        return selectedTrack;
+    }
+
 
     //SECOND NETWORK EVENT START------------------------
 
@@ -528,7 +537,6 @@ public class GameManager : MonoBehaviour
 
     void ShowNextRacePanel()
     {
-
         if (MainManager.levelCounter == 1)
         {
             if (!LocalIsActivePlayer())
@@ -639,7 +647,7 @@ public class GameManager : MonoBehaviour
 
         }
 
-        nextRaceComingUpPanel.SetActive(true);
+        nextRaceComingUpPanel.transform.localScale = new Vector3(1, 0.76248f, 1);
         audioSource.PlayOneShot(panelOpen);
 
 
@@ -749,7 +757,7 @@ public class GameManager : MonoBehaviour
     public void CancelRace()
 
     {
-        nextRaceComingUpPanel.SetActive(false);
+        nextRaceComingUpPanel.transform.localScale = new Vector3(0, 0, 0);
         l2SelectionIsOkay = true;
         buyingPossible = true;
         protectButton.gameObject.SetActive(false);
@@ -792,7 +800,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        nextRaceComingUpPanel.SetActive(false);
+        nextRaceComingUpPanel.transform.localScale = new Vector3(0, 0, 0);
         l2SelectionIsOkay = true;
         buyingPossible = true;
         playerHasBoughtCarThisRound = true;
@@ -839,7 +847,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        nextRaceComingUpPanel.SetActive(false);
+        nextRaceComingUpPanel.transform.localScale = new Vector3(0, 0, 0);
 
         int nonActivePlayer;
 
@@ -861,29 +869,36 @@ public class GameManager : MonoBehaviour
 
         lapCountScript.FindLapData(selectedTrack);
 
-        if (NetworkManager.Singleton.IsHost)
+        if (MainManager.nextTrackReverse)
         {
-            continueButtonNormal.SetActive(true);
-            getAutoResultsButtonNormalL1.SetActive(true);
+            reverseFlag.gameObject.SetActive(true);
         }
-
         else
         {
-            continueButtonNormal.SetActive(false);
-            getAutoResultsButtonNormalL1.SetActive(false);
-        }
+            reverseFlag.gameObject.SetActive(false);
 
+
+            if (NetworkManager.Singleton.IsHost)
+            {
+                continueButtonNormal.SetActive(true);
+                getAutoResultsButtonNormalL1.SetActive(true);
+            }
+
+            else
+            {
+                continueButtonNormal.SetActive(false);
+                getAutoResultsButtonNormalL1.SetActive(false);
+            }
+        }
     }
 
     public void ShowResultsPanel()
-
     {
         //raceInProgressPanel.SetActive(false);
         raceResultsPanel.SetActive(true);
         resultPanelActivePlayer.text = MainManager.playerNames[MainManager.activePlayer];
 
         if (MainManager.levelCounter == 2)
-
         {
             sliderDefeat.SetActive(true);
             sliderWin.SetActive(true);
@@ -938,6 +953,7 @@ public class GameManager : MonoBehaviour
 
             if(MainManager.levelCounter == 1)
             OnlineManager.Instance.Level1ReportManualResultsToServerRpc(0, 0, MainManager.activePlayerWins);
+            
 
             if (MainManager.levelCounter == 2)
             {
@@ -954,6 +970,7 @@ public class GameManager : MonoBehaviour
                 }
 
                 OnlineManager.Instance.Level2ReportManualResultsToServerRpc(0, 0, MainManager.activePlayerWins, MainManager.timeBattleSeconds);
+                
             }
 
             raceInProgressPanel.SetActive(false);
@@ -1577,6 +1594,7 @@ public class GameManager : MonoBehaviour
         buyingPossible = true;
         playerHasBoughtCarThisRound = false;
         resultsRegisteredForRound = false;
+        MainManager.nextTrackReverse = false;
 
         MainManager.activePlayer++;
 

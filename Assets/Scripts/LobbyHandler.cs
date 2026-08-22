@@ -44,18 +44,18 @@ public class LobbyHandler : MonoBehaviour
         
         if (!AuthenticationService.Instance.IsSignedIn)
         {
-            AuthenticationService.Instance.ClearSessionToken(); // DELETE WHEN I AM DONE, THIS IS IMPORTANT. THIS IS PRETTY MUCH MAKING IT SO WE CREATE A NEW AUTHENTIFICATION FOR THE PLAYER EACH BUILD
+            //AuthenticationService.Instance.ClearSessionToken(); // DELETE WHEN I AM DONE, THIS IS IMPORTANT. THIS IS PRETTY MUCH MAKING IT SO WE CREATE A NEW AUTHENTIFICATION FOR THE PLAYER EACH BUILD
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
             string playerId = AuthenticationService.Instance.PlayerId;
             Debug.Log(playerId);
         }
 
-        /*
+        
         AuthenticationService.Instance.SignedIn += () => { Debug.Log("Signed In : " + AuthenticationService.Instance.PlayerId); };
 
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        //await AuthenticationService.Instance.SignInAnonymouslyAsync();
         
-        */
+        
     }
 
     private void Callbacks_LobbyChanged(ILobbyChanges obj)
@@ -409,9 +409,7 @@ public class LobbyHandler : MonoBehaviour
             SetCarClassOnClients();
 
             SetMatchLengthOnClients();
-            
-
-
+                        
             var callbacks = new LobbyEventCallbacks();
             callbacks.LobbyChanged += Callbacks_LobbyChanged;
             try

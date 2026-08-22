@@ -271,7 +271,7 @@ public class CSVFileReader : MonoBehaviour
 
     }
 
-    void MoveCursorPosAfterSuccessfulRead()
+    public void MoveCursorPosAfterSuccessfulRead()
     {
 
         if ((cursorPos + MainManager.playerNumber) > linesInCSV)

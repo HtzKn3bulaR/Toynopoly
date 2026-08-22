@@ -6,9 +6,15 @@ using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+using Unity.Networking.Transport;
+using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
+using Unity.Services.Authentication;
+
+
+
 
 public class ToynopolyRelay : MonoBehaviour
 {
@@ -61,9 +67,13 @@ public class ToynopolyRelay : MonoBehaviour
 
             RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
 
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);                       
+
+            NetworkManager.Singleton.GetComponent<UnityTransport>().UseWebSockets = false;
 
             NetworkManager.Singleton.StartClient();
+
+            PreGameFlowManager.Instance.HideWelcomePanel();
 
             //LobbyHandler.Instance.LeaveLobby();
         }

@@ -5,6 +5,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Xml;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using Unity.Services.Lobbies;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -57,6 +58,7 @@ public class OnlineManager : NetworkBehaviour
 
     public NetworkVariable<int> numberOfPlayersReportedReadyForNextRound = new NetworkVariable<int>(0);
     public NetworkVariable<int> numberOfPlayersReadyForSellingRound = new NetworkVariable<int>(0);
+    public NetworkVariable<int> numberOfPlayersReportedReadyForNextLevel = new NetworkVariable<int>(0);
 
     public NetworkVariable<bool> skippingRoundNetworkVariable = new NetworkVariable<bool>(false);
 
@@ -124,10 +126,25 @@ public class OnlineManager : NetworkBehaviour
                 Debug.Log("All Clients Connected!");
                 GetPlayerCountConnectedToRelayRpc();
                 Debug.Log("Players Registered in Main Manager " + MainManager.playerNumber);
+
+                PassInformationToWebSocketClientsRpc(MainManager.raceThreshold);
+                                
                 LoadMainScene();
+                               
             }
         }
     }
+
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void PassInformationToWebSocketClientsRpc(int threshold)
+    {
+        if(NetworkManager.Singleton.GetComponent<UnityTransport>().UseWebSockets == true)
+        {
+            MainManager.raceThreshold = threshold;
+        }
+    }
+
 
     public void LoadMainScene()
     {
@@ -484,13 +501,13 @@ public class OnlineManager : NetworkBehaviour
         if(PlayerManager3P.Instance.LocalIsActivePlayer())
         {
             PlayerManager3P.Instance.ShowProtectionOptionAfterChallengePanel();
-            IdleCountdown.Instance.StartIdleCountdownMax(30f);
+            IdleCountdown.Instance.StartIdleCountdownMax(60f);
             PlayerManager3P.Instance.SetPromptText("You can enable protection for one of your cars");
         }
 
         else
         {
-            IdleCountdown.Instance.StartIdleCountdownMax(30f);
+            IdleCountdown.Instance.StartIdleCountdownMax(60f);
             PlayerManager3P.Instance.SetPromptText("Waiting for " + MainManager.playerNames[MainManager.activePlayer]);
         }
     }
@@ -660,6 +677,24 @@ public class OnlineManager : NetworkBehaviour
             SendAllClientsToNextRoundRpc();
             numberOfPlayersReportedReadyForNextRound.Value = 0;
         }
+    }
+
+    [Rpc(SendTo.Server)]
+    internal void ReportReadyForNextLevelRpc()
+    {
+        numberOfPlayersReportedReadyForNextLevel.Value++;
+        Debug.Log("Player Reported Ready For Next Level - Reported " + numberOfPlayersReportedReadyForNextRound.Value);
+
+        if (numberOfPlayersReportedReadyForNextLevel.Value == MainManager.playerNumber)
+        {
+            SendAllClientsToLevel2Rpc();            
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SendAllClientsToLevel2Rpc()
+    {
+        PlayerManager3P.Instance.CallActivePlayer();
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -921,5 +956,28 @@ public class OnlineManager : NetworkBehaviour
     {
         GameManager.Instance.StartSellingRound();
     }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void EndGameOnAllClientsRpc()
+    {
+        Debug.Log("Ending Game");
+
+        if(!NetworkManager.Singleton.IsHost)
+        PlayerManager3P.Instance.EndGame();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void ReportReverseTrackToAllPlayersRpc()
+    {
+        if (!GameManager.Instance.LocalIsActivePlayer())
+        {
+            MainManager.nextTrackReverse = true;
+            GameObject.Find("NextRaceComingUpPanel").GetComponent<ReverseHandler>().RemoveIcon();
+            Debug.Log("Next Track Is Reversed");
+        }
+    }
+
+
+
 }
 

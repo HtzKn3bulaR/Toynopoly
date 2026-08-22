@@ -97,6 +97,8 @@ public class GridGenerator : MonoBehaviour
     public TextAsset proNames;
     public TextAsset superProNames;
 
+    public TextAsset reverseTrackExclusions;
+
 
     private List<FixedString32Bytes> trackList = new List<FixedString32Bytes>();
 
@@ -105,6 +107,10 @@ public class GridGenerator : MonoBehaviour
 
     //BONUS TRACK NETWORK VARIABLE
     public FixedString64Bytes activeBonusTrack;
+
+
+    public List<FixedString32Bytes> reverseExclusionList = new List<FixedString32Bytes>();
+
 
     //ACTIVE CARS LIST
     public List<FixedString32Bytes> cars = new List<FixedString32Bytes>();
@@ -281,7 +287,11 @@ public class GridGenerator : MonoBehaviour
 
         string[] bonusData = bonusTrackNames.text.Split(new string[] { "\n" }, StringSplitOptions.None);
 
+        string[] reverseData = reverseTrackExclusions.text.Split(new string[] { "\n" }, StringSplitOptions.None);
+
         int tableSize = standardData.Length;
+        int reverseTableSize = reverseData.Length;
+              
 
         for (int i = 0; i < tableSize; i++)
         {
@@ -304,6 +314,18 @@ public class GridGenerator : MonoBehaviour
 
             bonusTrackList.Add(nameTrimmed);
         }
+
+        for (int i = 0; i < reverseTableSize; i++)
+        {
+            string nameTrimmed;
+
+            nameTrimmed = reverseData[i].TrimEnd(new char[] { '\r', ' ' });
+            nameTrimmed = nameTrimmed.TrimStart(new char[] { '\r', ' ' });
+
+            reverseExclusionList.Add(nameTrimmed);
+
+        }
+
 
 
     }
@@ -959,6 +981,12 @@ public class GridGenerator : MonoBehaviour
         timerPanel.gameObject.SetActive(true);
 
         ShowNextRow();
+    }
+
+    public bool TrackHasReverseVersion(FixedString32Bytes track)
+    {
+        if(reverseExclusionList.Contains(track.Value)) return false;
+        else return true;
     }
 
 

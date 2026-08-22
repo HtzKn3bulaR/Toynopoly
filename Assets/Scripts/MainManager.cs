@@ -73,6 +73,8 @@ public class MainManager : MonoBehaviour
 
     public static int changeValue = 0;
 
+    public static bool nextTrackReverse = false;
+
     
     //game Scores New
 

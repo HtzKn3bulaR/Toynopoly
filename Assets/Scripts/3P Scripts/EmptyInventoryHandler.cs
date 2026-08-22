@@ -89,7 +89,7 @@ public class EmptyInventoryHandler : MonoBehaviour
     public void EmptyInventoryProcedure(int emptyPlayer)    
     {
         OnlineManager.Instance.ReportEmptyInventoryToClientsRpc(emptyPlayer);
-        IdleCountdown.Instance.StartIdleCountdownMax(60f);
+        IdleCountdown.Instance.StartIdleCountdownMax(90f);
         PlayerManager3P.Instance.SetPromptText("Your Inventory is Empty!");
         OnPlayerHasEmptyInventory?.Invoke();
 

@@ -105,6 +105,8 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] Image carToBuyImage;
 
     [SerializeField] GameObject challengePanel;
+    [SerializeField] TextMeshProUGUI reverseFlag;
+    [SerializeField] TextMeshProUGUI reverseFlagChallenge;
 
     [SerializeField] GameObject continueButtonToynopoly;
     [SerializeField] GameObject continueButtonToynopolyAuto;
@@ -125,6 +127,8 @@ public class PlayerManager3P : MonoBehaviour
     [SerializeField] GameObject preSellingInfoPanel;
 
     [SerializeField] GameObject raceResultsPanelL2T;
+
+    [SerializeField] GameObject endGameOptionPanel;
 
     [SerializeField] GameObject gameOverPanel;
 
@@ -335,7 +339,7 @@ public class PlayerManager3P : MonoBehaviour
     }
 
 
-    private void CallActivePlayer()
+    public void CallActivePlayer()
     {
         ulong activePlayerID;
 
@@ -507,7 +511,7 @@ public class PlayerManager3P : MonoBehaviour
 
         { selectedTrack = MainManager.bonusTrack; }
 
-        helpText.text = "";
+        helpText.gameObject.SetActive(false);
 
         ShowNextRacePanel();
 
@@ -878,7 +882,7 @@ public class PlayerManager3P : MonoBehaviour
             
             MainManager.currentCarIndex = car;
         }
-
+        
         IdleCountdown.Instance.StartIdleCountdownMax(30f);
     }
 
@@ -978,6 +982,7 @@ public class PlayerManager3P : MonoBehaviour
             if (LocalIsActivePlayer())
             { return; }
             else
+                promptText.text = "Join the race in RVGL!";
                 StartRace();        
         } 
 
@@ -989,6 +994,7 @@ public class PlayerManager3P : MonoBehaviour
             }
             else
             {
+                promptText.text = "Processing Results";
                 CSVFileReader.Instance.SetAutoResultsValidRpc();                
                 CSVFileReader.Instance.LeaderboardClose();
                 RegisterResults();
@@ -1007,6 +1013,7 @@ public class PlayerManager3P : MonoBehaviour
             if (LocalIsActivePlayer())
             { return; }
             else
+                promptText.text = "Join the Race in RVGL";
                 StartRace();
         }
 
@@ -1018,6 +1025,7 @@ public class PlayerManager3P : MonoBehaviour
 
                 if (!NetworkManager.Singleton.IsHost)
                 {
+                    promptText.text = "Processing Results";
                     CSVFileReader.Instance.LeaderboardClose();
                     RegisterResults();
                     CSVFileReader.Instance.ChallengeRaceInProgessPanelClose();
@@ -1040,6 +1048,8 @@ public class PlayerManager3P : MonoBehaviour
             nextRaceComingUpPanel.gameObject.transform.localScale = new Vector3(0, 0, 0);
         }
         catch (Exception ex) { Debug.Log(ex.ToString()); }
+
+        promptText.text = "Join the race in RVGL!";
     }
 
 
@@ -1051,7 +1061,18 @@ public class PlayerManager3P : MonoBehaviour
 
         OnActivePlayerRaceStarted?.Invoke();
 
-        if(MainManager.levelCounter == 2)
+        if (MainManager.nextTrackReverse)
+        {
+            reverseFlag.gameObject.SetActive(true);
+            reverseFlagChallenge.gameObject.SetActive(true);
+        }
+        else
+        {
+            reverseFlag.gameObject.SetActive(false);
+            reverseFlagChallenge.gameObject.SetActive(false);
+        }
+
+            if (MainManager.levelCounter == 2)
         {
             Debug.Log("Starting Race, Local Is Active And Will Report Level 2 Race In Progress " + LocalIsActivePlayer());
 
@@ -1224,7 +1245,10 @@ public class PlayerManager3P : MonoBehaviour
                 PostRaceRandomMarketProcedure();
 
                 if (NetworkManager.Singleton.IsHost)
+                {
                     OnlineManager.Instance.ReportRaceLevel1InProgressRpc(false);
+                    promptText.text = "Processing Results";
+                }
 
                 break;
 
@@ -1489,6 +1513,7 @@ public class PlayerManager3P : MonoBehaviour
         raceInProgressPanel.SetActive(false);
 
         OnlineManager.Instance.ReportRaceLevel2InProgressRpc(false);
+        promptText.text = "Processing Results";
 
         //RoundChangeover();
 
@@ -1560,6 +1585,7 @@ public class PlayerManager3P : MonoBehaviour
 
         Debug.Log("Level 2 Race in Progress Network Variable set To False");
         OnlineManager.Instance.ReportRaceLevel2InProgressRpc(false);
+        promptText.text = "Processing Results";
     }
 
     public bool IsTimeBattleWinner()
@@ -2111,10 +2137,16 @@ public class PlayerManager3P : MonoBehaviour
 
                 if (MainManager.roundCounter == MainManager.raceThreshold)
                 {                    
-                    EndGame();
+                    PromptHostToEndGame();
                 }
             }
         }
+    }
+
+    private void PromptHostToEndGame()
+    {
+        if(NetworkManager.Singleton.IsHost)
+        endGameOptionPanel.SetActive(true);
     }
 
 
@@ -2126,8 +2158,7 @@ public class PlayerManager3P : MonoBehaviour
         OnLevel2Start?.Invoke();
 
         MainManager.activePlayer = GetIndexOfLowestValue(MainManager.playerCash);
-        CallActivePlayer();
-
+        
         for (int i = 0; i < MainManager.playerNumber; i++)
 
         {
@@ -2137,6 +2168,9 @@ public class PlayerManager3P : MonoBehaviour
         turnIndicator[MainManager.activePlayer].SetActive(true);              
 
         statusInfoTextBar.text = ($"Active Player is {MainManager.playerNames[MainManager.activePlayer]} / Level: {MainManager.levelCounter} / Races remaining: {MainManager.raceThreshold - MainManager.roundCounter} / Races completed: {MainManager.roundCounter - 1}");
+
+        OnlineManager.Instance.ReportReadyForNextLevelRpc();
+        promptText.text = "Waiting for All Players to Enter Level 2";
 
     }
 
@@ -2181,7 +2215,6 @@ public class PlayerManager3P : MonoBehaviour
 
 
     public void StartSellingRound()
-
     {
         preSellingInfoPanel.SetActive(false);
 
@@ -2239,29 +2272,30 @@ public class PlayerManager3P : MonoBehaviour
 
         { RoundChangeover(); }
 
-
     }
 
 
     void BankruptCheck()
-
     {
         for (int i = 0; i < MainManager.playerNumber; i++)
-
         {
             if (MainManager.playerCash[i] < 1)
 
             { RoundChangeover(); }
 
         }
+    }
 
+    public void ReportGameOverToClients()
+    {
+        OnlineManager.Instance.EndGameOnAllClientsRpc();
     }
 
 
-
     public void EndGame()
-
     {
+        endGameOptionPanel.SetActive(false);
+
         MainManager.gameOver = true;
         Debug.Log("Game Over");
 
