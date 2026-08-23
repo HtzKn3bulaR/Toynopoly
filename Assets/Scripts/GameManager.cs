@@ -34,8 +34,8 @@ public class GameManager : MonoBehaviour
     public Button[] p1InventoryDisplay;
     public Button[] p2InventoryDisplay;
 
-    private string selectedTrack;
-    private string selectedCar;
+    private string selectedTrack ="";
+    private string selectedCar ="";
 
     private bool l2SelectionIsOkay = true;
     private bool l3SelectionIsOkay = true;
@@ -876,6 +876,7 @@ public class GameManager : MonoBehaviour
         else
         {
             reverseFlag.gameObject.SetActive(false);
+        }
 
 
             if (NetworkManager.Singleton.IsHost)
@@ -888,8 +889,7 @@ public class GameManager : MonoBehaviour
             {
                 continueButtonNormal.SetActive(false);
                 getAutoResultsButtonNormalL1.SetActive(false);
-            }
-        }
+            }        
     }
 
     public void ShowResultsPanel()
@@ -1303,12 +1303,9 @@ public class GameManager : MonoBehaviour
     }
 
     public void UpdateInventoryDisplay()
-
     {
         for (int i = 0; i < MainManager.cars.Length; i++)
-
-        {
-                        
+        {                        
             invDisplayP1[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[0, i].ToString();
             invDisplayP2[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[1, i].ToString();
 
@@ -1409,8 +1406,7 @@ public class GameManager : MonoBehaviour
 
         if (MainManager.timeBattleSeconds > 19)
         {
-            audioSource.PlayOneShot(success);
-            
+            audioSource.PlayOneShot(success);            
         }
 
         if (MainManager.carPrizes[MainManager.TimeBattleCarIndex] < 0)
@@ -1423,7 +1419,7 @@ public class GameManager : MonoBehaviour
 
         if (IsTimeBattleWinner() == true)
         {
-            Debug.Log("Time Battle Winner Check: Local Is Winner");
+            Debug.Log("Time Battle Winner Check: Local Is Winner - Reporting Buff to Opponent");
             OnlineManager.Instance.DuelReportCarBuffToClientsRpc(MainManager.TimeBattleCarIndex);
         }
 
@@ -1441,7 +1437,6 @@ public class GameManager : MonoBehaviour
             Debug.Log("Protect Option for Active Player");
 
             if (MainManager.playerInventory[MainManager.activePlayer, MainManager.TimeBattleCarIndex] > 0 && MainManager.shieldAvailable[MainManager.activePlayer] == true)
-
             {
                 int totalInventory = 0;
                 totalInventory = MainManager.playerInventory[0, MainManager.TimeBattleCarIndex] + MainManager.playerInventory[1, MainManager.TimeBattleCarIndex];
@@ -1451,9 +1446,23 @@ public class GameManager : MonoBehaviour
                     protectionEnablePanel.gameObject.SetActive(true);
                     protectionHandlerScript.GetInformation();
                 }
+
+                else
+                {
+                    ResumeFromProtectOption();
+                    Debug.Log("Resuming From Protect Option");
+                }
+
             }
+
+            else
+            {
+                ResumeFromProtectOption();
+                Debug.Log("Resuming From Protect Option");
+            }
+
         }
-               
+
 
         else if (roundsWithCarSellingOption.Contains(MainManager.roundCounter))
         {
@@ -1463,8 +1472,18 @@ public class GameManager : MonoBehaviour
         }
 
         else
-            
-            StartCoroutine(WaitAfterCarFame());        
+        {
+            if (LocalIsActivePlayer())
+            {
+                StartCoroutine(WaitAfterCarFame());
+            }
+            else
+            {
+                Debug.Log("Inactive Player Ready For Round Changeover");
+                ReInstateRows();
+                ReadyForRoundChangeover();
+            }
+        }
 
     }
 
@@ -1486,7 +1505,10 @@ public class GameManager : MonoBehaviour
         buffNerfPanel.SetActive(false);
 
         if (IsTimeBattleWinner())
+        {
+            Debug.Log("Reporting Nerf to Opponent");
             OnlineManager.Instance.DuelReportCarNerfToClientsRpc(MainManager.TimeBattleCarIndex);
+        }
 
         Debug.Log("Current Round " + MainManager.roundCounter + " is Selling Round " + roundsWithCarSellingOption.Contains(MainManager.roundCounter));
 
@@ -1503,7 +1525,6 @@ public class GameManager : MonoBehaviour
             Debug.Log("Protect Option for Active Player");
 
             if (MainManager.playerInventory[MainManager.activePlayer, MainManager.TimeBattleCarIndex] > 0 && MainManager.shieldAvailable[MainManager.activePlayer] == true)
-
             {
                 int totalInventory = 0;
                 totalInventory = MainManager.playerInventory[0, MainManager.TimeBattleCarIndex] + MainManager.playerInventory[1, MainManager.TimeBattleCarIndex];
@@ -1513,6 +1534,18 @@ public class GameManager : MonoBehaviour
                     protectionEnablePanel.gameObject.SetActive(true);
                     protectionHandlerScript.GetInformation();
                 }
+
+                else
+                {
+                    ResumeFromProtectOption();
+                    Debug.Log("Resuming From Protect Option");
+                }
+            }
+
+            else
+            {
+                ResumeFromProtectOption();
+                Debug.Log("Resuming From Protect Option");
             }
         }
 
@@ -1923,6 +1956,7 @@ public class GameManager : MonoBehaviour
 
     System.Collections.IEnumerator WaitAfterCarFame()
     {
+        Debug.Log("Waiting...");
         yield return new WaitForSeconds(10.0f);
         ReInstateRows();
         ReadyForRoundChangeover();

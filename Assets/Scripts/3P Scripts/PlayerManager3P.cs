@@ -1,13 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-using System;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEditor;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 
 
@@ -76,8 +77,8 @@ public class PlayerManager3P : MonoBehaviour
 
     public TextMeshProUGUI statusInfoTextBar;
 
-    public string selectedTrack;
-    public string selectedCar;
+    public string selectedTrack="";
+    public string selectedCar="";
 
     [SerializeField] GameObject[] turnIndicator;
 
@@ -415,6 +416,11 @@ public class PlayerManager3P : MonoBehaviour
             Debug.Log("Field Clicked Method Activated On Client");
             FieldClicked(newValue);
         }
+    }
+
+    public FixedString32Bytes ReturnSelectedTrack()
+    {
+        return selectedTrack;
     }
 
     //FIRST NETWORK EVENT FINISHED--------------------------------------------------
@@ -2065,6 +2071,7 @@ public class PlayerManager3P : MonoBehaviour
         resultsRegisteredForRound = false;
         MainManager.IsToynopolyBattle = false;
         challengeWon = true;
+        MainManager.nextTrackReverse = false;
 
         MainManager.activePlayer++;        
 

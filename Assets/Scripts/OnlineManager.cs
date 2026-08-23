@@ -584,8 +584,7 @@ public class OnlineManager : NetworkBehaviour
     internal void ReportCarNerfToClientsRpc()
     {
         if (!PlayerManager3P.Instance.IsTimeBattleWinner())
-        {
-            
+        {            
             PlayerManager3P.Instance.NerfCarAndContinue();
         }
     }
@@ -887,10 +886,16 @@ public class OnlineManager : NetworkBehaviour
             if (MainManager.playerNumber < 3)
             {
                 GameManager.Instance.AcceptDividend();
+                GameManager.Instance.SetPromptText("Warning! Manual score override by Host!");
             }
 
             else
+            {
                 PlayerManager3P.Instance.AcceptDividend();
+                PlayerManager3P.Instance.SetPromptText("Warning! Manual score override by Host!");
+            }
+
+            
         }
     }
 
@@ -905,11 +910,15 @@ public class OnlineManager : NetworkBehaviour
 
             if (MainManager.playerNumber < 3)
             {
+                GameManager.Instance.SetPromptText("Warning! Manual score override by Host!");
                 GameManager.Instance.UpdateCarPrizesDisplay();
             }
 
             else
+            {
+                PlayerManager3P.Instance.SetPromptText("Warning! Manual score override by Host!");
                 PlayerManager3P.Instance.UpdateCarPrizesDisplay();
+            }
         }
     }
 
@@ -920,12 +929,15 @@ public class OnlineManager : NetworkBehaviour
 
         if (MainManager.playerNumber > 2)
         {
+            PlayerManager3P.Instance.SetPromptText("Warning! Manual score override by Host!");
             PlayerManager3P.Instance.UpdateInventoryDisplay();
         }
 
-        else
-
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.SetPromptText("Warning! Manual score override by Host!");
             GameManager.Instance.UpdateInventoryDisplay();
+        }
 
     }
 
@@ -969,12 +981,26 @@ public class OnlineManager : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     public void ReportReverseTrackToAllPlayersRpc()
     {
-        if (!GameManager.Instance.LocalIsActivePlayer())
+        if (MainManager.playerNumber < 3)
         {
-            MainManager.nextTrackReverse = true;
-            GameObject.Find("NextRaceComingUpPanel").GetComponent<ReverseHandler>().RemoveIcon();
-            Debug.Log("Next Track Is Reversed");
+            if (!GameManager.Instance.LocalIsActivePlayer())
+            {
+                MainManager.nextTrackReverse = true;
+                GameObject.Find("NextRaceComingUpPanel").GetComponent<ReverseHandler>().RemoveIcon();
+                Debug.Log("Next Track Is Reversed");
+            }
         }
+
+        if (MainManager.playerNumber > 2)
+        {
+            if (!PlayerManager3P.Instance.LocalIsActivePlayer())
+            {
+                MainManager.nextTrackReverse = true;
+                GameObject.Find("NextRaceComingUpPanel").GetComponent<ReverseHandler>().RemoveIcon();
+                Debug.Log("Next Track Is Reversed");
+            }
+        }
+
     }
 
 

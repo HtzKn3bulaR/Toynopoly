@@ -24086,7 +24086,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
-        m_MethodName: NewDataPlayer5Rpc
+        m_MethodName: NewDataPlayer5
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -48740,7 +48740,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
-        m_MethodName: NewDataPlayer1Rpc
+        m_MethodName: NewDataPlayer1
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -51396,7 +51396,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
-        m_MethodName: NewDataCar2Rpc
+        m_MethodName: NewDataCar2
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -57155,7 +57155,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
-        m_MethodName: NewDataPlayer3Rpc
+        m_MethodName: NewDataPlayer3
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -76050,7 +76050,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
-        m_MethodName: NewDataPlayer4Rpc
+        m_MethodName: NewDataPlayer4
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -96505,7 +96505,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
-        m_MethodName: NewDataCar3Rpc
+        m_MethodName: NewDataCar3
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -146070,7 +146070,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
-        m_MethodName: NewDataCar6Rpc
+        m_MethodName: NewDataCar6
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -151309,7 +151309,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
-        m_MethodName: NewDataCar5Rpc
+        m_MethodName: NewDataCar5
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -156249,7 +156249,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
-        m_MethodName: NewDataPlayer2Rpc
+        m_MethodName: NewDataPlayer2
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -197284,7 +197284,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
-        m_MethodName: NewDataCar1Rpc
+        m_MethodName: NewDataCar1
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -217798,7 +217798,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1256153606}
         m_TargetAssemblyTypeName: MatchScoreEditor, Assembly-CSharp
-        m_MethodName: NewDataCar4Rpc
+        m_MethodName: NewDataCar4
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

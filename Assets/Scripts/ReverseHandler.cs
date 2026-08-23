@@ -20,18 +20,32 @@ public class ReverseHandler : MonoBehaviour
     }
 
     private void OnPendingFieldChanged(int previousValue, int newValue)
-    {
-        Debug.Log("Track is " + GameManager.Instance.ReturnSelectedTrack());
+    {        
         Debug.Log("Reverse Icons Remaining " + reverseIconsRemaining);
-        Debug.Log("Track Has Reversed Version " + GridGenerator.Instance.TrackHasReverseVersion(GameManager.Instance.ReturnSelectedTrack()));
 
-        if(GridGenerator.Instance.TrackHasReverseVersion(GameManager.Instance.ReturnSelectedTrack()) && reverseIconsRemaining > 0)
+        if (MainManager.playerNumber < 3)
         {
-            ShowReversePanel();            
+
+            if (GridGenerator.Instance.TrackHasReverseVersion(GameManager.Instance.ReturnSelectedTrack()) && reverseIconsRemaining > 0)
+            {
+                ShowReversePanel();
+            }
+
+            else
+                HideReversePanel();
         }
 
-        else
-            HideReversePanel();
+        if (MainManager.playerNumber > 2)
+        {
+            if (GridGenerator3P.Instance.TrackHasReverseVersion(PlayerManager3P.Instance.ReturnSelectedTrack()) && reverseIconsRemaining > 0)
+            {
+                ShowReversePanel();
+            }
+
+            else
+                HideReversePanel();
+        }
+
     }
        
 
@@ -39,13 +53,30 @@ public class ReverseHandler : MonoBehaviour
     {
         reverseOptionPanel.SetActive(true);
 
-        if(GameManager.Instance.LocalIsActivePlayer())
+        if (MainManager.playerNumber < 3)
         {
-            reverseButton.SetActive(true);
+
+            if (GameManager.Instance.LocalIsActivePlayer())
+            {
+                reverseButton.SetActive(true);
+            }
+            else
+            {
+                reverseButton.SetActive(false);
+            }
         }
-        else
+
+        if (MainManager.playerNumber > 2)
         {
-            reverseButton.SetActive(false);
+
+            if (PlayerManager3P.Instance.LocalIsActivePlayer())
+            {
+                reverseButton.SetActive(true);
+            }
+            else
+            {
+                reverseButton.SetActive(false);
+            }
         }
 
     }
@@ -57,13 +88,28 @@ public class ReverseHandler : MonoBehaviour
 
     public void UseReverseIcon()
     {
-        if (GameManager.Instance.LocalIsActivePlayer())
+        if (MainManager.playerNumber < 3)
         {
-            MainManager.nextTrackReverse = true;
-            ReportReverseTrackToServer();
-            RemoveIcon();
-            reverseButton.SetActive(false);
-            Debug.Log("Next Track Reversed");
+            if (GameManager.Instance.LocalIsActivePlayer())
+            {
+                MainManager.nextTrackReverse = true;
+                ReportReverseTrackToServer();
+                RemoveIcon();
+                reverseButton.SetActive(false);
+                Debug.Log("Next Track Reversed");
+            }
+        }
+
+        if (MainManager.playerNumber > 2)
+        {
+            if (PlayerManager3P.Instance.LocalIsActivePlayer())
+            {
+                MainManager.nextTrackReverse = true;
+                ReportReverseTrackToServer();
+                RemoveIcon();
+                reverseButton.SetActive(false);
+                Debug.Log("Next Track Reversed");
+            }
         }
     }
 
@@ -76,7 +122,16 @@ public class ReverseHandler : MonoBehaviour
 
     private void ReportReverseTrackToServer()
     {
-        if(GameManager.Instance.LocalIsActivePlayer())
-        OnlineManager.Instance.ReportReverseTrackToAllPlayersRpc();
+        if (MainManager.playerNumber < 3)
+        {
+            if (GameManager.Instance.LocalIsActivePlayer())
+                OnlineManager.Instance.ReportReverseTrackToAllPlayersRpc();
+        }
+
+        if (MainManager.playerNumber > 2)
+        {
+            if (PlayerManager3P.Instance.LocalIsActivePlayer())
+                OnlineManager.Instance.ReportReverseTrackToAllPlayersRpc();
+        }
     }
 }

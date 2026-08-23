@@ -4,10 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
-using Unity.Netcode;
+
 
 public class MatchScoreEditor : MonoBehaviour
 {
+    public static MatchScoreEditor instance;
 
     [SerializeField] TextMeshProUGUI[] carPrizeFields;
     [SerializeField] TextMeshProUGUI[] carNames;
@@ -31,19 +32,16 @@ public class MatchScoreEditor : MonoBehaviour
     int[] tempPrize = { 20, 20, 20, 20, 20, 20 };
     int[] tempCash = { 150, 150, 150, 150, 150, 150 };
 
-    private PlayerManager3P playerManagerScript;
-    private GameManager gameManagerScript;
+    public void Start()
+    {
+        instance = this;
+    }
 
     // Start is called before the first frame update
-    void Awake()
+    public void Awake()
     {
 
-        if (MainManager.playerNumber > 2)
-        {
-            playerManagerScript = GameObject.Find("PlayerManager3P").GetComponent<PlayerManager3P>();
-        }
-        else
-        gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+        
     }
 
     // Update is called once per frame
@@ -51,6 +49,12 @@ public class MatchScoreEditor : MonoBehaviour
     {
         
     }
+
+    public void EditorPanelHide()
+    {
+        editorPanel.SetActive(false);
+    }
+        
 
     public void OpenMatchScoreEditor()
     {
@@ -80,264 +84,7 @@ public class MatchScoreEditor : MonoBehaviour
         PopulateCarDropdown();
 
     }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    public void NewDataPlayer1Rpc (string cash)
-    {
-        int tempCash = int.Parse(cash);
-
-        MainManager.playerCash[0] = tempCash;
-
-        editorPanel.gameObject.SetActive(false);
-
-        if (MainManager.playerNumber < 3)
-        {
-            gameManagerScript.AcceptDividend();
-        }
-
-        else
-            playerManagerScript.AcceptDividend();
-
-        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 0);
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    public void NewDataPlayer2Rpc(string cash)
-    {
-        int tempCash = int.Parse(cash);
-
-        MainManager.playerCash[1] = tempCash;
-
-        editorPanel.gameObject.SetActive(false);
-
-        if (MainManager.playerNumber < 3)
-        {
-            gameManagerScript.AcceptDividend();
-        }
-
-        else
-            playerManagerScript.AcceptDividend();
-
-        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 1);
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    public void NewDataPlayer3Rpc(string cash)
-    {
-        int tempCash = int.Parse(cash);
-
-        MainManager.playerCash[2] = tempCash;
-
-        editorPanel.gameObject.SetActive(false);
-
-        if (MainManager.playerNumber < 3)
-        {
-            gameManagerScript.AcceptDividend();
-        }
-
-        else
-
-            playerManagerScript.AcceptDividend();
-
-        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 2);
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    public void NewDataPlayer4Rpc(string cash)
-    {
-        int tempCash = int.Parse(cash);
-
-        MainManager.playerCash[3] = tempCash;
-
-        editorPanel.gameObject.SetActive(false);
-
-        if (MainManager.playerNumber < 3)
-        {
-            gameManagerScript.AcceptDividend();
-        }
-
-        else
-
-            playerManagerScript.AcceptDividend();
-
-        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 3);
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    public void NewDataPlayer5Rpc(string cash)
-    {
-        int tempCash = int.Parse(cash);
-
-        MainManager.playerCash[4] = tempCash;
-
-        editorPanel.gameObject.SetActive(false);
-
-        if (MainManager.playerNumber < 3)
-        {
-            gameManagerScript.AcceptDividend();
-        }
-
-        else
-
-            playerManagerScript.AcceptDividend();
-
-        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 4);
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    public void NewDataCar1Rpc(string price)
-    {
-        int tempPrize = int.Parse(price);
-                    
-        Debug.Log(price);
-        Debug.Log(tempPrize);
-        MainManager.carPrizes[0] = tempPrize;
-    
-
-        editorPanel.gameObject.SetActive(false);
-
-        if (MainManager.playerNumber < 3)
-        {
-            gameManagerScript.UpdateCarPrizesDisplay();
-        }
-
-        else
-
-            playerManagerScript.UpdateCarPrizesDisplay();
-
-        OnlineManager.Instance.ReportCarValueChangeToClientsRpc(tempPrize, 0);
-
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    public void NewDataCar2Rpc(string price)
-    {
-
-        int tempPrize = int.Parse(price);
-
-        Debug.Log(price);
-        Debug.Log(tempPrize);
-        MainManager.carPrizes[1] = tempPrize;
-
-
-        editorPanel.gameObject.SetActive(false);
-
-        if (MainManager.playerNumber < 3)
-        {
-            gameManagerScript.UpdateCarPrizesDisplay();
-        }
-
-        else
-
-            playerManagerScript.UpdateCarPrizesDisplay();
-
-        OnlineManager.Instance.ReportCarValueChangeToClientsRpc(tempPrize, 1);
-
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    public void NewDataCar3Rpc(string price)
-    {
-
-        int tempPrize = int.Parse(price);
-
-        Debug.Log(price);
-        Debug.Log(tempPrize);
-        MainManager.carPrizes[2] = tempPrize;
-
-
-        editorPanel.gameObject.SetActive(false);
-
-        if (MainManager.playerNumber < 3)
-        {
-            gameManagerScript.UpdateCarPrizesDisplay();
-        }
-
-        else
-
-            playerManagerScript.UpdateCarPrizesDisplay();
-
-        OnlineManager.Instance.ReportCarValueChangeToClientsRpc(tempPrize, 2);
-
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    public void NewDataCar4Rpc(string price)
-    {
-
-        int tempPrize = int.Parse(price);
-
-        Debug.Log(price);
-        Debug.Log(tempPrize);
-        MainManager.carPrizes[3] = tempPrize;
-
-
-        editorPanel.gameObject.SetActive(false);
-
-        if (MainManager.playerNumber < 3)
-        {
-            gameManagerScript.UpdateCarPrizesDisplay();
-        }
-
-        else
-
-            playerManagerScript.UpdateCarPrizesDisplay();
-
-        OnlineManager.Instance.ReportCarValueChangeToClientsRpc(tempPrize, 3);
-
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    public void NewDataCar5Rpc(string price)
-    {
-
-        int tempPrize = int.Parse(price);
-
-        Debug.Log(price);
-        Debug.Log(tempPrize);
-        MainManager.carPrizes[4] = tempPrize;
-
-        editorPanel.gameObject.SetActive(false);
-
-        if (MainManager.playerNumber < 3)
-        {
-            gameManagerScript.UpdateCarPrizesDisplay();
-        }
-
-        else
-
-            playerManagerScript.UpdateCarPrizesDisplay();
-
-        OnlineManager.Instance.ReportCarValueChangeToClientsRpc(tempPrize, 4);
-
-    }
-
-
-    [Rpc(SendTo.ClientsAndHost)]
-    public void NewDataCar6Rpc(string price)
-    {
-
-        int tempPrize = int.Parse(price);
-
-        Debug.Log(price);
-        Debug.Log(tempPrize);
-        MainManager.carPrizes[5] = tempPrize;
-
-        editorPanel.gameObject.SetActive(false);
-
-        if(MainManager.playerNumber < 3)
-        {
-            gameManagerScript.UpdateCarPrizesDisplay();
-        }
-
-        else
-
-        playerManagerScript.UpdateCarPrizesDisplay();
-
-        OnlineManager.Instance.ReportCarValueChangeToClientsRpc(tempPrize, 5);
-
-    }
-
+        
 
     private void PopulatePlayerDropdown()
     {
@@ -432,6 +179,10 @@ public class MatchScoreEditor : MonoBehaviour
 
     public void InventorySubmit()
     {
+        Debug.Log("Submitting Inventory Player Index " + inventoryPlayerIndex);
+        Debug.Log("Submitting Inventory Car Index " + inventoryCarIndex);
+        Debug.Log("Submitting Inventory Content " + inventoryContent);
+
         OnlineManager.Instance.InventorySubmitRpc(inventoryPlayerIndex, inventoryCarIndex, inventoryContent);
     }
         
@@ -440,5 +191,211 @@ public class MatchScoreEditor : MonoBehaviour
     {
         editorPanel.gameObject.SetActive(false);
     }
+
+
+    //SET VALUES ON THE NETWORK
+
+    public void NewDataPlayer1(string cash)
+    {
+        int tempCash = int.Parse(cash);
+
+        MainManager.playerCash[0] = tempCash;
+
+        EditorPanelHide();
+
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.AcceptDividend();
+        }
+
+        else
+            PlayerManager3P.Instance.AcceptDividend();
+
+        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 0);
+    }
+
+    public void NewDataPlayer2(string cash)
+    {
+        int tempCash = int.Parse(cash);
+
+        MainManager.playerCash[1] = tempCash;
+
+        EditorPanelHide();
+
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.AcceptDividend();
+        }
+
+        else
+            PlayerManager3P.Instance.AcceptDividend();
+
+        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 1);
+    }
+
+    public void NewDataPlayer3(string cash)
+    {
+        int tempCash = int.Parse(cash);
+
+        MainManager.playerCash[2] = tempCash;
+
+        EditorPanelHide();
+
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.AcceptDividend();
+        }
+
+        else
+            PlayerManager3P.Instance.AcceptDividend();
+
+        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 2);
+    }
+    public void NewDataPlayer4(string cash)
+    {
+        int tempCash = int.Parse(cash);
+
+        MainManager.playerCash[3] = tempCash;
+
+        EditorPanelHide();
+
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.AcceptDividend();
+        }
+
+        else
+            PlayerManager3P.Instance.AcceptDividend();
+
+        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 3);
+    }
+
+    public void NewDataPlayer5(string cash)
+    {
+        int tempCash = int.Parse(cash);
+
+        MainManager.playerCash[4] = tempCash;
+
+        EditorPanelHide();
+
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.AcceptDividend();
+        }
+
+        else
+            PlayerManager3P.Instance.AcceptDividend();
+
+        OnlineManager.Instance.ReportPlayerCashBalanceChangeToClientsRpc(tempCash, 4);
+    }
+
+    public void NewDataCar1(string price)
+    {
+        int tempPrize = int.Parse(price);
+
+        MainManager.carPrizes[0] = tempPrize;
+
+
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.UpdateCarPrizesDisplay();
+        }
+
+        else
+            PlayerManager3P.Instance.UpdateCarPrizesDisplay();
+
+        MatchScoresNetworkHandler.instance.NewDataCar1Rpc(price);
+    }
+
+    public void NewDataCar2(string price)
+    {
+        int tempPrize = int.Parse(price);
+
+        MainManager.carPrizes[1] = tempPrize;
+
+
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.UpdateCarPrizesDisplay();
+        }
+
+        else
+            PlayerManager3P.Instance.UpdateCarPrizesDisplay();
+
+        MatchScoresNetworkHandler.instance.NewDataCar2Rpc(price);
+    }
+
+    public void NewDataCar3(string price)
+    {
+        int tempPrize = int.Parse(price);
+
+        MainManager.carPrizes[2] = tempPrize;
+
+
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.UpdateCarPrizesDisplay();
+        }
+
+        else
+            PlayerManager3P.Instance.UpdateCarPrizesDisplay();
+
+        MatchScoresNetworkHandler.instance.NewDataCar3Rpc(price);
+    }
+
+    public void NewDataCar4(string price)
+    {
+        int tempPrize = int.Parse(price);
+
+        MainManager.carPrizes[3] = tempPrize;
+
+
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.UpdateCarPrizesDisplay();
+        }
+
+        else
+            PlayerManager3P.Instance.UpdateCarPrizesDisplay();
+
+        MatchScoresNetworkHandler.instance.NewDataCar4Rpc(price);
+    }
+
+    public void NewDataCar5(string price)
+    {
+        int tempPrize = int.Parse(price);
+
+        MainManager.carPrizes[4] = tempPrize;
+
+
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.UpdateCarPrizesDisplay();
+        }
+
+        else
+            PlayerManager3P.Instance.UpdateCarPrizesDisplay();
+
+        MatchScoresNetworkHandler.instance.NewDataCar5Rpc(price);
+    }
+
+    public void NewDataCar6(string price)
+    {
+        int tempPrize = int.Parse(price);
+
+        MainManager.carPrizes[5] = tempPrize;
+
+
+        if (MainManager.playerNumber < 3)
+        {
+            GameManager.Instance.UpdateCarPrizesDisplay();
+        }
+
+        else
+            PlayerManager3P.Instance.UpdateCarPrizesDisplay();
+
+        MatchScoresNetworkHandler.instance.NewDataCar6Rpc(price);
+    }
+
 
 }
