@@ -49,14 +49,18 @@ public class PreGameFlowManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       Instance = this; 
+       Instance = this;
+
+        LoadGameFolder();
     }
 
 
     public void ShowNewGameBox()
-    {
+    {        
+        CSVFileSelector.Instance.SetNewMainFolder(LoadGameFolder());
+        CSVFileSelector.Instance.GetAllCSVFiles();
         welcomePanel.SetActive(false);
-        newGamePanel.SetActive(true);
+        newGamePanel.SetActive(true);        
     }
 
     public void HideWelcomePanel()
@@ -197,4 +201,29 @@ public class PreGameFlowManager : MonoBehaviour
         lobbyWindow.SetActive(false);
         clientSignUpWindow.SetActive(false);
     }
+
+
+    public string LoadGameFolder()
+    {        
+        string saveString = SaveSystem.Load();
+
+        if (saveString != null)
+        {
+            Debug.Log("Saved Game Folder Found");
+
+            GameManager.SaveGameData playerData = JsonUtility.FromJson<GameManager.SaveGameData>(saveString);
+
+            Debug.Log("Saved Game Folder Is " + playerData.gameFolder);
+            CSVFileSelector.Instance.SetNewMainFolder(playerData.gameFolder);
+
+            return playerData.gameFolder;
+        }
+
+        else
+        {
+            Debug.Log("No saved Game Folder");
+            return "";
+        }
+    }
+
 }

@@ -184,6 +184,7 @@ public class MatchScoreEditor : MonoBehaviour
         Debug.Log("Submitting Inventory Content " + inventoryContent);
 
         OnlineManager.Instance.InventorySubmitRpc(inventoryPlayerIndex, inventoryCarIndex, inventoryContent);
+                
     }
         
 

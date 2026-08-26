@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using Unity.VisualScripting;
+using Unity.Netcode;
 
 
 public class ReplaceCarHandler : MonoBehaviour
@@ -50,12 +51,10 @@ public class ReplaceCarHandler : MonoBehaviour
         carReplaceDialoguePanel.gameObject.SetActive(true);
 
         for (int i = 0; i < MainManager.cars.Length; i++)
-
         {
             carReplaceOldLinupDisplays[i].text = MainManager.cars[i];
 
         }
-
 
         if (MainManager.roundCounter > 1)
 
@@ -63,10 +62,7 @@ public class ReplaceCarHandler : MonoBehaviour
             replaceUnavailableMessage.gameObject.SetActive(true);
             newCarSprite.gameObject.SetActive(false);
             searchButton.gameObject.SetActive(false);
-
         }
-
-
     }
 
 
@@ -79,8 +75,7 @@ public class ReplaceCarHandler : MonoBehaviour
 
     public void GetListIndex(int carPosition)
     {
-        newCarPosition = carPosition;
-                           
+        newCarPosition = carPosition;                           
     }
 
 
@@ -115,7 +110,7 @@ public class ReplaceCarHandler : MonoBehaviour
 
     public void ExecuteCarReplace()
         {
-        MainManager.cars[newCarPosition] = GridGenerator3P.Instance.activeList[newCarIndex].ToSafeString();
+        MainManager.cars[newCarPosition] = GridGenerator.Instance.activeList[newCarIndex].ToSafeString();
         
         switch(newCarPosition)
         {
@@ -151,6 +146,11 @@ public class ReplaceCarHandler : MonoBehaviour
          }
 
         carReplaceDialoguePanel.SetActive(false);
+
+        if(NetworkManager.Singleton.IsHost)
+        {
+            MatchScoresNetworkHandler.instance.SendCarReplacementToClientRpc(newCarPosition, newCarIndex);
+        }
 
     }
 

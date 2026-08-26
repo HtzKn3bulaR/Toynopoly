@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -12,6 +13,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {   
     public static GameManager Instance;
+       
 
     public AudioClip panelOpen;
     public AudioClip stageReady;
@@ -1302,21 +1304,37 @@ public class GameManager : MonoBehaviour
         TimeBattleOutcome();
     }
 
+
+    public void InventoryP1Show(int index)
+    {
+        invDisplayP1[index].gameObject.SetActive(true);
+    }
+
+    public void InventoryP2Show(int index)
+    {
+        invDisplayP2[index].gameObject.SetActive(true);
+    }
+
     public void UpdateInventoryDisplay()
     {
         for (int i = 0; i < MainManager.cars.Length; i++)
-        {                        
+        {
+            Debug.Log("Iterating inventory " + i);
+
             invDisplayP1[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[0, i].ToString();
             invDisplayP2[i].GetComponentInChildren<TMP_Text>().text = MainManager.playerInventory[1, i].ToString();
 
             if (MainManager.playerInventory[0, i] < 1)
             {
+                Debug.Log("Inventory " + MainManager.playerInventory[0, i] + "is Zero");
                 invDisplayP1[i].gameObject.SetActive(false);
             }
+            
 
             if (MainManager.playerInventory[1, i] < 1)
 
             {
+                Debug.Log("Inventory " + MainManager.playerInventory[1, i] + "is Zero");
                 invDisplayP2[i].gameObject.SetActive(false);
             }
         }
@@ -1612,7 +1630,10 @@ public class GameManager : MonoBehaviour
     {
         OnRoundChangeover?.Invoke();
 
-        //Save();
+        if (MainManager.roundCounter < 2)
+        {
+            Save();
+        }
 
         carInDefaultPanel.SetActive(false);
         p1SellButton.gameObject.SetActive(false);
@@ -1992,6 +2013,7 @@ public class GameManager : MonoBehaviour
 
     private void Save()
     {
+        /*
         int[] concatenatedInventory = new int[36];
         int x = 0;
         int y = 0;
@@ -2037,11 +2059,11 @@ public class GameManager : MonoBehaviour
 
 
         }
-
+        */
 
         SaveGameData playerData = new SaveGameData
         {
-            playerNumber = MainManager.playerNumber,
+            /*playerNumber = MainManager.playerNumber,
             playerNames = MainManager.playerNames,
             playerCash = MainManager.playerCash,
 
@@ -2060,11 +2082,17 @@ public class GameManager : MonoBehaviour
             matchlength = MainManager.raceThreshold,
             shields = MainManager.shieldAvailable,
             protection = MainManager.protection,
+            */
+
+            gameFolder = CSVFileSelector.Instance.ReturnGameFolder()
             
+
             //Resume N/A in Netcode Version
             //tempdividends = dividendScript.actualDividendList,
 
         };
+
+        Debug.Log("Saving Folder " + CSVFileSelector.Instance.ReturnGameFolder());
 
         string json = JsonUtility.ToJson(playerData);
         Debug.Log(json);
@@ -2080,7 +2108,7 @@ public class GameManager : MonoBehaviour
 
     public class SaveGameData
         {
-        public int playerNumber;
+        /*public int playerNumber;
         public string[] playerNames;
         public int[] playerCash;
 
@@ -2102,7 +2130,8 @@ public class GameManager : MonoBehaviour
         public bool[] shields;
         public bool[] protection;
         public List<int> tempdividends;
-
+        */
+        public string gameFolder;
 
 
         }

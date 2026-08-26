@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Unity.Netcode;
+using Unity.VisualScripting;
+using UnityEngine;
 
 public class MatchScoresNetworkHandler : NetworkBehaviour
 {
@@ -181,6 +183,64 @@ public class MatchScoresNetworkHandler : NetworkBehaviour
 
     }
 
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void SendCarReplacementToClientRpc(int newCarPosition, int newCarIndex)
+    {
+        if(!NetworkManager.Singleton.IsHost)
+        { 
+        MainManager.cars[newCarPosition] = GridGenerator.Instance.activeList[newCarIndex].ToSafeString();
 
+            switch (newCarPosition)
+            {
+                case 0:
+                    GridGenerator.Instance.carAText.text = MainManager.cars[0];
+                    GridGenerator.Instance.carPicA.image.sprite = GridGenerator.Instance.activeSpriteList[newCarIndex];
+                    break;
 
+                case 1:
+                    GridGenerator.Instance.carBText.text = MainManager.cars[1];
+                    GridGenerator.Instance.carPicB.image.sprite = GridGenerator.Instance.activeSpriteList[newCarIndex];
+                    break;
+
+                case 2:
+                    GridGenerator.Instance.carCText.text = MainManager.cars[2];
+                    GridGenerator.Instance.carPicC.image.sprite = GridGenerator.Instance.activeSpriteList[newCarIndex];
+                    break;
+
+                case 3:
+                    GridGenerator.Instance.carDText.text = MainManager.cars[3];
+                    GridGenerator.Instance.carPicD.image.sprite = GridGenerator.Instance.activeSpriteList[newCarIndex];
+                    break;
+
+                case 4:
+                    GridGenerator.Instance.carEText.text = MainManager.cars[4];
+                    GridGenerator.Instance.carPicE.image.sprite = GridGenerator.Instance.activeSpriteList[newCarIndex];
+                    break;
+
+                case 5:
+                    GridGenerator.Instance.carFText.text = MainManager.cars[5];
+                    GridGenerator.Instance.carPicF.image.sprite = GridGenerator.Instance.activeSpriteList[newCarIndex];
+                    break;
+            }
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    internal void ReportTrackReplacementToClientRpc(int trackPosition, string newTrackName)
+    {
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            if (trackPosition != 9)
+            {
+                MainManager.activeTracks[trackPosition] = newTrackName;
+            }
+
+            else
+            {
+                MainManager.bonusTrack = newTrackName;
+            }
+            
+            ReplaceTrackHandler.Instance.UpdateTrackPanel();
+        }
+    }
 }

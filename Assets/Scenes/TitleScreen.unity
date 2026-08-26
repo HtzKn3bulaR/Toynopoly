@@ -2480,6 +2480,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fileDropdown: {fileID: 1379272255}
   rvglFolder: {fileID: 47256970}
+  gameFolderPlaceholder: {fileID: 2121485435}
   csvFiles: []
   fileName: 
   selectedFilePath: 
@@ -21127,7 +21128,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'v 2.07b Netcode
+  m_text: 'v 2.08b Netcode
 
 '
   m_isRightToLeft: 0
@@ -21650,7 +21651,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: D:\Re-Volt
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: af17111b7c862414b9b0a68fc902f709, type: 2}
   m_sharedMaterial: {fileID: 7486160777593221014, guid: af17111b7c862414b9b0a68fc902f709, type: 2}

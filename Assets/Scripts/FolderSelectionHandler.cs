@@ -21,8 +21,7 @@ public class FolderSelectionHandler : MonoBehaviour
     {
         if (folderUserInput.text == string.Empty)
         {
-
-            placeholderText.text = "D:/Re-Volt";
+            placeholderText.text = "Please enter your RVGL Folder";
         }
     }
 

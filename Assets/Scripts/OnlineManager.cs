@@ -934,8 +934,19 @@ public class OnlineManager : NetworkBehaviour
         }
 
         if (MainManager.playerNumber < 3)
-        {
+        {                        
+                if (inventoryPlayerIndex == 0 && inventoryContent > 0)
+                {
+                    GameManager.Instance.InventoryP1Show(inventoryCarIndex);
+                }
+
+                if (inventoryPlayerIndex == 1 && inventoryContent > 0)
+                {
+                    GameManager.Instance.InventoryP2Show(inventoryCarIndex);
+                }            
+
             GameManager.Instance.SetPromptText("Warning! Manual score override by Host!");
+            Debug.Log("New Inventory count for car" + MainManager.playerInventory[inventoryPlayerIndex, inventoryCarIndex]);
             GameManager.Instance.UpdateInventoryDisplay();
         }
 

@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.Netcode;
 
 
 public class ReplaceTrackHandler : MonoBehaviour
 {
+    public static ReplaceTrackHandler Instance;
+
     [SerializeField] Button[] trackButtons;
     [SerializeField] TextMeshProUGUI[] trackNamesDisplay;
 
@@ -21,6 +24,7 @@ public class ReplaceTrackHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Instance = this;
         gridGeneratorScript = GameObject.Find("GridGenerator").GetComponent<GridGenerator>();
     }
 
@@ -61,21 +65,24 @@ public class ReplaceTrackHandler : MonoBehaviour
         if (trackPosition != 9)
         {
             MainManager.activeTracks[trackPosition] = newTrackName;
-
         }
 
         else
-
         {
             MainManager.bonusTrack = newTrackName;
         }
-
         UpdateTrackPanel();
         trackReplacePanel.gameObject.SetActive(false);
+
+        if(NetworkManager.Singleton.IsHost)
+        {
+            MatchScoresNetworkHandler.instance.ReportTrackReplacementToClientRpc(trackPosition, newTrackName);
+        }
+
     }
 
 
-    private void UpdateTrackPanel()
+    public void UpdateTrackPanel()
     {
         
         gridGeneratorScript.track1.text = MainManager.activeTracks[0];

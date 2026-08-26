@@ -2050,7 +2050,11 @@ public class PlayerManager3P : MonoBehaviour
     public void RoundChangeover()
     {
         OnRoundChangeover?.Invoke();
-        //Save();
+
+        if (MainManager.roundCounter < 2)
+        {
+            Save();
+        }
 
         carInDefaultPanel.SetActive(false);        
         hostOptionsPanel.SetActive(false);
@@ -2377,6 +2381,7 @@ public class PlayerManager3P : MonoBehaviour
 
     private void Save()
     {
+        /*
         int[] concatenatedInventory = new int[36];
         int x = 0;
         int y = 0;
@@ -2424,11 +2429,12 @@ public class PlayerManager3P : MonoBehaviour
 
         }
 
-
+        */
 
 
         SaveGameData playerData = new SaveGameData
         {
+            /*
             playerNumber = MainManager.playerNumber,
             playerNames = MainManager.playerNames,
             playerCash = MainManager.playerCash,
@@ -2448,7 +2454,9 @@ public class PlayerManager3P : MonoBehaviour
             matchlength = MainManager.raceThreshold,
             shields = MainManager.shieldAvailable,
             protection = MainManager.protection,
-            
+            */
+            gameFolder = CSVFileSelector.Instance.ReturnGameFolder()
+
             //Resume N/A in Netcode Version
             //tempdividends = dividendScript.actualDividendList,
 
@@ -2520,7 +2528,7 @@ public class PlayerManager3P : MonoBehaviour
 
     public class SaveGameData
     {
-        public int playerNumber;
+        /*public int playerNumber;
         public string[] playerNames;
         public int[] playerCash;
 
@@ -2542,7 +2550,9 @@ public class PlayerManager3P : MonoBehaviour
         public bool[] shields;
         public bool[] protection;
         public List<int> tempdividends;
+        */
 
+        public string gameFolder;
 
     }
 

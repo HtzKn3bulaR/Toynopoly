@@ -75,6 +75,8 @@ public class MainManager : MonoBehaviour
 
     public static bool nextTrackReverse = false;
 
+    public static string gameFolder = string.Empty;
+
     
     //game Scores New
 

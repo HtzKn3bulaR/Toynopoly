@@ -9,13 +9,17 @@ using Unity.VisualScripting;
 
 public class CSVFileSelector : MonoBehaviour
 {
+    
+    public static CSVFileSelector Instance { get; private set; }
+    
     [SerializeField] TMP_Dropdown fileDropdown;
     [SerializeField] TextMeshProUGUI rvglFolder;
+    [SerializeField] TextMeshProUGUI gameFolderPlaceholder;
     public List<string> csvFiles = new List<string>();
     public string fileName;
     public string selectedFilePath;
     private string applicationDataPath;
-    private string defaultFolderName = "D:/Re-Volt";
+    //private string defaultFolderName;
 
     private CSVFileReader fileReaderScript;
    
@@ -30,12 +34,12 @@ public class CSVFileSelector : MonoBehaviour
     }
 
     void Start()
-    {
-                
-        applicationDataPath = defaultFolderName + "/profiles/";
+    {         
+        Instance = this;         
+        
+        applicationDataPath = MainManager.gameFolder + "/profiles/";
 
         GetAllCSVFiles();
-
     }
 
     
@@ -44,11 +48,20 @@ public class CSVFileSelector : MonoBehaviour
         
     }
 
+    public string ReturnGameFolder()
+    {
+        return MainManager.gameFolder;
+    }
+       
+
     public void SetNewMainFolder(string folder)
     {
         string newFolder = folder;
-        defaultFolderName = newFolder;
-        applicationDataPath = defaultFolderName + "/profiles/";
+        MainManager.gameFolder = newFolder;
+        Debug.Log(MainManager.gameFolder + "set as New Game Folder");
+        applicationDataPath = MainManager.gameFolder + "/profiles/";
+        Debug.Log(applicationDataPath + "set as Application Path");
+        gameFolderPlaceholder.text = MainManager.gameFolder;
         GetAllCSVFiles();
     }
 
@@ -58,7 +71,6 @@ public class CSVFileSelector : MonoBehaviour
         csvFiles.Clear();
                 
         try
-
         {
             csvFiles.Add("Select the Log File for your session");
 
@@ -86,10 +98,7 @@ public class CSVFileSelector : MonoBehaviour
         {
             fileDropdown.ClearOptions();
             Debug.LogError($"An error occured while accessing files: {e.Message}");
-            return;
-            
-            
-            
+            return;                        
         }
 
         SetDropdownOptions();

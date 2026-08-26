@@ -24,7 +24,6 @@ public static class SaveSystem
     {
         if (File.Exists(SAVE_FOLDER + "/save.txt"))
         {
-
             string saveString = File.ReadAllText(SAVE_FOLDER + "/save.txt");
             return saveString;
         }
